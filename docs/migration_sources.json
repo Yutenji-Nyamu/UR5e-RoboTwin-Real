@@ -1,0 +1,18 @@
+{
+  "source_revision": "working-tree-at-initial-migration",
+  "files": {
+    "freedrive_urscript.py": "5893ee211fc682e604a702def8cf52297c277eecfb102a595cd9c14b8539b5ad",
+    "gripper_serial.py": "f5e2f936edd1a36e50c18cf1ba25388ad947c504f02d511e62836f47a1eff9f3",
+    "rtde_tcp_logger.py": "559cc438aba6d003aeb3a8989429794b0d5abd3a8e50b6812333944a2b440a62",
+    "arm_gripper_collector.py": "5210dda7284c76978bdf5e02838bbc736eb596460b168c24f62b4d281dd09a10",
+    "realsense_dual_collect_2_folder_func.py": "66106c5eb6822109b40091e4a8982d54e60bb7b8f826b8a02f0b241d1cbefb31",
+    "collect_data_action_arm_gripper_dual_camera_no_cv.py": "971cda8bfd255b8676c75003461b3a02ce0608303cfe5f75e4a005288ed2374c",
+    "collect_data_action_arm_gripper_dual_camera_no_cv_save_video.py": "35a85bdc388adc47b7012145a0ed3fc731e9deddef386c860e66065023713960",
+    "convert_2_hdf5_output_log_dual_gripper.py": "c26aa298531e3274088a4e7014cb48cd614c86b70a1222befa9a01ef373a1435",
+    "preview_hdf5.py": "bb031eccf93bd19cfa50b5978eb27891ce9bcb37d5a616a66e4e0bbecbfe3b05",
+    "replay_action_socket_batch.py": "fa813c0e7ad5036d741e952a33eccd0d231d8dab307d4ee395275f4b6320f36c",
+    "RoboTwin/policy/ACT/process_data_real.py": "e621dd8e684ebf8fd17df31bfea4fadb573a574a6fa4d6a1daea0af58f526270",
+    "RoboTwin/policy/ACT/rtde_servoj_controller.py": "c40653c61c2bb1375514a33335b7d5820f8d99f86c1d1392b45d86d1712613b0",
+    "RoboTwin/policy/ACT/real_eval_rtde_servoj_dualcam_gripper.py": "a38f7f611202fe1a3082814afe0a4a26f2343951cd1c23acdfb566f719e13ef4"
+  }
+}

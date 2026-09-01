@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ur5e-robotwin-real"
+version = "0.1.0"
+description = "Real UR5e data collection, replay, and RoboTwin policy adapters"
+readme = "README.md"
+requires-python = ">=3.10,<3.12"
+dependencies = [
+  "PyYAML>=6,<7",
+]
+
+[project.optional-dependencies]
+hardware = [
+  "numpy==1.26.4",
+  "opencv-python==4.11.0.86",
+  "pyserial==3.5",
+  "pyrealsense2==2.56.5.9235",
+  "UrRtde==2.7.12",
+]
+data = [
+  "h5py==3.14.0",
+  "matplotlib>=3.10,<4",
+]
+dev = [
+  "pytest>=8,<9",
+  "ruff>=0.12,<1",
+]
+
+[project.scripts]
+ur5e-real = "ur5e_real.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

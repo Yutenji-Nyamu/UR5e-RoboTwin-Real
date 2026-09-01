@@ -1,0 +1,38 @@
+.third_party/
+.venv/
+*.egg-info/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Local laboratory configuration and credentials
+configs/lab.yaml
+.env
+.env.*
+!.env.example
+
+# Runtime data and generated artifacts
+/data/
+/raw/
+/outputs/
+/logs/
+/checkpoints/
+act_ckpt/
+processed_data/
+RoboTwin_like_data/
+*.hdf5
+*.h5
+*.bag
+*.mp4
+*.avi
+*.npy
+*.npz
+*.pt
+*.pth
+*.ckpt
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store

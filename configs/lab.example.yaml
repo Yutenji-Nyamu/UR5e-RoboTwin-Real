@@ -1,0 +1,31 @@
+robot:
+  host: "robot-ip-or-hostname"
+  script_port: 30001
+  rtde_port: 30004
+  rtde_frequency_hz: 10.0
+  socket_timeout_s: 10.0
+
+gripper:
+  port: "/dev/ttyUSB0"
+  baudrate: 9600
+  timeout_s: 1.0
+
+cameras:
+  head_serial: "head-camera-serial"
+  wrist_serial: "wrist-camera-serial"
+  width: 640
+  height: 480
+  fps: 30
+  save_hz: 10.0
+
+collection:
+  data_root: "../data"
+  enable_freedrive_on_start: true
+  preview: false
+  save_video: false
+
+servoj:
+  frequency_hz: 500
+  config_xml: "../robot_programs/control_loop_configuration.xml"
+  mode: 2
+  connect_timeout_s: 15.0

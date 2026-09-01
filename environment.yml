@@ -1,0 +1,27 @@
+name: RoboTwinSimReal
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10.18
+  - pip
+  - numpy=1.26.4
+  - h5py=3.14.0
+  - pyserial=3.5
+  - pyyaml=6.0.3
+  - matplotlib=3.10
+  - pip:
+      - --extra-index-url=https://download.pytorch.org/whl/cu121
+      - opencv-python==4.11.0.86
+      - pyrealsense2==2.56.5.9235
+      - UrRtde==2.7.12
+      - mujoco==2.3.7
+      - dm-control==1.0.14
+      - einops==0.8.1
+      - pyquaternion==0.9.9
+      - rospkg
+      - pexpect
+      - packaging
+      - ipython
+      - torch==2.4.1+cu121
+      - torchvision==0.19.1+cu121

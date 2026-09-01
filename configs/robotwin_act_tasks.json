@@ -1,0 +1,12 @@
+{
+  "sim-pick_block_bowl-simple-15": {
+    "dataset_dir": "./processed_data/sim-pick_block_bowl/simple-15",
+    "num_episodes": 15,
+    "episode_len": 1000,
+    "camera_names": [
+      "cam_high",
+      "cam_right_wrist",
+      "cam_left_wrist"
+    ]
+  }
+}

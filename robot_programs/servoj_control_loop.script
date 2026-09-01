@@ -1,0 +1,18 @@
+def ur5e_real_servoj_control_loop():
+  local mode = 0
+  local target = p[0, 0, 0, 0, 0, 0]
+  local joints = get_actual_joint_positions()
+  write_output_boolean_register(0, False)
+  while (mode < 3):
+    mode = read_input_integer_register(0)
+    if (mode == 2):
+      target = p[read_input_float_register(0), read_input_float_register(1), read_input_float_register(2), read_input_float_register(3), read_input_float_register(4), read_input_float_register(5)]
+      joints = get_inverse_kin(target, get_actual_joint_positions())
+      servoj(joints, 0, 0, 0.002, 0.2, 2000)
+    else:
+      sync()
+    end
+  end
+end
+
+ur5e_real_servoj_control_loop()

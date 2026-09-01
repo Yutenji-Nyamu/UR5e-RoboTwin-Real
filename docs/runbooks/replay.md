@@ -1,5 +1,7 @@
 # Manual record/replay
 
+[简体中文](../zh-CN/runbooks/replay.md)
+
 This is a commissioning and regression tool, not a required stage of policy
 training or inference. It replays a demonstrated TCP path with two independent
 outputs:

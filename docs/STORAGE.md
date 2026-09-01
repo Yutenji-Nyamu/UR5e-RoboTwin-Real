@@ -1,55 +1,62 @@
-# Workstation storage layout
+# Workstation storage
 
-Inventory snapshot: 2026-09-01. Sizes are approximate and no data was deleted.
+[简体中文](zh-CN/STORAGE.md)
 
-## Physical disks
+Inventory: 2026-09-01. No historical project or model data was deleted.
 
-| Device | Usable size | Current format/use |
+## Active layout
+
+| Device | Filesystem | State | Role |
+|---|---|---|---|
+| 1 TB Lenovo NVMe | ext4 | 937 GiB usable, 839 GiB used, 52 GiB available | OS, source, Git, Conda/venv, active small files |
+| 4 TB Seagate HDD | NTFS3 | mounted at `/data`, 299 GiB used, 3.4 TiB available | datasets, recordings, checkpoints, archives |
+
+The HDD is persistently configured by UUID in `/etc/fstab` with `nofail` and a
+systemd automount. Accounts `zhangw`, `ur5`, and `wlf` belong to `robotdata`;
+`/data/robotics` is setgid group-writable. A pre-change fstab backup is retained
+at `/etc/fstab.codex-backup-20260901`.
+
+NTFS keeps the existing cross-platform data intact, but source trees, Conda,
+venv, and workloads that depend heavily on Unix links/permissions stay on ext4.
+
+## Root-disk ownership
+
+| Account/area | Approx. size | Dominant content |
 |---|---:|---|
-| 1 TB Lenovo NVMe (`nvme0n1`) | 953.9 GiB | Ubuntu root filesystem; code, home directories, active environments |
-| 4 TB Seagate HDD (`sda`) | 3.64 TiB | One NTFS data partition; about 299 GiB used and 3.4 TiB free |
+| `zhangw` account | 480 GiB | `ScutPythonProject` 354.7 GiB, mostly one RoboTwin policy tree |
+| `ur5` account | 272.4 GiB | RoboTwin/Pi0.5 work 130.2 GiB, caches 90.5 GiB, Anaconda 45.3 GiB |
+| `wlf` account | 38.2 GiB | caches 31.9 GiB, mostly pip and Hugging Face |
 
-The 4 TB disk is real and healthy enough to read. It has no `/etc/fstab` entry,
-so Linux normally leaves it unmounted; this is why the nearly full root disk did
-not benefit from its free space. NTFS is suitable for large datasets and archive
-files, but Linux Conda environments and active Git trees should remain on ext4
-because they rely on Unix permissions, links, and many small-file operations.
+Largest regular-data migration candidates:
 
-The largest existing areas on the 4 TB partition are:
+1. old DETwinVLA checkpoints: about 208.1 GiB;
+2. DexVLA checkpoints: about 89.5 GiB;
+3. Pi0.5 checkpoints and training data: about 59.3 + 15.5 GiB;
+4. historical RoboTwin ACT/processed datasets: tens of GiB.
+5. three top-level download archives/model shards: about 17.4 GiB total.
 
-- Hugging Face LeRobot/parquet caches: about 199.5 GiB;
-- `wlf_data`: about 72.4 GiB, including another RoboTwin tree and Anaconda;
-- simulator data: about 16.3 GiB;
-- a `pi05_move_can_pot_400` dataset: about 8.8 GiB.
+These can move to `/data/robotics/shared` and be linked back after copy and
+checksum verification. Current GPU/process inspection found no active training,
+but migration is still scheduled as an explicit I/O job rather than performed
+during hardware commissioning.
 
-## Secondary robotics account on the NVMe
+The two largest checkpoint directories contain no internal symlinks, making
+them the safest high-impact candidates; moving both would recover about
+297.6 GiB on the NVMe.
 
-The `ur5` account uses about 272.4 GiB. It is mostly a coherent
-RoboTwin/Pi0.5/OpenVLA workspace rather than miscellaneous personal files:
+Pip caches (about 30.5 GiB across two accounts) and Conda package caches are
+re-downloadable and should normally be cleaned, not archived. Hugging Face
+caches, full environments, and Git worktrees are not blindly moved to NTFS.
 
-| Area | Approx. size | Main contents |
-|---|---:|---|
-| `work` | 130.2 GiB | `RoboTwin-pi05` (114.4 GiB) plus an older RoboTwin tree |
-| `work/RoboTwin-pi05/policy` | 84.4 GiB | Pi0.5 checkpoints (~59.3 GiB), training data (~15.5 GiB), `.venv` (~9.6 GiB) |
-| `.cache` | 90.5 GiB | Hugging Face models (~65.5 GiB), pip (~13.0 GiB), OpenPI (~11.6 GiB) |
-| `anaconda3` | 45.3 GiB | environments (~29.4 GiB) and package cache (~11.5 GiB) |
+## Data-disk directories
 
-The model checkpoints and datasets are likely valuable experiments. Package and
-pip caches are more disposable, but they should not be removed during a general
-cleanup without first deciding whether fast environment restoration matters.
+```text
+/data/robotics/
+├── ur5e-real/{raw,converted,checkpoints,logs}
+├── shared/{datasets,models,checkpoints,archives}
+└── staging
+```
 
-## Placement policy
-
-- NVMe: source code, Conda environments, active small checkpoints, temporary
-  build files.
-- 4 TB disk: raw recordings, converted datasets, full checkpoints, model caches,
-  old RoboTwin experiments, and archives.
-- Configure `collection.data_root` as a path on the mounted 4 TB disk, for example
-  `/data/ur5e_real`, before the next recording.
-- Migrate large directories by copy, checksum, switch configuration, verify, and
-  only then remove the old copy. Do not use blind symlinks or mass deletion.
-
-Short term, mount the existing NTFS partition persistently at `/data`. Long term,
-after a verified backup, an ext4 data partition would give more predictable Linux
-behaviour; repartitioning is destructive and is intentionally outside the current
-inspection.
+The local `configs/lab.yaml` uses `/data/robotics/ur5e-real` as
+`collection.data_root`. See [`DATA_MANAGEMENT.md`](DATA_MANAGEMENT.md) for
+dataset identity, retention, and verified migration rules.

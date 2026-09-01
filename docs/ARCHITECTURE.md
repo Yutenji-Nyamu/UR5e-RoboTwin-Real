@@ -1,5 +1,7 @@
 # Architecture
 
+[简体中文](zh-CN/ARCHITECTURE.md)
+
 Dependency direction is intentionally one-way:
 
 ```text
@@ -58,4 +60,5 @@ before Diffusion Policy training.
 The policy never owns sockets, serial ports, cameras, or safety decisions. It
 returns a timestamped chunk; the real-robot executor decides how much of that
 chunk may be applied. The detailed commissioning gates are in
-[`ROADMAP.md`](ROADMAP.md).
+[`ROADMAP.md`](ROADMAP.md); upstream location and backend choices are in
+[`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md).

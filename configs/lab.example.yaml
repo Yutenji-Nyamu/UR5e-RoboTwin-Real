@@ -1,25 +1,25 @@
 robot:
-  host: "robot-ip-or-hostname"
+  host: "192.168.0.4"
   script_port: 30001
   rtde_port: 30004
   rtde_frequency_hz: 10.0
   socket_timeout_s: 10.0
 
 gripper:
-  port: "/dev/ttyUSB0"
+  port: "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
   baudrate: 9600
   timeout_s: 1.0
 
 cameras:
-  head_serial: "head-camera-serial"
-  wrist_serial: "wrist-camera-serial"
+  head_serial: "243522072333"
+  wrist_serial: "233522079334"
   width: 640
   height: 480
   fps: 30
   save_hz: 10.0
 
 collection:
-  data_root: "../data"
+  data_root: "/data/robotics/ur5e-real"
   enable_freedrive_on_start: true
   preview: false
   save_video: false

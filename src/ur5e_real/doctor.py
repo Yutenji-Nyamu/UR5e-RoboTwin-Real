@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import socket
 import sys
 from dataclasses import dataclass
@@ -40,6 +41,11 @@ def run_doctor(cfg: LabConfig, hardware: bool = False) -> list[Check]:
         _module("pyrealsense2"),
         _module("rtde.rtde"),
         Check("servoj:config_xml", cfg.servoj.config_xml.is_file(), str(cfg.servoj.config_xml)),
+        Check(
+            "collection:data_root",
+            cfg.collection.data_root.is_dir() and os.access(cfg.collection.data_root, os.W_OK),
+            str(cfg.collection.data_root),
+        ),
     ]
     if not hardware:
         return checks

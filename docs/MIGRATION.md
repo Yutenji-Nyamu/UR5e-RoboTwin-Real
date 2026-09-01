@@ -1,5 +1,7 @@
 # Migration record
 
+[简体中文](zh-CN/MIGRATION.md)
+
 The historical repository remains unchanged and is the source of truth for old
 experiments and data. This repository migrates only the working real-robot path.
 

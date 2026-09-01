@@ -1,5 +1,7 @@
 # Infer on the real UR5e
 
+[简体中文](../zh-CN/runbooks/infer.md)
+
 1. Run the hardware doctor and move the arm to a validated start pose.
 2. Switch PolyScope to Local mode.
 3. Start the robot-side servoJ loop using the existing validated URP or create a
@@ -18,3 +20,7 @@ Inference maps the physical head camera to `cam_high`, the wrist camera to
 `cam_right_wrist`, and duplicates the wrist image for the unused
 `cam_left_wrist` channel. The single physical arm is duplicated into the ACT
 left/right arm slots; the unused left gripper remains zero to match conversion.
+
+ACT receives measured TCP/runtime state and writes TCP setpoints through RTDE
+input registers. The running PolyScope loop performs IK and servoJ; this is not
+the socket `movel` replay path.

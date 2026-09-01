@@ -1,5 +1,7 @@
 # Collect
 
+[简体中文](../zh-CN/runbooks/collect.md)
+
 1. Clear the workspace and keep a person at the emergency stop.
 2. Confirm the robot mode required by the chosen freedrive workflow.
 3. Run `ur5e-real doctor --config configs/lab.yaml --hardware`.
@@ -9,4 +11,5 @@
 
 Raw output is written beneath the configured `data_root/raw` and is ignored by
 Git. `--save-video` adds convenient MP4 previews; PNG frames remain the source
-used for synchronized conversion.
+used for synchronized conversion. Accepted raw runs are append-only; see
+[`../DATA_MANAGEMENT.md`](../DATA_MANAGEMENT.md).

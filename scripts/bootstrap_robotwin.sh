@@ -10,11 +10,13 @@ ROBOTWIN_ROOT="${VENDOR_ROOT}/RoboTwin"
 PATCH_FILE="${PROJECT_ROOT}/integrations/robotwin/patches/0001-act-normalize-num-queries.patch"
 
 mkdir -p "${VENDOR_ROOT}"
+fresh_clone=false
 if [[ ! -d "${ROBOTWIN_ROOT}/.git" ]]; then
-  git clone --filter=blob:none --no-checkout "${ROBOTWIN_REPOSITORY}" "${ROBOTWIN_ROOT}"
+  git clone --filter=blob:none "${ROBOTWIN_REPOSITORY}" "${ROBOTWIN_ROOT}"
+  fresh_clone=true
 fi
 
-if [[ -n "$(git -C "${ROBOTWIN_ROOT}" status --porcelain)" ]]; then
+if [[ "${fresh_clone}" == false && -n "$(git -C "${ROBOTWIN_ROOT}" status --porcelain)" ]]; then
   if ! git -C "${ROBOTWIN_ROOT}" apply --reverse --check "${PATCH_FILE}" >/dev/null 2>&1; then
     echo "Refusing to replace a modified RoboTwin checkout: ${ROBOTWIN_ROOT}" >&2
     exit 1

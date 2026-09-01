@@ -1,7 +1,9 @@
 # UR5e RoboTwin Real
 
 Real-robot support for a UR5e workcell, organized from hardware smoke tests to
-data collection, conversion, replay, and RoboTwin ACT inference.
+data collection, policy training, and guarded real-robot inference. RoboTwin is
+the framework above this repository; the device and execution layers below it
+remain independent and testable.
 
 This repository contains **our real-world code only**. RoboTwin is an upstream
 dependency pinned by [`robotwin.lock`](robotwin.lock) and checked out under the
@@ -39,7 +41,7 @@ Use an existing environment without recreating it:
 conda run -n RoboTwinSimReal python -m pip install -e .
 ```
 
-## Main workflow
+## Main ML workflow
 
 ```bash
 # 1. Check dependencies; add --hardware only when devices are connected.
@@ -49,19 +51,41 @@ ur5e-real doctor --config configs/lab.yaml --hardware
 # 2. Collect synchronized RTDE + gripper + dual-camera data.
 ur5e-real collect --config configs/lab.yaml
 
-# 3. Convert raw runs to the RoboTwin-style episode schema.
+# 3. Convert raw runs to the canonical episode schema.
 ur5e-real convert --config configs/lab.yaml --task pick_block_bowl --task-config simple
 
-# 4. Inspect replay without moving hardware; --execute is deliberately required.
-ur5e-real replay --config configs/lab.yaml ACTION.csv --gripper-events EVENTS.csv
-ur5e-real replay --config configs/lab.yaml ACTION.csv --gripper-events EVENTS.csv --execute
-
-# 5. Checkout the pinned RoboTwin tree, then process/train/infer through our adapter.
+# 4. Checkout the pinned RoboTwin tree, then process/train/infer through an adapter.
 scripts/bootstrap_robotwin.sh
 ```
 
-Detailed procedures are in [`docs/runbooks`](docs/runbooks). Always keep a human
-at the emergency stop for commands that can move the robot.
+ACT is the current baseline adapter. Diffusion Policy is the target integration;
+its staged implementation and safety gates are defined in
+[`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+## Manual commissioning replay
+
+The historical record/replay route is intentionally separate from the ML path.
+It verifies RTDE capture, URScript socket motion, gripper timing, and trajectory
+continuity without involving a policy:
+
+```bash
+# Dry-run first; this does not connect to or move the robot.
+ur5e-real replay --config configs/lab.yaml ACTION.csv --gripper-events EVENTS.csv
+
+# First physical test: one segment only, after the human safety check.
+ur5e-real replay --config configs/lab.yaml ACTION.csv \
+  --gripper-events EVENTS.csv --max-segments 1 --execute
+```
+
+See [`docs/runbooks/replay.md`](docs/runbooks/replay.md). Always keep a human at
+the emergency stop for commands that can move the robot.
+
+## Project documents
+
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md): ownership and dependency boundaries.
+- [`docs/ROADMAP.md`](docs/ROADMAP.md): device-by-device commissioning and DP rollout plan.
+- [`docs/STORAGE.md`](docs/STORAGE.md): workstation disk layout and data placement.
+- [`docs/runbooks`](docs/runbooks): repeatable lab procedures.
 
 ## Repository policy
 

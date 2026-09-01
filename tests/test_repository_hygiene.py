@@ -12,9 +12,10 @@ class RepositoryHygieneTest(unittest.TestCase):
             re.compile(r"sk-[A-Za-z0-9_-]{20,}"),
             re.compile(r"AIza[0-9A-Za-z_-]{20,}"),
         ]
+        ignored_parts = {".git", ".third_party", ".venv", "__pycache__", ".pytest_cache", ".ruff_cache"}
         violations = []
         for path in root.rglob("*"):
-            if not path.is_file() or ".git" in path.parts:
+            if not path.is_file() or ignored_parts.intersection(path.parts):
                 continue
             if path.stat().st_size > 1_000_000:
                 violations.append(f"large file: {path.relative_to(root)}")

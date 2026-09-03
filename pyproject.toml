@@ -31,6 +31,10 @@ dev = [
 
 [project.scripts]
 ur5e-real = "ur5e_real.cli:main"
+ur5e-collect-init = "ur5e_real.operator:collect_init"
+ur5e-collect = "ur5e_real.operator:collect"
+ur5e-replay-init = "ur5e_real.operator:replay_init"
+ur5e-replay = "ur5e_real.operator:replay"
 
 [tool.setuptools.packages.find]
 where = ["src"]

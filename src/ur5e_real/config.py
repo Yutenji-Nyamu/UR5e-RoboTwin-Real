@@ -15,6 +15,7 @@ class RobotConfig:
     rtde_port: int = 30004
     rtde_frequency_hz: float = 10.0
     socket_timeout_s: float = 10.0
+    home_tcp_pose: tuple[float, ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -107,6 +108,11 @@ def load_config(path: str | Path) -> LabConfig:
             rtde_port=int(robot.get("rtde_port", 30004)),
             rtde_frequency_hz=float(robot.get("rtde_frequency_hz", 10.0)),
             socket_timeout_s=float(robot.get("socket_timeout_s", 10.0)),
+            home_tcp_pose=(
+                tuple(float(value) for value in robot["home_tcp_pose"])
+                if robot.get("home_tcp_pose") is not None
+                else None
+            ),
         ),
         gripper=GripperConfig(
             port=str(gripper.get("port", "/dev/ttyUSB0")),
@@ -147,6 +153,8 @@ def validate_config(cfg: LabConfig) -> None:
         raise ValueError("head and wrist camera serial numbers must differ")
     if cfg.cameras.warmup_frames < 0:
         raise ValueError("cameras.warmup_frames must be non-negative")
+    if cfg.robot.home_tcp_pose is not None and len(cfg.robot.home_tcp_pose) != 6:
+        raise ValueError("robot.home_tcp_pose must contain six values")
     for name, value in (
         ("robot.rtde_frequency_hz", cfg.robot.rtde_frequency_hz),
         ("cameras.save_hz", cfg.cameras.save_hz),

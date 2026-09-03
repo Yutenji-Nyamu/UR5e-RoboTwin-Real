@@ -1,59 +1,56 @@
-# Record and register data
+# Collection workflow
 
 [简体中文](../zh-CN/runbooks/collect.md)
 
-## After each power-up
+## Routine workflow
 
-Clear the workcell, keep a person at the emergency stop, and power/connect the
-robot, gripper, and both cameras. Then run:
+Before starting, power the robot, gripper, and both cameras; switch PolyScope to
+**Remote Control**; make sure the gripper holds no object; clear the home path
+and workcell; and keep a person at the emergency stop.
 
-```bash
-conda activate RoboTwinSimReal
-cd ~/UR5e_RoboTwin_Real
-ur5e-real doctor --config configs/lab.yaml --hardware
-```
-
-Start recording only when every item is `OK`. This check reads status only; it
-does not move the arm or gripper.
-
-## Record one raw trajectory
-
-Switch PolyScope to Remote Control and confirm that freedrive may be enabled:
+First, initialize collection:
 
 ```bash
-ur5e-real collect --config configs/lab.yaml --task pick_block_bowl \
-  --initial-gripper closed
+ur5e-collect-init
 ```
 
-`--initial-gripper` records the actual starting state without commanding the
-gripper; set it to `open` or `closed` as appropriate. Use
-`--note "red block, trial 1"` when a setup variation matters. During capture:
+This command selects the `RoboTwinSimReal` environment and repository
+configuration internally, checks all hardware, moves slowly to the shared home
+pose, waits for RTDE arrival confirmation, and opens the gripper. Continue only
+after `[READY]`.
+
+Second, record one teleoperated trajectory:
+
+```bash
+ur5e-collect pick_block_bowl
+```
+
+`pick_block_bowl` is the trajectory task name. The command warms both cameras,
+starts RTDE capture and freedrive, and then accepts:
 
 - `c`: close gripper;
 - `o`: open gripper;
 - `q`: finish normally;
 - `Ctrl+C`: finish as interrupted.
 
-Each trajectory creates one `session_<run_id>.json`. It records the task,
-start/end/duration, stop mode, code commit, sample/event/frame-pair counts, and
-every raw product path. Raw data lives under
-`/data/robotics/ur5e-real/raw`.
-
-## Review the result
-
-Use the session path printed when capture finishes:
+After stopping, enter `s`, `f`, or `a` to mark success, failure, or aborted;
+press Enter to review later. Add a setup note when needed:
 
 ```bash
-ur5e-real review /data/robotics/ur5e-real/raw/action/session_RUN_ID.json \
-  --result success --note "clean demonstration"
+ur5e-collect pick_block_bowl --note "red block, trial 1"
 ```
 
-The other results are `failure` and `aborted`. Re-reviewing appends history; it
-does not alter image, RTDE, or gripper CSV data. List the latest 20 sessions:
+## Output
+
+Raw data lives under `/data/robotics/ur5e-real/raw`. Each trajectory has one
+`session_<run_id>.json` containing task, timing, outcome, code commit, counts,
+and product paths. Later reviews do not rewrite image, RTDE, or gripper CSV
+products.
+
+List the latest 20 sessions:
 
 ```bash
-ur5e-real sessions --config configs/lab.yaml
+ur5e-real sessions --config ~/UR5e_RoboTwin_Real/configs/lab.yaml
 ```
 
-`--save-video` adds preview MP4 files only; synchronized conversion still uses
-PNG frames. See [`../DATA_MANAGEMENT.md`](../DATA_MANAGEMENT.md) for retention.
+See [hardware commissioning](hardware_commissioning.md) for low-level checks.

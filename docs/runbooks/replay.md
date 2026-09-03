@@ -1,49 +1,57 @@
-# Replay a manually recorded trajectory
+# Replay workflow
 
 [简体中文](../zh-CN/runbooks/replay.md)
 
-This is an independent commissioning and physical-regression path, not the
-policy training/inference backend. The arm receives grouped socket `movel`
-programs and the gripper runs recorded events at segment boundaries; RTDE is the
-TCP-pose recorder in this path.
+This is an independent commissioning and physical-regression path: the arm uses
+grouped socket `movel` programs and the gripper executes recorded events at
+segment boundaries. It is not the policy training or inference backend.
 
-## 1. No-motion preview
+## Routine workflow
 
-Pass the session JSON produced by capture; it resolves both CSV paths:
+Switch PolyScope to **Remote Control**, make sure the gripper holds no object,
+clear the home path and the complete recorded workspace, and keep a person at
+the emergency stop.
 
-```bash
-conda activate RoboTwinSimReal
-cd ~/UR5e_RoboTwin_Real
-ur5e-real replay --config configs/lab.yaml \
-  /data/robotics/ur5e-real/raw/action/session_RUN_ID.json
-```
-
-By default this only prints point, segment, gripper-event, and timing summaries.
-It does not connect to the robot.
-
-## 2. Execute only the first physical segment
-
-Clear the workcell, hold the emergency-stop position, confirm that the current
-TCP is near the recorded start, and put PolyScope in Remote Control with no
-safety fault. Then run:
+First, initialize replay:
 
 ```bash
-ur5e-real replay --config configs/lab.yaml \
-  /data/robotics/ur5e-real/raw/action/session_RUN_ID.json \
-  --max-segments 1 --execute
+ur5e-replay-init
 ```
 
-Only after confirming no pose jump, wrong rotation branch, collision risk, or
-unexpected gripper event should `--max-segments 1` be removed for full replay.
-`--execute` first moves slowly to the recorded start, so every run requires an
-on-site check.
+This command selects the environment and repository internally, checks the
+hardware, moves slowly to the shared home pose, and opens the gripper.
 
-For legacy data without a session JSON, pass the action CSV directly and use
-`--gripper-events` for its event CSV.
+Second, replay a named trajectory:
 
-## 3. Boundary
+```bash
+ur5e-replay 20260903_123456 --execute
+```
 
-This path validates RTDE recording, socket motion, rotation-vector continuity,
-gripper events, and the physical workcell together. It is open-loop replay; it
-does not validate a policy model, RTDE input-register servoJ, chunk blending, or
-closed-loop safety. Learned policies keep the independent servoJ path.
+The argument is a session run ID; a full `session_*.json` path is also accepted.
+The command first aligns slowly to the recorded start, then executes the complete
+path and gripper events.
+
+## First validation of a trajectory
+
+Preview without motion:
+
+```bash
+ur5e-replay 20260903_123456
+```
+
+Then initialize and execute only the first segment:
+
+```bash
+ur5e-replay-init
+ur5e-replay 20260903_123456 --max-segments 1 --execute
+```
+
+Use the routine full replay only after confirming no pose jump, wrong rotation
+branch, collision risk, or unexpected gripper event.
+
+## Boundary
+
+Replay validates RTDE recording, socket motion, rotation-vector continuity, and
+gripper events. It is open loop and does not validate a policy model, RTDE
+input-register servoJ, chunk blending, or closed-loop safety. Learned policies
+keep the independent servoJ execution path.

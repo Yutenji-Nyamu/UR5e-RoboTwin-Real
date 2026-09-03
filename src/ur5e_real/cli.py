@@ -14,6 +14,10 @@ def _parser() -> argparse.ArgumentParser:
     doctor.add_argument("--config", required=True)
     doctor.add_argument("--hardware", action="store_true")
 
+    prepare = sub.add_parser("prepare", help="move to the configured home TCP and open the gripper")
+    prepare.add_argument("--config", required=True)
+    prepare.add_argument("--execute", action="store_true", help="actually move the robot and open the gripper")
+
     collect = sub.add_parser("collect", help="collect RTDE, gripper, and dual-camera data")
     collect.add_argument("--config", required=True)
     collect.add_argument("--task", required=True, help="short task name stored in the session manifest")
@@ -88,6 +92,12 @@ def main(argv: list[str] | None = None) -> int:
         from .doctor import print_checks, run_doctor
 
         return 0 if print_checks(run_doctor(load_config(args.config), hardware=args.hardware)) else 1
+
+    if args.command == "prepare":
+        from .control.prepare import run_prepare
+
+        run_prepare(load_config(args.config), execute=args.execute)
+        return 0
 
     if args.command == "collect":
         from .collection.session import run_collection

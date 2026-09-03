@@ -8,6 +8,7 @@ from ur5e_real.config import load_config
 CONFIG = """
 robot:
   host: robot.local
+  home_tcp_pose: [1, 2, 3, 4, 5, 6]
 cameras:
   head_serial: head
   wrist_serial: wrist
@@ -27,6 +28,7 @@ class ConfigTest(unittest.TestCase):
             path.write_text(CONFIG, encoding="utf-8")
             cfg = load_config(path)
             self.assertEqual(cfg.robot.host, "robot.local")
+            self.assertEqual(cfg.robot.home_tcp_pose, (1, 2, 3, 4, 5, 6))
             self.assertEqual(cfg.cameras.warmup_frames, 60)
             self.assertEqual(cfg.collection.data_root, Path(directory) / "runtime-data")
             self.assertEqual(cfg.servoj.config_xml, Path(directory) / "robot_programs/control_loop_configuration.xml")

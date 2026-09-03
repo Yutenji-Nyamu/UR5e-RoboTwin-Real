@@ -4,6 +4,7 @@ robot:
   rtde_port: 30004
   rtde_frequency_hz: 10.0
   socket_timeout_s: 10.0
+  home_tcp_pose: [-0.4479512414, -0.4779532359, 0.3397913564, 1.1351054288, 2.8938840645, -0.0267875432]
 
 gripper:
   port: "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"

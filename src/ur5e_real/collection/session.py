@@ -262,5 +262,4 @@ def run_collection(
         write_manifest(manifest_path, manifest)
 
     print(f"[SAVED] {manifest_path}")
-    print(f"[NEXT] ur5e-real review {manifest_path} --result success")
     return manifest_path

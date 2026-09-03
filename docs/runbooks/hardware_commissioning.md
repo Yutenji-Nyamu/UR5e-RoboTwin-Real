@@ -65,9 +65,12 @@ These require a human at the workcell and an explicit `--execute`:
 
 1. Park the arm so the gripper is clear; issue one gripper `open`, then one
    `close` after visual confirmation.
-2. Support the arm and test freedrive start/stop.
-3. Record a short path; dry-run its replay; execute one bounded segment.
-4. Separately load the servoJ URP and validate hold, millimetre step, ramp, and
+2. Inspect the home target with `ur5e-real prepare --config configs/lab.yaml`,
+   then add `--execute` after an on-site check to validate the slow home move and
+   gripper opening.
+3. Support the arm and test freedrive start/stop.
+4. Record a short path; dry-run its replay; execute one bounded segment.
+5. Separately load the servoJ URP and validate hold, millimetre step, ramp, and
    watchdog stop.
 
 Never combine the first gripper, freedrive, replay, and servoJ tests into one

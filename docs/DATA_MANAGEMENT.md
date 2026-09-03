@@ -78,7 +78,9 @@ or checkpoints:
 
 1. confirm no process is using the source;
 2. copy to `/data/robotics/staging` with preserved timestamps;
-3. compare file count, byte count, and content checksums;
+3. require a successful copy and a metadata dry run with no file-tree, size, or
+   timestamp differences; use full content checksums only for irreplaceable data
+   or suspected corruption;
 4. rename the destination into its final shared location;
 5. rename the source to a rollback name, create one explicit symlink, and run an
    application read/load test;

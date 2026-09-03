@@ -19,10 +19,12 @@ ur5e-real doctor --config configs/lab.yaml --hardware
 PolyScope 切到 Remote Control，并确认可以进入 freedrive：
 
 ```bash
-ur5e-real collect --config configs/lab.yaml --task pick_block_bowl
+ur5e-real collect --config configs/lab.yaml --task pick_block_bowl \
+  --initial-gripper closed
 ```
 
-需要记录场景变化时可加 `--note "red block, trial 1"`。录制中：
+`--initial-gripper` 只登记开始录制时两指的实际状态，不会驱动夹爪；按现场情况填写
+`open` 或 `closed`。需要记录场景变化时可加 `--note "red block, trial 1"`。录制中：
 
 - `c`：闭合夹爪；
 - `o`：打开夹爪；

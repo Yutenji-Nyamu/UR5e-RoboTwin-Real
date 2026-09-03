@@ -36,11 +36,18 @@ def run_collection(
     cfg: LabConfig,
     *,
     task: str,
+    initial_gripper_state: str,
     note: str | None = None,
     preview: bool | None = None,
     save_video: bool | None = None,
 ) -> Path:
     import cv2
+
+    task = task.strip()
+    if not task:
+        raise ValueError("task must not be empty")
+    if initial_gripper_state not in {"open", "closed"}:
+        raise ValueError("initial_gripper_state must be 'open' or 'closed'")
 
     show_preview = cfg.collection.preview if preview is None else preview
     write_video = cfg.collection.save_video if save_video is None else save_video
@@ -76,6 +83,7 @@ def run_collection(
         "collection": {
             "data_root": str(cfg.collection.data_root),
             "enable_freedrive_on_start": cfg.collection.enable_freedrive_on_start,
+            "initial_gripper_state": initial_gripper_state,
             "preview": show_preview,
             "save_video": write_video,
         },
@@ -153,7 +161,7 @@ def run_collection(
             )
             freedrive_started = True
 
-        gripper_state = 0
+        gripper_state = 1 if initial_gripper_state == "closed" else 0
         manifest["started_at"] = datetime.now().astimezone().isoformat()
         manifest["recording_status"] = "recording"
         write_manifest(manifest_path, manifest)

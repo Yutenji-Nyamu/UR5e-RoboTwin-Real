@@ -17,6 +17,12 @@ def _parser() -> argparse.ArgumentParser:
     collect = sub.add_parser("collect", help="collect RTDE, gripper, and dual-camera data")
     collect.add_argument("--config", required=True)
     collect.add_argument("--task", required=True, help="short task name stored in the session manifest")
+    collect.add_argument(
+        "--initial-gripper",
+        required=True,
+        choices=("open", "closed"),
+        help="physical gripper state at recording start; does not command the gripper",
+    )
     collect.add_argument("--note", help="optional setup or variation note")
     collect.add_argument("--preview", action=argparse.BooleanOptionalAction, default=None)
     collect.add_argument("--save-video", action=argparse.BooleanOptionalAction, default=None)
@@ -89,6 +95,7 @@ def main(argv: list[str] | None = None) -> int:
         run_collection(
             load_config(args.config),
             task=args.task,
+            initial_gripper_state=args.initial_gripper,
             note=args.note,
             preview=args.preview,
             save_video=args.save_video,

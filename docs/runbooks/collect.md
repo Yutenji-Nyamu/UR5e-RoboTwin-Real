@@ -21,10 +21,13 @@ does not move the arm or gripper.
 Switch PolyScope to Remote Control and confirm that freedrive may be enabled:
 
 ```bash
-ur5e-real collect --config configs/lab.yaml --task pick_block_bowl
+ur5e-real collect --config configs/lab.yaml --task pick_block_bowl \
+  --initial-gripper closed
 ```
 
-Use `--note "red block, trial 1"` when a setup variation matters. During capture:
+`--initial-gripper` records the actual starting state without commanding the
+gripper; set it to `open` or `closed` as appropriate. Use
+`--note "red block, trial 1"` when a setup variation matters. During capture:
 
 - `c`: close gripper;
 - `o`: open gripper;

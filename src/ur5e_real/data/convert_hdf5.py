@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -16,12 +17,31 @@ class RawSession:
     sync_csv: Path | None
 
 
-def discover_sessions(action_dir: Path, camera_dir: Path) -> list[RawSession]:
+def discover_sessions(
+    action_dir: Path,
+    camera_dir: Path,
+    *,
+    task_name: str | None = None,
+    include_unreviewed: bool = False,
+) -> list[RawSession]:
     sessions: list[RawSession] = []
     if not action_dir.is_dir() or not camera_dir.is_dir():
         return sessions
     for action_csv in action_dir.glob("rtde_tcp_gripper_*.csv"):
         run_id = action_csv.stem.removeprefix("rtde_tcp_gripper_")
+        manifest_path = action_dir / f"session_{run_id}.json"
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            manifest = None
+        if manifest is None:
+            if not include_unreviewed:
+                continue
+        else:
+            if task_name is not None and manifest.get("task") != task_name:
+                continue
+            if not include_unreviewed and manifest.get("outcome") != "success":
+                continue
         camera_run = camera_dir / f"cam_dual_{run_id}"
         if not camera_run.is_dir():
             continue
@@ -154,10 +174,18 @@ def convert_raw_sessions(
     output_root: Path,
     task_name: str,
     task_config: str,
+    *,
+    include_unreviewed: bool = False,
 ) -> Path:
-    sessions = discover_sessions(action_dir, camera_dir)
+    sessions = discover_sessions(
+        action_dir,
+        camera_dir,
+        task_name=task_name,
+        include_unreviewed=include_unreviewed,
+    )
     if not sessions:
-        raise RuntimeError(f"no matched raw sessions in {action_dir} and {camera_dir}")
+        qualifier = "matched" if include_unreviewed else "reviewed-success"
+        raise RuntimeError(f"no {qualifier} raw sessions in {action_dir} and {camera_dir}")
     run_tag = datetime.now().strftime("%Y%m%d_%H%M%S")
     run_root = output_root / f"run_{run_tag}"
     episode_dir = run_root / task_name / task_config / "data"

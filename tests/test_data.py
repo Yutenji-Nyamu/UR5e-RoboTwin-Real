@@ -1,4 +1,5 @@
 import csv
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -58,6 +59,11 @@ class AlignmentTest(unittest.TestCase):
                     self.assertTrue(cv2.imwrite(str(head_dir / name), image))
                     self.assertTrue(cv2.imwrite(str(wrist_dir / name), image))
                     writer.writerow([timestamp, index, name, name])
+
+            (action_dir / "session_test.json").write_text(
+                json.dumps({"run_id": "test", "task": "task", "outcome": "success"}),
+                encoding="utf-8",
+            )
 
             converted = convert_raw_sessions(
                 action_dir,

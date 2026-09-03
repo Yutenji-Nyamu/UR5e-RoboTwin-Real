@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import csv
-import json
+import subprocess
 import time
 from dataclasses import asdict
 from datetime import datetime
@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from ..config import LabConfig
+from ..data.session_manifest import write_manifest
 from ..hardware.gripper import GripperSerial
 from ..hardware.realsense import DualColorCamera
 from ..hardware.rtde import RtdeCsvWriter, RtdeOutputConfig, RtdeTcpClient
@@ -20,7 +21,25 @@ def _run_id() -> str:
     return datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
-def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: bool | None = None) -> Path:
+def _code_commit() -> str | None:
+    repository = Path(__file__).resolve().parents[3]
+    result = subprocess.run(
+        ["git", "-C", str(repository), "rev-parse", "HEAD"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return result.stdout.strip() or None
+
+
+def run_collection(
+    cfg: LabConfig,
+    *,
+    task: str,
+    note: str | None = None,
+    preview: bool | None = None,
+    save_video: bool | None = None,
+) -> Path:
     import cv2
 
     show_preview = cfg.collection.preview if preview is None else preview
@@ -39,9 +58,18 @@ def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: b
     sync_path = action_dir / f"sync_action_cam_{run_id}.csv"
     manifest_path = action_dir / f"session_{run_id}.json"
     manifest = {
-        "schema_version": 1,
+        "schema_version": 2,
         "run_id": run_id,
-        "started_at": datetime.now().astimezone().isoformat(),
+        "task": task,
+        "note": note or None,
+        "started_at": None,
+        "finished_at": None,
+        "duration_s": None,
+        "recording_status": "initializing",
+        "stop_reason": None,
+        "outcome": "unreviewed",
+        "reviews": [],
+        "code_commit": _code_commit(),
         "robot": asdict(cfg.robot),
         "gripper": asdict(cfg.gripper),
         "cameras": asdict(cfg.cameras),
@@ -56,9 +84,19 @@ def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: b
             "gripper_events": str(events_path),
             "sync": str(sync_path),
             "camera": str(camera_dir),
+            "head_frames": str(head_dir),
+            "wrist_frames": str(wrist_dir),
+        },
+        "counts": {
+            "rtde_samples": 0,
+            "gripper_events": 0,
+            "frame_pairs": 0,
         },
     }
-    manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+    if write_video:
+        manifest["paths"]["head_video"] = str(camera_dir / "head.mp4")
+        manifest["paths"]["wrist_video"] = str(camera_dir / "wrist.mp4")
+    write_manifest(manifest_path, manifest)
 
     cameras = DualColorCamera(
         cfg.cameras.head_serial,
@@ -78,6 +116,10 @@ def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: b
     head_video: Any = None
     wrist_video: Any = None
     freedrive_started = False
+    started_monotonic: float | None = None
+    rtde_sample_count = 0
+    event_counter = 0
+    frame_index = 0
 
     try:
         cameras.start()
@@ -112,8 +154,10 @@ def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: b
             freedrive_started = True
 
         gripper_state = 0
-        event_counter = 0
-        frame_index = 0
+        manifest["started_at"] = datetime.now().astimezone().isoformat()
+        manifest["recording_status"] = "recording"
+        write_manifest(manifest_path, manifest)
+        started_monotonic = time.monotonic()
         next_save = time.monotonic()
         print(f"[RUN] {run_id}")
         print("Keys: c=close, o=open, q=quit; Ctrl+C also stops.")
@@ -146,6 +190,7 @@ def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: b
                 if pair is None:
                     continue
                 rtde_writer.write(controller_time, pose, gripper_state, event_counter)
+                rtde_sample_count += 1
 
                 if show_preview:
                     cv2.imshow("head", pair.head)
@@ -167,8 +212,16 @@ def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: b
                     sync_writer.writerow([controller_time, frame_index, head_name, wrist_name])
                     sync_handle.flush()
                     next_save += 1.0 / cfg.cameras.save_hz
+        manifest["recording_status"] = "completed"
+        manifest["stop_reason"] = "user_quit"
     except KeyboardInterrupt:
+        manifest["recording_status"] = "interrupted"
+        manifest["stop_reason"] = "keyboard_interrupt"
         print("\n[STOP] interrupted")
+    except Exception as exc:
+        manifest["recording_status"] = "failed"
+        manifest["stop_reason"] = f"{type(exc).__name__}: {exc}"
+        raise
     finally:
         if freedrive_started:
             try:
@@ -190,5 +243,16 @@ def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: b
         if show_preview:
             cv2.destroyAllWindows()
 
+        manifest["finished_at"] = datetime.now().astimezone().isoformat()
+        if started_monotonic is not None:
+            manifest["duration_s"] = round(time.monotonic() - started_monotonic, 3)
+        manifest["counts"] = {
+            "rtde_samples": rtde_sample_count,
+            "gripper_events": event_counter,
+            "frame_pairs": frame_index,
+        }
+        write_manifest(manifest_path, manifest)
+
     print(f"[SAVED] {manifest_path}")
+    print(f"[NEXT] ur5e-real review {manifest_path} --result success")
     return manifest_path

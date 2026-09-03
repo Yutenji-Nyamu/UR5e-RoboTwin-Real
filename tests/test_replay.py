@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -8,6 +9,7 @@ from ur5e_real.replay import (
     build_segments,
     filter_waypoints,
     load_action_rows,
+    resolve_replay_paths,
     smooth_rotation_vectors,
 )
 
@@ -33,6 +35,26 @@ class ReplayTest(unittest.TestCase):
             self.assertIn("def ur5e_replay_segment_000", program)
             self.assertIn("movel(p[", program)
             self.assertGreaterEqual(wait, 0.5)
+
+    def test_session_manifest_resolves_replay_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            manifest = root / "session_test.json"
+            manifest.write_text(
+                json.dumps(
+                    {
+                        "run_id": "test",
+                        "paths": {
+                            "rtde": "rtde.csv",
+                            "gripper_events": "events.csv",
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            action, events = resolve_replay_paths(manifest)
+            self.assertEqual(action, root / "rtde.csv")
+            self.assertEqual(events, root / "events.csv")
 
 
 if __name__ == "__main__":

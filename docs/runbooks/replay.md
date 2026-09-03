@@ -1,53 +1,49 @@
-# Manual record/replay
+# Replay a manually recorded trajectory
 
 [简体中文](../zh-CN/runbooks/replay.md)
 
-This is a commissioning and regression tool, not a required stage of policy
-training or inference. It replays a demonstrated TCP path with two independent
-outputs:
+This is an independent commissioning and physical-regression path, not the
+policy training/inference backend. The arm receives grouped socket `movel`
+programs and the gripper runs recorded events at segment boundaries; RTDE is the
+TCP-pose recorder in this path.
 
-- arm: grouped `movel` URScript sent to port `30001`;
-- gripper: serial open/close events aligned to segment boundaries.
+## 1. No-motion preview
 
-Recording reads `actual_TCP_pose` from RTDE and can enable freedrive. Replay is
-open-loop: completion is estimated from planned segment duration, so it is not
-the backend for learned-policy rollout.
-
-## 1. Dry-run
-
-Replay is dry-run by default. First inspect point filtering, gripper-event
-segmentation, and estimated durations:
+Pass the session JSON produced by capture; it resolves both CSV paths:
 
 ```bash
-ur5e-real replay --config configs/lab.yaml ACTION.csv --gripper-events EVENTS.csv
+conda activate RoboTwinSimReal
+cd ~/UR5e_RoboTwin_Real
+ur5e-real replay --config configs/lab.yaml \
+  /data/robotics/ur5e-real/raw/action/session_RUN_ID.json
 ```
 
-No robot connection is made without `--execute`.
+By default this only prints point, segment, gripper-event, and timing summaries.
+It does not connect to the robot.
 
-## 2. First physical segment
+## 2. Execute only the first physical segment
 
-The human operator must:
-
-1. clear the workcell and hold the emergency-stop position;
-2. verify the start pose is close to the recording start pose;
-3. switch PolyScope to Remote Control and clear safety faults;
-4. confirm the gripper and tool cannot collide during the first segment.
-
-Then run only one segment:
+Clear the workcell, hold the emergency-stop position, confirm that the current
+TCP is near the recorded start, and put PolyScope in Remote Control with no
+safety fault. Then run:
 
 ```bash
-ur5e-real replay --config configs/lab.yaml ACTION.csv \
-  --gripper-events EVENTS.csv --max-segments 1 --execute
+ur5e-real replay --config configs/lab.yaml \
+  /data/robotics/ur5e-real/raw/action/session_RUN_ID.json \
+  --max-segments 1 --execute
 ```
 
-Stop immediately for a pose jump, wrong rotation branch, unexpected gripper
-event, or timing mismatch. Expand to the full trajectory only after inspecting
-the one-segment result.
+Only after confirming no pose jump, wrong rotation branch, collision risk, or
+unexpected gripper event should `--max-segments 1` be removed for full replay.
+`--execute` first moves slowly to the recorded start, so every run requires an
+on-site check.
 
-## 3. What this validates
+For legacy data without a session JSON, pass the action CSV directly and use
+`--gripper-events` for its event CSV.
 
-Passing replay establishes that RTDE capture, rotation-vector continuity,
-socket motion, serial gripper commands, and the physical calibration agree. It
-does **not** validate the policy model, RTDE input-register servo loop, chunk
-blending, or learned closed-loop safety; those have separate gates in
-[`../ROADMAP.md`](../ROADMAP.md).
+## 3. Boundary
+
+This path validates RTDE recording, socket motion, rotation-vector continuity,
+gripper events, and the physical workcell together. It is open-loop replay; it
+does not validate a policy model, RTDE input-register servoJ, chunk blending, or
+closed-loop safety. Learned policies keep the independent servoJ path.

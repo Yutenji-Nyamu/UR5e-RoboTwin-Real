@@ -1,47 +1,42 @@
-# 手动录制/重播
+# 手动录制轨迹重播
 
 [English](../../runbooks/replay.md)
 
-这是验机和回归工具，不是策略训练或推理的必经步骤。它通过两个独立输出重播
-示教TCP路径：
+这是独立的验机和物理回归链路，不是策略训练/推理后端。机械臂使用 socket 批量
+`movel`，夹爪按录制事件分段执行；RTDE在这里负责录制TCP位姿。
 
-- 机械臂：向端口 `30001` 发送成组 `movel` URScript；
-- 夹爪：在分段边界对齐串口开/闭事件。
+## 1. 无运动预检
 
-录制时从RTDE读取 `actual_TCP_pose`，并可启用freedrive。重播是开环的，完成时间
-按规划段时长估计，因此不是学习策略默认后端。
-
-## 1. Dry-run
-
-先检查点过滤、夹爪事件分段和预计时长：
+直接传入采集生成的 session JSON；程序会自动找到动作和夹爪CSV：
 
 ```bash
-ur5e-real replay --config configs/lab.yaml ACTION.csv --gripper-events EVENTS.csv
+conda activate RoboTwinSimReal
+cd ~/UR5e_RoboTwin_Real
+ur5e-real replay --config configs/lab.yaml \
+  /data/robotics/ur5e-real/raw/action/session_RUN_ID.json
 ```
 
-没有 `--execute` 时不会连接机器人。
+默认只打印点数、分段、夹爪事件和预计时长，不连接机器人。
 
-## 2. 首个物理分段
+## 2. 只执行第一个物理分段
 
-现场人员必须：
-
-1. 清空工作区并守在急停位置；
-2. 确认当前起点接近录制起点；
-3. 将PolyScope切到Remote Control并清除安全故障；
-4. 确认首段中夹爪和工具不会碰撞。
-
-然后只执行一段：
+现场人员清空工作区并守在急停旁，确认当前TCP接近录制起点，PolyScope为 Remote
+Control 且无安全故障，然后：
 
 ```bash
-ur5e-real replay --config configs/lab.yaml ACTION.csv \
-  --gripper-events EVENTS.csv --max-segments 1 --execute
+ur5e-real replay --config configs/lab.yaml \
+  /data/robotics/ur5e-real/raw/action/session_RUN_ID.json \
+  --max-segments 1 --execute
 ```
 
-若出现位姿跳变、错误旋转分支、意外夹爪事件或时序不符，立即停止。检查一段结果
-后才能扩展到完整轨迹。
+确认没有位姿跳变、错误旋转分支、碰撞风险或意外夹爪事件后，去掉
+`--max-segments 1` 才是完整重播。`--execute` 会先以低速移动到记录起点，因此每次
+都必须现场确认。
 
-## 3. 它证明什么
+旧数据没有session JSON时仍可直接提供动作CSV，并用 `--gripper-events` 指定事件CSV。
 
-重播通过可证明RTDE采集、旋转向量连续性、socket运动、串口夹爪和物理标定一致；
-它不能证明策略模型、RTDE输入寄存器servoJ循环、chunk融合或学习策略闭环安全。
-后者有独立验收门，见 [`../ROADMAP.md`](../ROADMAP.md)。
+## 3. 边界
+
+这条链路验证RTDE录制、socket运动、旋转向量连续性、夹爪事件和物理工作区是否
+一致。它是开环重播，不证明策略模型、RTDE输入寄存器servoJ、chunk融合或闭环安全；
+学习策略继续使用独立servoJ链路。

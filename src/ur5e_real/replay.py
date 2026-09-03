@@ -7,6 +7,7 @@ import time
 from dataclasses import dataclass
 from pathlib import Path
 
+from .data.session_manifest import load_manifest
 from .hardware.gripper import GripperSerial
 from .hardware.urscript import pose_literal
 
@@ -37,6 +38,27 @@ class ReplayConfig:
     assumed_point_dt_s: float = 0.5
     wait_scale: float = 1.35
     wait_extra_s: float = 0.25
+
+
+def resolve_replay_paths(source: Path, gripper_events: Path | None = None) -> tuple[Path, Path | None]:
+    """Resolve either a session manifest or the legacy pair of CSV paths."""
+    if source.suffix.lower() != ".json":
+        return source, gripper_events
+    manifest = load_manifest(source)
+    paths = manifest.get("paths") or {}
+    action_value = paths.get("rtde")
+    if not action_value:
+        raise ValueError(f"{source}: paths.rtde is missing")
+
+    def resolve(value: str) -> Path:
+        path = Path(value).expanduser()
+        return path if path.is_absolute() else (source.parent / path).resolve()
+
+    action_path = resolve(str(action_value))
+    if gripper_events is not None:
+        return action_path, gripper_events
+    events_value = paths.get("gripper_events")
+    return action_path, resolve(str(events_value)) if events_value else None
 
 
 def load_action_rows(path: Path) -> list[dict]:

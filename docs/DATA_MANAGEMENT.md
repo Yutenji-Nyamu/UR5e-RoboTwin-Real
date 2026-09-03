@@ -7,8 +7,8 @@ evaluation result traceable to immutable source data.
 
 ## Lifecycle
 
-1. **Raw**: append-only RTDE, gripper, image, sync, and session manifest output.
-   Never edit a successful raw run in place.
+1. **Raw**: RTDE, gripper, image, and sync products are write-once. The small
+   session manifest is the sole index and only receives appended review history.
 2. **Validated**: attach timing/frame/action quality results and an acceptance or
    rejection reason.
 3. **Converted**: create a versioned schema output from named raw run IDs. It is
@@ -41,8 +41,7 @@ rename or mutate raw files.
 
 Each recorded trajectory has one canonical `session_<run_id>.json`. Keep it
 small: it points to products instead of repeating per-frame records already held
-by the sync CSV. Before production collection, the collector should finalize
-these fields when recording stops:
+by the sync CSV. The collector finalizes these fields when recording stops:
 
 - identity: run ID, task type/name, schema version, and code commit;
 - timing: start, finish, and duration;
@@ -54,11 +53,11 @@ these fields when recording stops:
 - provenance: robot, gripper, cameras, calibration ID, collection config, and
   sample rates.
 
-The sync CSV remains the frame-level index. A later human or automated quality
-review is an additive record keyed by run ID; it does not rewrite captured
-sensor/action files. This single-index rule is also the boundary for future
-RoboTwin conversion: converters consume accepted run IDs and produce a separate
-dataset manifest.
+The sync CSV remains the frame-level index. `ur5e-real review` appends a timed
+entry to `reviews` and sets the top-level `outcome` to the latest result; it does
+not rewrite captured sensor/action files. Conversion selects only runs whose
+task matches and whose `outcome=success`; every HDF5 episode retains its source
+run ID.
 
 ## Retention
 

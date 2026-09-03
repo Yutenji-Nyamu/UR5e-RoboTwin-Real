@@ -16,14 +16,30 @@ def _parser() -> argparse.ArgumentParser:
 
     collect = sub.add_parser("collect", help="collect RTDE, gripper, and dual-camera data")
     collect.add_argument("--config", required=True)
+    collect.add_argument("--task", required=True, help="short task name stored in the session manifest")
+    collect.add_argument("--note", help="optional setup or variation note")
     collect.add_argument("--preview", action=argparse.BooleanOptionalAction, default=None)
     collect.add_argument("--save-video", action=argparse.BooleanOptionalAction, default=None)
+
+    sessions = sub.add_parser("sessions", help="list recent raw recording sessions")
+    sessions.add_argument("--config", required=True)
+    sessions.add_argument("--limit", type=int, default=20, help="newest sessions to show; 0 means all")
+
+    review = sub.add_parser("review", help="append a success/failure review to a session manifest")
+    review.add_argument("session_json")
+    review.add_argument("--result", required=True, choices=("success", "failure", "aborted"))
+    review.add_argument("--note")
 
     convert = sub.add_parser("convert", help="convert raw sessions to RoboTwin-style HDF5")
     convert.add_argument("--config", required=True)
     convert.add_argument("--task", required=True)
     convert.add_argument("--task-config", default="simple")
     convert.add_argument("--output-root")
+    convert.add_argument(
+        "--include-unreviewed",
+        action="store_true",
+        help="also convert legacy or non-success sessions",
+    )
 
     preview = sub.add_parser("preview", help="inspect a converted HDF5 episode")
     preview.add_argument("hdf5_path")
@@ -33,7 +49,7 @@ def _parser() -> argparse.ArgumentParser:
 
     replay = sub.add_parser("replay", help="preview or execute a collected trajectory")
     replay.add_argument("--config", required=True)
-    replay.add_argument("action_csv")
+    replay.add_argument("source", help="session JSON, or an action CSV for legacy data")
     replay.add_argument("--gripper-events")
     replay.add_argument("--row-stride", type=int, default=5)
     replay.add_argument("--max-segments", type=int)
@@ -70,7 +86,28 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "collect":
         from .collection.session import run_collection
 
-        run_collection(load_config(args.config), preview=args.preview, save_video=args.save_video)
+        run_collection(
+            load_config(args.config),
+            task=args.task,
+            note=args.note,
+            preview=args.preview,
+            save_video=args.save_video,
+        )
+        return 0
+
+    if args.command == "sessions":
+        from .data.session_manifest import print_session_summaries
+
+        cfg = load_config(args.config)
+        print_session_summaries(cfg.collection.data_root / "raw" / "action", args.limit)
+        return 0
+
+    if args.command == "review":
+        from .data.session_manifest import review_session
+
+        path = Path(args.session_json).expanduser().resolve()
+        review = review_session(path, args.result, args.note)
+        print(f"[REVIEWED] {path}: {review['result']}")
         return 0
 
     if args.command == "convert":
@@ -84,6 +121,7 @@ def main(argv: list[str] | None = None) -> int:
             output_root,
             args.task,
             args.task_config,
+            include_unreviewed=args.include_unreviewed,
         )
         print(result)
         return 0
@@ -95,12 +133,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "replay":
-        from .replay import ReplayConfig, run_replay
+        from .replay import ReplayConfig, resolve_replay_paths, run_replay
 
         cfg = load_config(args.config)
+        action_csv, gripper_events = resolve_replay_paths(
+            Path(args.source).expanduser().resolve(),
+            Path(args.gripper_events).expanduser().resolve() if args.gripper_events else None,
+        )
         replay_cfg = ReplayConfig(
-            action_csv=Path(args.action_csv),
-            gripper_events=Path(args.gripper_events) if args.gripper_events else None,
+            action_csv=action_csv,
+            gripper_events=gripper_events,
             robot_host=cfg.robot.host,
             robot_port=cfg.robot.script_port,
             socket_timeout_s=cfg.robot.socket_timeout_s,

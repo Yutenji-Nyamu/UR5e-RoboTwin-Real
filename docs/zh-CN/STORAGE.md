@@ -2,14 +2,14 @@
 
 [English](../STORAGE.md)
 
-盘点日期：2026-09-01。未删除任何历史项目或模型数据。
+盘点更新：2026-09-03。
 
 ## 当前布局
 
 | 设备 | 文件系统 | 状态 | 定位 |
 |---|---|---|---|
-| 1TB Lenovo NVMe | ext4 | 可用937 GiB，已用839 GiB，剩余52 GiB | 系统、源码、Git、Conda/venv、活跃小文件 |
-| 4TB Seagate HDD | NTFS3 | 挂载到 `/data`，已用299 GiB，剩余3.4 TiB | 数据集、录制、checkpoint、归档 |
+| 1TB Lenovo NVMe | ext4 | 可用937 GiB，已用428 GiB，剩余462 GiB | 系统、源码、Git、Conda/venv、活跃小文件 |
+| 4TB Seagate HDD | NTFS3 | 挂载到 `/data`，已用709 GiB，剩余3.0 TiB | 数据集、录制、checkpoint、归档 |
 
 HDD 已按 UUID 写入 `/etc/fstab`，使用 `nofail` 和 systemd automount。
 `zhangw`、`ur5`、`wlf` 均加入 `robotdata`；`/data/robotics` 为组可写并继承组。
@@ -18,30 +18,22 @@ HDD 已按 UUID 写入 `/etc/fstab`，使用 `nofail` 和 systemd automount。
 保留 NTFS 是为了不破坏盘上已有跨平台数据；源码、Conda、venv 以及高度依赖
 Unix链接/权限的工作负载继续留在ext4。
 
-## 根盘占用归属
+## 已迁移的大块数据
 
-| 账户/区域 | 约占用 | 主要内容 |
-|---|---:|---|
-| `zhangw` | 480 GiB | `ScutPythonProject` 354.7 GiB，主要为一个RoboTwin策略树 |
-| `ur5` | 272.4 GiB | RoboTwin/Pi0.5工作区130.2 GiB、缓存90.5 GiB、Anaconda45.3 GiB |
-| `wlf` | 38.2 GiB | 缓存31.9 GiB，主要是pip和Hugging Face |
+DETwinVLA（208.1 GiB）、DexVLA（89.5 GiB）、Pi0.5 checkpoint与训练数据
+（约74.8 GiB）、ACT数据与模型（约21 GiB），以及下载目录的大型归档/模型分片
+（约17.4 GiB）已经迁入 `/data/robotics/shared`。旧位置保留软链接，因此原命令
+无需改路径；NVMe现有约462 GiB余量。
 
-最适合迁移的常规数据目录：
+可重新下载的pip/Conda缓存适合直接清理；Conda环境、Git工作树和频繁产生大量
+小文件的缓存不迁到NTFS。
 
-1. 旧 DETwinVLA checkpoints：约208.1 GiB；
-2. DexVLA checkpoints：约89.5 GiB；
-3. Pi0.5 checkpoints与训练数据：约59.3 + 15.5 GiB；
-4. 历史 RoboTwin ACT/processed data：数十GiB。
-5. 下载目录顶层的三个压缩包/模型分片：合计约17.4 GiB。
+## 速度边界
 
-它们可迁至 `/data/robotics/shared`，复制并校验后再用软链接接回。当前GPU和进程
-检查没有训练任务，但迁移仍应作为独立I/O任务执行，不与真机调试同时进行。
-
-两个最大的checkpoint目录内部都没有软链接，是最高收益且最安全的候选；迁移
-两者可为NVMe释放约297.6 GiB。
-
-两个账户的pip缓存合计约30.5 GiB，Conda包缓存也可重新下载，通常应清理而不是
-归档。Hugging Face缓存、完整环境和Git工作树不盲目迁到NTFS。
+4TB盘是机械硬盘，顺序写入录制数据、HDF5、视频以及长期保存checkpoint很合适，
+但随机读取大量小PNG会明显慢于NVMe。模型首次加载也更慢，加载进内存/GPU后影响
+通常很小。默认把raw和checkpoint放在 `/data`；训练前转成HDF5或分片格式。只有
+实测训练被I/O卡住时，才把当次活跃数据临时放到NVMe，结束后移回数据盘。
 
 ## 数据盘目录
 

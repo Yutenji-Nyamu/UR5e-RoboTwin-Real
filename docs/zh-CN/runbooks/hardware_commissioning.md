@@ -49,6 +49,11 @@ ur5e-real doctor --config configs/lab.yaml --hardware
 若某个 RealSense 序列号缺失，重新插紧相机两端的数据线，并优先使用主机后部
 USB 3.x 接口。当前夹爪协议没有身份/状态回读，因此 doctor 只能证明目标串口存在。
 
+D435i 刚启动的彩色帧可能偏暗、严重偏色，这是自动曝光和自动白平衡尚未收敛。
+[librealsense官方OpenCV示例](https://github.com/realsenseai/librealsense/blob/master/doc/stepbystep/getting_started_with_openCV.md)
+也会丢弃启动帧。本实验室实测白平衡比曝光收敛更晚，因此公共相机封装先丢弃60帧
+（30 FPS时约2秒）再返回数据；只有在实测现场光照后才调整 `warmup_frames`。
+
 ## 4. 第一次输出检查
 
 以下操作需要人员守在现场，并显式添加 `--execute`：

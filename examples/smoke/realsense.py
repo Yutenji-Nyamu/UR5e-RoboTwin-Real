@@ -24,6 +24,7 @@ def main() -> None:
         cfg.cameras.width,
         cfg.cameras.height,
         cfg.cameras.fps,
+        cfg.cameras.warmup_frames,
     )
     try:
         cameras.start()

@@ -66,6 +66,7 @@ def run_collection(cfg: LabConfig, *, preview: bool | None = None, save_video: b
         cfg.cameras.width,
         cfg.cameras.height,
         cfg.cameras.fps,
+        cfg.cameras.warmup_frames,
     )
     rtde = RtdeTcpClient(
         RtdeOutputConfig(cfg.robot.host, cfg.robot.rtde_port, cfg.robot.rtde_frequency_hz)

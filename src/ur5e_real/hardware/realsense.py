@@ -35,12 +35,21 @@ class FramePair:
 
 
 class DualColorCamera:
-    def __init__(self, head_serial: str, wrist_serial: str, width: int, height: int, fps: int) -> None:
+    def __init__(
+        self,
+        head_serial: str,
+        wrist_serial: str,
+        width: int,
+        height: int,
+        fps: int,
+        warmup_frames: int = 60,
+    ) -> None:
         self.head_serial = head_serial
         self.wrist_serial = wrist_serial
         self.width = width
         self.height = height
         self.fps = fps
+        self.warmup_frames = warmup_frames
         self.head_pipeline: Any = None
         self.wrist_pipeline: Any = None
 
@@ -52,9 +61,13 @@ class DualColorCamera:
         self.head_pipeline = start_color_pipeline(self.head_serial, self.width, self.height, self.fps)
         try:
             self.wrist_pipeline = start_color_pipeline(self.wrist_serial, self.width, self.height, self.fps)
+            # D435i automatic exposure and white balance need initial frames to
+            # converge. Never expose those startup frames to collection/inference.
+            for _ in range(self.warmup_frames):
+                self.head_pipeline.wait_for_frames()
+                self.wrist_pipeline.wait_for_frames()
         except Exception:
-            self.head_pipeline.stop()
-            self.head_pipeline = None
+            self.stop()
             raise
 
     def read(self) -> FramePair | None:

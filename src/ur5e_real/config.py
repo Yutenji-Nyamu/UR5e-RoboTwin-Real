@@ -32,6 +32,7 @@ class CameraConfig:
     height: int = 480
     fps: int = 30
     save_hz: float = 10.0
+    warmup_frames: int = 60
 
 
 @dataclass(frozen=True)
@@ -119,6 +120,7 @@ def load_config(path: str | Path) -> LabConfig:
             height=int(cameras.get("height", 480)),
             fps=int(cameras.get("fps", 30)),
             save_hz=float(cameras.get("save_hz", 10.0)),
+            warmup_frames=int(cameras.get("warmup_frames", 60)),
         ),
         collection=CollectionConfig(
             data_root=_resolve(base, str(collection.get("data_root", "../data"))),
@@ -143,6 +145,8 @@ def validate_config(cfg: LabConfig) -> None:
         raise ValueError("robot.host still contains the example placeholder")
     if cfg.cameras.head_serial == cfg.cameras.wrist_serial:
         raise ValueError("head and wrist camera serial numbers must differ")
+    if cfg.cameras.warmup_frames < 0:
+        raise ValueError("cameras.warmup_frames must be non-negative")
     for name, value in (
         ("robot.rtde_frequency_hz", cfg.robot.rtde_frequency_hz),
         ("cameras.save_hz", cfg.cameras.save_hz),

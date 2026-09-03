@@ -52,6 +52,13 @@ If a RealSense serial is absent, reseat both ends of its data cable and prefer a
 rear USB 3.x port. The gripper has no implemented identity/readback command, so
 the doctor proves only that the expected serial adapter exists.
 
+The first D435i color frames can be dark and strongly color-cast while automatic
+exposure and white balance converge. The upstream
+[librealsense OpenCV example](https://github.com/realsenseai/librealsense/blob/master/doc/stepbystep/getting_started_with_openCV.md)
+also discards startup frames. This lab discards 60 frames (about two seconds at
+30 FPS), because its measured color balance converged later than exposure;
+adjust `warmup_frames` only after measuring the actual lighting.
+
 ## 4. First output checks
 
 These require a human at the workcell and an explicit `--execute`:

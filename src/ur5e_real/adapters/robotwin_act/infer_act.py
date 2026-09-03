@@ -213,6 +213,7 @@ def run_inference(
         lab.cameras.width,
         lab.cameras.height,
         lab.cameras.fps,
+        lab.cameras.warmup_frames,
     )
     controller = ServoJController(
         ServoJStreamConfig(

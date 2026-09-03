@@ -37,6 +37,29 @@ task/config, cameras/calibration, sample rate, schema version, converter commit,
 quality result, and a checksum inventory. Human notes are additive; they do not
 rename or mutate raw files.
 
+## One trajectory, one index
+
+Each recorded trajectory has one canonical `session_<run_id>.json`. Keep it
+small: it points to products instead of repeating per-frame records already held
+by the sync CSV. Before production collection, the collector should finalize
+these fields when recording stops:
+
+- identity: run ID, task type/name, schema version, and code commit;
+- timing: start, finish, and duration;
+- outcome: `unreviewed`, `success`, `failure`, or `aborted`, plus an optional
+  stop/failure reason and short note;
+- products: RTDE/action CSV, gripper-event CSV, sync CSV, head/wrist frame
+  directories, and optional video/preview paths;
+- counts: RTDE samples, gripper events, and synchronized frame pairs;
+- provenance: robot, gripper, cameras, calibration ID, collection config, and
+  sample rates.
+
+The sync CSV remains the frame-level index. A later human or automated quality
+review is an additive record keyed by run ID; it does not rewrite captured
+sensor/action files. This single-index rule is also the boundary for future
+RoboTwin conversion: converters consume accepted run IDs and produce a separate
+dataset manifest.
+
 ## Retention
 
 - Raw accepted demonstrations: keep by default.

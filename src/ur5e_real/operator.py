@@ -36,7 +36,11 @@ def _init_command(flow: str) -> int:
     )
     parser.add_argument("--dry-run", action="store_true", help="check hardware and print the plan without motion")
     args = parser.parse_args()
-    return _initialize(flow, execute=not args.dry_run)
+    try:
+        return _initialize(flow, execute=not args.dry_run)
+    except RuntimeError as exc:
+        print(f"[BLOCKED] {exc}")
+        return 2
 
 
 def collect_init() -> int:

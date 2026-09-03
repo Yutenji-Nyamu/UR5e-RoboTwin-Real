@@ -168,6 +168,7 @@ def run_collection(
         started_monotonic = time.monotonic()
         next_save = time.monotonic()
         print(f"[RUN] {run_id}")
+        print("[READY] recording and freedrive are active; start teleoperation now")
         print("Keys: c=close, o=open, q=quit; Ctrl+C also stops.")
 
         with TerminalKeyPoller() as keys:

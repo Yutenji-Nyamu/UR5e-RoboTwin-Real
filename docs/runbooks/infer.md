@@ -60,6 +60,14 @@ Each inference preserves and executes all six native RoboTwin actions. Every
 10 Hz TCP target is interpolated into the 500 Hz RTDE servoJ stream. The gripper
 uses element 14; add `--no-gripper` to disable it temporarily.
 
-Offline and shadow modes are hardware-tested. Execute is wired; the next live
-session first uses `--chunks 1` to verify automatic program startup, servoJ hold,
-and small motion before running a complete episode.
+The current smoothing version places all six actions on one continuous
+0.6-second clock, without dropping reference velocity to zero at intermediate
+action knots. Cameras acquire in the background and no longer block 500 Hz
+setpoints; the existing servoJ lookahead remains active. The final pose is still
+held while the next chunk is inferred.
+
+The first execute run exposed per-action stop/start motion; this correction now
+awaits another `--chunks 1` run. If physical response remains poor, a parallel
+socket-chunk backend can package each six-action chunk as one URScript program
+with blended `movel r=` commands, reusing the proven historical approach. It is
+open-loop and will not silently replace RTDE servoJ.

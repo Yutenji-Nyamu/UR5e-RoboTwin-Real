@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass
 from typing import Any
 
@@ -97,3 +98,59 @@ class DualColorCamera:
 
     def __exit__(self, exc_type: Any, exc: Any, traceback: Any) -> None:
         self.stop()
+
+
+class LatestDualColorCamera:
+    """Continuously acquire camera pairs so motion code never waits for a frame."""
+
+    def __init__(self, camera: DualColorCamera) -> None:
+        self.camera = camera
+        self._latest: FramePair | None = None
+        self._error: Exception | None = None
+        self._lock = threading.Lock()
+        self._ready = threading.Event()
+        self._running = False
+        self._thread: threading.Thread | None = None
+
+    def start(self) -> None:
+        self.camera.start()
+        self._running = True
+        self._thread = threading.Thread(target=self._loop, name="ur5e-cameras", daemon=True)
+        self._thread.start()
+        if not self._ready.wait(timeout=2.0):
+            self.stop()
+            raise RuntimeError("timed out waiting for the first camera pair")
+        if self._error is not None:
+            self.stop()
+            raise RuntimeError("camera acquisition failed") from self._error
+
+    def _loop(self) -> None:
+        import numpy as np
+
+        while self._running:
+            try:
+                pair = self.camera.read()
+            except Exception as exc:
+                if self._running:
+                    self._error = exc
+                    self._ready.set()
+                return
+            if pair is None:
+                continue
+            latest = FramePair(np.copy(pair.head), np.copy(pair.wrist))
+            with self._lock:
+                self._latest = latest
+            self._ready.set()
+
+    def read(self) -> FramePair | None:
+        if self._error is not None:
+            raise RuntimeError("camera acquisition failed") from self._error
+        with self._lock:
+            return self._latest
+
+    def stop(self) -> None:
+        self._running = False
+        if self._thread is not None:
+            self._thread.join(timeout=1.0)
+        self.camera.stop()
+        self._thread = None

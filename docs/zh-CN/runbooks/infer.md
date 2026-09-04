@@ -55,5 +55,11 @@ ur5e-infer 600 --execute
 每次推理保持RoboTwin原生6步输出并依次执行；每个10 Hz TCP目标在底层插值为500 Hz
 RTDE servoJ设点。夹爪读取第14维；需要暂时禁用时加 `--no-gripper`。
 
-离线和shadow已经实测；`--execute`代码已接好，下一次现场先用 `--chunks 1` 验证
-自动启动、servoJ保持和小步动作，再运行完整episode。
+当前平滑版本把6个动作放在同一个0.6秒时钟内连续插值，中间动作点不再降到零速度；
+相机在后台持续采帧，不阻塞500 Hz设点。servoJ自身继续使用原有lookahead。chunk之间
+仍会在模型计算时保持末位姿。
+
+首轮execute实测暴露了逐动作停启；上述修正已完成，下一次仍先用 `--chunks 1` 复测。
+若机械响应仍不理想，可增加并列的socket chunk后端：每个6步chunk生成一个带 `movel
+r=` 的URScript程序。这会复用旧项目已验证的批量平滑思想，但属于开环后端，不与
+RTDE servoJ静默切换。

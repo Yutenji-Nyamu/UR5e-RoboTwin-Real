@@ -8,7 +8,12 @@ import zarr
 
 from ur5e_real.adapters.robotwin_dp.infer_dp import RealObservationEncoder, observation_from_vector
 from ur5e_real.adapters.robotwin_dp.train_dp import TrainConfig, build_train_command, run_training
-from ur5e_real.control.chunk import ChunkStreamConfig, interpolated_tcp_targets, limit_tcp_target
+from ur5e_real.control.chunk import (
+    ChunkStreamConfig,
+    continuous_chunk_targets,
+    interpolated_tcp_targets,
+    limit_tcp_target,
+)
 from ur5e_real.control.gripper_policy import GripperCommandConfig, GripperPolicy
 from ur5e_real.operator import resolve_dp_checkpoint
 
@@ -53,6 +58,22 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
         np.testing.assert_allclose(target, [0.1, 0, 0, 0.2, 0, 0], atol=1e-6)
         points = interpolated_tcp_targets(np.zeros(6), target, 10)
         np.testing.assert_allclose(points[-1], target, atol=1e-6)
+
+    def test_continuous_chunk_does_not_stop_at_action_knots(self):
+        config = ChunkStreamConfig(policy_hz=10.0, servo_hz=500, max_linear_velocity=0.05)
+        samples, waypoints, steps = continuous_chunk_targets(
+            np.zeros(6),
+            [[0.005, 0, 0, 0, 0, 0], [0.010, 0, 0, 0, 0, 0]],
+            config,
+        )
+        path = np.vstack((np.zeros(6), samples))
+        velocity = np.diff(path[:, :3], axis=0) * config.servo_hz
+        self.assertEqual(steps, 50)
+        self.assertEqual(len(samples), 100)
+        np.testing.assert_allclose(waypoints[-1], [0.010, 0, 0, 0, 0, 0], atol=1e-6)
+        self.assertAlmostEqual(float(np.linalg.norm(velocity[49])), 0.05, places=5)
+        self.assertAlmostEqual(float(np.linalg.norm(velocity[50])), 0.05, places=5)
+        self.assertLessEqual(float(np.linalg.norm(velocity, axis=1).max()), 0.05001)
 
     def test_gripper_hysteresis(self):
         gripper = FakeGripper()

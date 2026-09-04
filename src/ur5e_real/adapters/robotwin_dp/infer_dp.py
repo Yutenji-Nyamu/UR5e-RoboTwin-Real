@@ -9,13 +9,13 @@ from pathlib import Path
 from typing import Any
 
 from ...config import LabConfig, load_config
-from ...control.chunk import ChunkStreamConfig, stream_tcp_target
+from ...control.chunk import ChunkStreamConfig, stream_tcp_chunk
 from ...control.gripper_policy import GripperCommandConfig, GripperPolicy
 from ...control.servoj import ServoJController, ServoJStreamConfig
 from ...data.schema import nearest_rotation_vector
 from ...hardware.dashboard import require_external_motion_ready
 from ...hardware.gripper import GripperSerial
-from ...hardware.realsense import DualColorCamera
+from ...hardware.realsense import DualColorCamera, LatestDualColorCamera
 from ...hardware.rtde import RtdeOutputConfig, RtdeTcpClient
 from ...hardware.urscript import send_urscript
 
@@ -213,7 +213,7 @@ def run_shadow(
 
     model = load_model(robotwin_root, checkpoint, inference)
     encoder = RealObservationEncoder()
-    cameras = _camera(lab)
+    cameras = LatestDualColorCamera(_camera(lab))
     rtde = RtdeTcpClient(
         RtdeOutputConfig(lab.robot.host, lab.robot.rtde_port, inference.policy_hz)
     )
@@ -259,7 +259,7 @@ def run_execute(
 
     model = load_model(robotwin_root, checkpoint, inference)
     encoder = RealObservationEncoder()
-    cameras = _camera(lab)
+    cameras = LatestDualColorCamera(_camera(lab))
     controller = _servo(lab)
     gripper = (
         GripperSerial(lab.gripper.port, lab.gripper.baudrate, lab.gripper.timeout_s)
@@ -274,7 +274,7 @@ def run_execute(
         _start_servoj_program(lab)
         controller.connect_and_start()
         model.reset_obs()
-        print("[EXECUTE] streaming each 6-action DP chunk through RTDE servoJ")
+        print("[EXECUTE] continuous 6-action chunks through RTDE servoJ")
         while inference.chunks == 0 or chunk_index < inference.chunks:
             tcp = controller.get_latest_tcp()
             pair = cameras.read()
@@ -286,15 +286,22 @@ def run_execute(
             actions = np.asarray(model.get_action(observation), dtype=np.float32)
             elapsed_ms = (time.perf_counter() - started) * 1000.0
             print(f"[CHUNK {chunk_index}] {len(actions)} actions, inference={elapsed_ms:.1f}ms")
-            for action in actions:
-                stream_tcp_target(controller, action[:6], stream_config)
+
+            captured_observations = []
+
+            def update_observation(action_index: int, _target: list[float]) -> None:
+                action = actions[action_index]
                 if gripper_policy is not None:
                     gripper_policy.step(float(action[13]))
                 tcp = controller.get_latest_tcp()
                 pair = cameras.read()
                 if tcp is not None and pair is not None:
                     gripper_value = 0.0 if gripper_policy is None else gripper_policy.estimated
-                    model.update_obs(encoder.encode(tcp, gripper_value, pair.head, pair.wrist))
+                    captured_observations.append((tcp, gripper_value, pair))
+
+            stream_tcp_chunk(controller, actions[:, :6], stream_config, on_waypoint=update_observation)
+            for tcp, gripper_value, pair in captured_observations:
+                model.update_obs(encoder.encode(tcp, gripper_value, pair.head, pair.wrist))
             chunk_index += 1
     except KeyboardInterrupt:
         print("\n[STOP] DP execution interrupted")

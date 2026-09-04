@@ -16,6 +16,7 @@
 
 ## 操作手册
 
+- [采集与重播速查](runbooks/operator_workflows.md)
 - [硬件逐项调试](runbooks/hardware_commissioning.md)
 - [环境设置](runbooks/setup.md)
 - [数据采集](runbooks/collect.md)

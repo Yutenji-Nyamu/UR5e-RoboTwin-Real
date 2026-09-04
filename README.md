@@ -2,59 +2,43 @@
 
 [简体中文](README.zh-CN.md)
 
-Reusable, one-stop infrastructure for B81L UR5e real-world data collection,
-policy training, evaluation, and deployment—from device-level diagnostics to
-RoboTwin integration.
+Reusable infrastructure for B81L UR5e real-world data collection, training,
+evaluation, and deployment—from device-level drivers to a narrow RoboTwin
+integration layer. This repository owns real hardware and data handling;
+RoboTwin remains a pinned upstream policy framework.
 
-```text
-UR5e / gripper / RealSense
-          ↓
-hardware → control → collection/data → policy adapter
-                                      ↓
-                         pinned upstream RoboTwin
-```
+## Daily operation
 
-This repository owns real hardware, timing, data contracts, safety limits, and
-deployment adapters. RoboTwin remains a reproducible pinned upstream framework
-with only reviewed narrow patches; upstream policy code never directly owns a
-socket, serial port, or camera.
+The installed commands select the repository and `RoboTwinSimReal` environment
+automatically; no manual `cd` or Conda activation is required.
 
-## Start
+Collection:
 
 ```bash
-conda env create -f environment.yml
-conda activate RoboTwinSimReal
-python -m pip install -e .
-cp configs/lab.example.yaml configs/lab.yaml
-ur5e-real doctor --config configs/lab.yaml --hardware
+ur5e-collect-init
+ur5e-collect TASK --note "optional setup note"
 ```
 
-For the current workstation, raw and converted data live under
-`/data/robotics/ur5e-real` on the shared 4 TB disk.
+Use `c` to close the gripper, `o` to open it, and `q` to finish; then enter
+`s`, `f`, or `a` for success, failure, or aborted. Save the `[RUN]` ID printed by
+the command—the timestamp is generated automatically.
 
-## Main paths
+Replay:
 
-- `examples/smoke/`: bounded one-device checks.
-- `src/ur5e_real/hardware/`: RTDE, URScript, serial gripper, RealSense.
-- `src/ur5e_real/control/`: trajectories and RTDE servoJ streaming.
-- `src/ur5e_real/collection/` and `data/`: synchronized capture and conversion.
-- `src/ur5e_real/adapters/`: narrow RoboTwin policy adapters.
-- `robot_programs/`: PolyScope/RTDE robot-side programs.
-- `integrations/robotwin/`: pinned-upstream metadata and reviewed patches.
+```bash
+ur5e-replay-init
+ur5e-replay RUN_ID --execute
+```
 
-ACT is the current real-robot baseline. Diffusion Policy is the next target; its
-RoboTwin model configuration stays unchanged unless measured evidence justifies
-a deviation. Manual socket replay remains an independent commissioning path.
+After initialization, restore the recorded scene before executing the replay.
+See the [one-page operator guide](docs/runbooks/operator_workflows.md) for the
+complete fixed procedure and safety checks.
 
-## Documentation
+## Data and documentation
 
-See [`docs/README.md`](docs/README.md) for architecture, hardware commissioning,
-storage/data management, migration records, and runbooks. Chinese mirrors are
-maintained under [`docs/zh-CN`](docs/zh-CN).
+Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architecture,
+hardware commissioning, data management, training, and inference documentation
+is indexed in [`docs/README.md`](docs/README.md).
 
-## Repository policy
-
-Local configuration, raw data, videos, checkpoints, caches, and the upstream
-checkout are ignored. The historical repository remains unchanged. Commands
-that can move hardware require an explicit execution step and a human at the
-emergency stop.
+Commands that move hardware require PolyScope **Remote Control**, a clear
+workspace, and an operator at the emergency stop.

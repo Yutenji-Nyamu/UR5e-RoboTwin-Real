@@ -16,6 +16,7 @@
 
 ## Runbooks
 
+- [Collection and replay quick reference](runbooks/operator_workflows.md)
 - [Hardware commissioning](runbooks/hardware_commissioning.md)
 - [Setup](runbooks/setup.md)
 - [Collection](runbooks/collect.md)

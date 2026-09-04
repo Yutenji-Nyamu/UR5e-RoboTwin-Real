@@ -6,11 +6,13 @@
 
 - [架构](ARCHITECTURE.md)
 - [RoboTwin 集成边界](ROBOTWIN_INTEGRATION.md)
+- [Diffusion Policy 真机实施上下文](DIFFUSION_POLICY_PLAN.md)
 - [真机路线图](ROADMAP.md)
 - [迁移记录](MIGRATION.md)
 
 ## 数据与工作站
 
+- [软硬件前置条件与分层调试](PREREQUISITES.md)
 - [存储布局](STORAGE.md)
 - [数据管理](DATA_MANAGEMENT.md)
 

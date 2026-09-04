@@ -1,19 +1,19 @@
 robot:
-  host: "192.168.0.4"
+  host: "robot-ip-or-hostname"
   script_port: 30001
   rtde_port: 30004
   rtde_frequency_hz: 10.0
   socket_timeout_s: 10.0
-  home_tcp_pose: [-0.4479512414, -0.4779532359, 0.3397913564, 1.1351054288, 2.8938840645, -0.0267875432]
+  home_tcp_pose: null
 
 gripper:
-  port: "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0"
+  port: "/dev/serial/by-id/your-gripper-device"
   baudrate: 9600
   timeout_s: 1.0
 
 cameras:
-  head_serial: "243522072333"
-  wrist_serial: "233522079334"
+  head_serial: "HEAD_CAMERA_SERIAL"
+  wrist_serial: "WRIST_CAMERA_SERIAL"
   width: 640
   height: 480
   fps: 30

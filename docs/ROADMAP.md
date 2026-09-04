@@ -2,8 +2,8 @@
 
 [简体中文](zh-CN/ROADMAP.md)
 
-Status: 2026-09-01. The stack is commissioned from individual devices upward;
-RoboTwin stays above one narrow policy adapter.
+Status: 2026-09-04. Devices, capture, and manual replay are commissioned; DP
+offline data and servoJ are next. RoboTwin stays above one narrow policy adapter.
 
 ## Fixed principles
 
@@ -38,32 +38,29 @@ current 14-value compatibility layout the initial mapping is
 | Wheel | Status | Next physical gate |
 |---|---|---|
 | UR5e network/Dashboard | Reachable; PolyScope 5.13, `RUNNING`, safety `NORMAL` | Human verifies mode before output |
-| RTDE receive | Five stable 10 Hz TCP samples read | Longer rate/timestamp report |
-| Serial gripper | Stable CH340 by-id device present | One open, then one close |
-| Dual RealSense | Both configured D435i devices stream together | Timing/exposure report |
-| socket replay | Historical and migrated batched `movel` path exists | Dry-run, then one segment |
+| RTDE receive | 10 Hz capture used for a complete session | Recheck 500 Hz feedback with servoJ |
+| Serial gripper | Stable by-id path; open and close tested | Policy gripper decoding |
+| Dual RealSense | Dual capture and 60-frame warmup tested | Live DP shadow input |
+| socket replay | Session `20260903_182752` replayed completely | Keep as an independent regression path |
 | RTDE servoJ | ACT client, recipe, and robot program exist | Hold, small step, ramp, watchdog |
-| Diffusion Policy | Pinned upstream code/config inspected | Dataset adapter and offline batch |
+| Diffusion Policy | Pinned upstream data, training, and six-action inference inspected | One-session Zarr and offline batch |
 
 ## Chunk execution
 
-RoboTwin DP returns six actions. The target implementation preserves that output
-and can execute all six after commissioning. For the first bounded motion only,
-the executor may cap physical output to the first step; this is a temporary
-safety gate, not a changed DP default or a permanent receding-horizon decision.
+RoboTwin DP returns six actions. The first baseline executes all six in upstream
+order before inferring again; it does not default to first-action-only execution
+or overlapping-chunk fusion.
 
 Before reaching the robot, every chunk passes:
 
-1. finite/frame/staleness validation;
-2. rotation-vector continuity;
-3. workspace, velocity, acceleration, and jerk limits;
-4. overlap blending where configured;
-5. 10 Hz to 500 Hz minimum-jerk interpolation for servoJ;
-6. RTDE loss, runtime stop, expiry, and tracking-error watchdogs.
+1. finite values, coordinate meaning, and rotation-vector continuity;
+2. workspace and per-step speed limits;
+3. 10 Hz to 500 Hz interpolation for servoJ;
+4. RTDE runtime state and measured TCP feedback.
 
-Log raw prediction, guarded target, and measured execution separately. Any
-proposal to execute fewer/more actions or replan earlier is evaluated from these
-logs against the unchanged six-step baseline.
+Log raw prediction, commanded target, and measured TCP separately. Early
+replanning or chunk fusion is compared only if the full six-step baseline shows
+a measured problem. See [`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md).
 
 ## Motion backends
 
@@ -80,8 +77,8 @@ The backends never switch automatically. See
 ### 0 — Offline contracts
 
 - Add `/joint_action/vector`, a DP Zarr adapter, and round-trip tests.
-- Test time alignment, rotation continuity, limits, chunk overlap, and
-  interpolation with synthetic episodes.
+- Test time alignment, rotation continuity, and interpolation with synthetic
+  episodes.
 
 Exit: one canonical episode produces a correct upstream DP batch and decodes to
 the same single-arm meaning.
@@ -100,6 +97,8 @@ Exit: all independent checks pass. This gate is complete for the current setup.
 
 Exit: exact commands and stop behaviour are observed and recorded.
 
+Status: complete.
+
 ### 3 — Manual record/replay
 
 - Record a short path, inspect manifest/timing, dry-run replay, execute one
@@ -107,6 +106,8 @@ Exit: exact commands and stop behaviour are observed and recorded.
 
 Exit: no pose discontinuity and bounded tracking/timing error. This gate remains
 independent of ML.
+
+Status: one complete capture and replay is finished.
 
 ### 4 — servoJ backend
 

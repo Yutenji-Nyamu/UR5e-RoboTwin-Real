@@ -50,6 +50,8 @@ UR5e_RoboTwin_Real（本仓库跟踪、维护）
 当前转换器还缺上游 DP 需要的 `/joint_action/vector` 和经过测试的 DP Zarr 适配。
 初始兼容映射保持为
 `[tcp(6), dummy_gripper, tcp(6), physical_gripper]`，保证采集、训练、推理含义一致。
+第一版沿用上游的头部单相机输入和完整6步执行；具体阶段与待决策项见
+[`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md)。
 
 ## 为什么不默认用 socket 重播执行 DP？
 

@@ -55,6 +55,9 @@ The current converter still needs the upstream-required
 `/joint_action/vector` and a tested DP Zarr adapter. The initial compatibility
 mapping remains `[tcp(6), dummy_gripper, tcp(6), physical_gripper]` so collection,
 training, and inference share exactly one meaning.
+The first baseline keeps upstream head-only input and complete six-action
+execution; see [`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md) for stages
+and later decisions.
 
 ## Why not use socket replay as the DP default?
 

@@ -6,11 +6,13 @@
 
 - [Architecture](ARCHITECTURE.md)
 - [RoboTwin integration boundary](ROBOTWIN_INTEGRATION.md)
+- [Diffusion Policy real-robot implementation context](DIFFUSION_POLICY_PLAN.md)
 - [Real-robot roadmap](ROADMAP.md)
 - [Migration record](MIGRATION.md)
 
 ## Data and workstation
 
+- [Software, hardware, and layered debugging prerequisites](PREREQUISITES.md)
 - [Storage layout](STORAGE.md)
 - [Data management](DATA_MANAGEMENT.md)
 

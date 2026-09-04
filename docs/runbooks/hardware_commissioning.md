@@ -9,13 +9,13 @@ are read-only and cannot move the robot or gripper.
 
 Checked on 2026-09-01:
 
-- workstation Ethernet: `192.168.0.6/24`;
-- UR5e: `192.168.0.4`, Dashboard `29999`, URScript `30001`, RTDE `30004` reachable;
+- workstation and UR5e share one static subnet; actual addresses are in local
+  `configs/lab.yaml`;
+- Dashboard `29999`, URScript `30001`, and RTDE `30004` are reachable;
 - PolyScope `5.13.0`, robot mode `RUNNING`, safety `NORMAL`, Local control, no
   program running;
 - gripper: CH340 adapter at stable `/dev/serial/by-id/...` path;
-- head D435i `243522072333` and wrist D435i `233522079334` both stream
-  `640x480` color frames.
+- configured head and wrist D435i devices both stream `640x480` color frames.
 
 ## 1. Power and PolyScope
 
@@ -23,7 +23,7 @@ Checked on 2026-09-01:
 2. Press the teach pendant power button and wait for PolyScope.
 3. On the initialization screen press **ON**, then **START**. The status should
    become `RUNNING` and safety should remain `NORMAL`.
-4. Verify Ethernet is connected and the robot address is `192.168.0.4/24`.
+4. Verify Ethernet is connected and the robot address matches `configs/lab.yaml`.
 5. Do not load or start a motion program for the read-only checks below.
 
 Remote Control must first be enabled in PolyScope settings. Use Remote mode for

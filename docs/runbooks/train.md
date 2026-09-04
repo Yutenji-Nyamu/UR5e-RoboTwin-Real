@@ -48,11 +48,19 @@ ur5e-real train-dp ZARR_PATH \
 ```
 
 Without `--debug`, this preserves RoboTwin `robot_dp_14.yaml`: horizon 8,
-three observations, six actions, 10 Hz, batch 128, and 600 epochs. Run output
-and checkpoints are written under `/data/robotics/ur5e-real/checkpoints/dp/`.
+three observations, six actions, 10 Hz, and 600 epochs. Batch size is capped at
+128 and automatically fits within the shortest episode for small datasets so
+the held-out episode produces at least one validation batch. Run output and
+checkpoints are written under `/data/robotics/ur5e-real/checkpoints/dp/`.
 
-On 2026-09-04 one real episode passed the native Dataset read, two-epoch GPU
-training, and production of two reloadable checkpoints.
+The default saves every 300 epochs, at epochs 300 and 600. Per-epoch train and
+validation losses are written to `logs.json.txt` in the run directory.
+
+The first full run on 2026-09-04 included six successful episodes (869
+transitions), held out the last episode for validation, and trained on the
+other five. All 600 epochs finished in about 15.6 minutes; both `300.ckpt` and
+`600.ckpt` were produced and loaded successfully against the held-out episode.
+Two aborted sessions remain in raw storage but were excluded from this dataset.
 
 ## ACT (retained adapter)
 

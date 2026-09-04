@@ -34,6 +34,33 @@ After initialization, restore the recorded scene before executing the replay.
 See the [one-page operator guide](docs/runbooks/operator_workflows.md) for the
 complete fixed procedure and safety checks.
 
+## Diffusion Policy quick path
+
+```bash
+conda activate RoboTwinSimReal
+cd ~/UR5e_RoboTwin_Real
+
+# Convert only raw sessions with outcome=success; save the printed HDF5_RUN
+ur5e-real convert --config configs/lab.yaml \
+  --task pick_place_cube --task-config simple
+
+# N is the successful-episode count; save the printed ZARR_PATH
+ur5e-real process-dp HDF5_RUN \
+  --task pick_place_cube --task-config simple --episodes N
+
+# Full training: 600 epochs, checkpoints at epochs 300 and 600
+ur5e-real train-dp ZARR_PATH \
+  --task pick_place_cube --task-config simple --episodes N
+
+# Offline inference, then live shadow inference
+ur5e-real infer-dp --checkpoint CHECKPOINT --episode HDF5_EPISODE --index 20
+ur5e-real infer-dp --checkpoint CHECKPOINT \
+  --config configs/lab.yaml --shadow --chunks 10
+```
+
+See [training](docs/runbooks/train.md) and [inference](docs/runbooks/infer.md)
+for all options.
+
 ## Data and documentation
 
 Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architecture,
@@ -43,6 +70,14 @@ is indexed in [`docs/README.md`](docs/README.md).
 The Diffusion Policy path now passes HDF5, Zarr, native training, offline
 checkpoint loading, and live shadow inference; see [training](docs/runbooks/train.md)
 and [inference](docs/runbooks/infer.md).
+
+Each raw trajectory has one `session_<RUN_ID>.json` index containing task,
+timestamps, duration, counts, notes, review history, and
+`success/failure/aborted`. Images, RTDE, and gripper files remain immutable;
+failed or aborted sessions are excluded from training but never deleted
+automatically. List them with
+`ur5e-real sessions --config configs/lab.yaml`. HDF5 and Zarr retain source run
+IDs, and every checkpoint configuration points back to its Zarr dataset.
 
 Commands that move hardware require PolyScope **Remote Control**, a clear
 workspace, and an operator at the emergency stop.

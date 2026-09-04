@@ -79,6 +79,28 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
             self.assertIn("dataloader.batch_size=5", command)
             self.assertIn("training.debug=true", command)
 
+    def test_training_batch_fits_shortest_episode(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            robotwin = root / "RoboTwin"
+            train_script = robotwin / "policy" / "DP" / "train.py"
+            train_script.parent.mkdir(parents=True)
+            train_script.write_text("", encoding="utf-8")
+            dataset_path = root / "episodes.zarr"
+            dataset = zarr.open_group(str(dataset_path), mode="w")
+            data = dataset.create_group("data")
+            data.create_dataset("state", data=np.zeros((12, 14), dtype=np.float32))
+            meta = dataset.create_group("meta")
+            meta.create_dataset("episode_ends", data=np.asarray([7, 12], dtype=np.int64))
+            command = build_train_command(
+                robotwin,
+                dataset_path,
+                root / "output",
+                TrainConfig("task", "simple", 2),
+            )
+            self.assertIn("dataloader.batch_size=5", command)
+            self.assertIn("val_dataloader.batch_size=5", command)
+
     @mock.patch("ur5e_real.adapters.robotwin_dp.train_dp.subprocess.run")
     def test_training_runs_from_output_directory(self, run):
         with tempfile.TemporaryDirectory() as directory:

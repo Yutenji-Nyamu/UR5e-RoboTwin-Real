@@ -30,6 +30,32 @@ ur5e-replay <RUN_ID> --execute
 初始化完成后，先恢复录制时的场景，再执行重播。完整固定流程和检查项见
 [《采集与重播速查》](docs/zh-CN/runbooks/operator_workflows.md)。
 
+## Diffusion Policy 快速流程
+
+```bash
+conda activate RoboTwinSimReal
+cd ~/UR5e_RoboTwin_Real
+
+# 只把 outcome=success 的raw轨迹转换为HDF5；记下输出的 HDF5_RUN
+ur5e-real convert --config configs/lab.yaml \
+  --task pick_place_cube --task-config simple
+
+# N是成功轨迹数；记下输出的 ZARR_PATH
+ur5e-real process-dp HDF5_RUN \
+  --task pick_place_cube --task-config simple --episodes N
+
+# 正式训练；默认600 epoch，在第300和600轮保存checkpoint
+ur5e-real train-dp ZARR_PATH \
+  --task pick_place_cube --task-config simple --episodes N
+
+# 先离线推理，再接真机shadow
+ur5e-real infer-dp --checkpoint CHECKPOINT --episode HDF5_EPISODE --index 20
+ur5e-real infer-dp --checkpoint CHECKPOINT \
+  --config configs/lab.yaml --shadow --chunks 10
+```
+
+完整参数见[训练](docs/zh-CN/runbooks/train.md)与[推理](docs/zh-CN/runbooks/infer.md)。
+
 ## 数据与文档
 
 数据统一存放在4TB共享盘的 `/data/robotics/ur5e-real`。架构、硬件调试、数据管理、
@@ -37,6 +63,11 @@ ur5e-replay <RUN_ID> --execute
 
 Diffusion Policy 主链已打通到 HDF5、Zarr、官方训练、checkpoint离线加载和真机
 shadow；命令见[训练](docs/zh-CN/runbooks/train.md)与[推理](docs/zh-CN/runbooks/infer.md)。
+
+每条raw轨迹由 `session_<RUN_ID>.json` 索引，记录任务、起止时间、时长、样本数、
+备注、复核历史和 `success/failure/aborted`。图像、RTDE与夹爪文件原样保留；失败或
+中止数据不会训练，但也不会自动删除。`ur5e-real sessions --config configs/lab.yaml`
+可随时查看汇总。HDF5与Zarr均保留源run ID，checkpoint配置再引用对应Zarr路径。
 
 执行任何运动命令前，PolyScope 必须处于 **Remote Control**，工作区必须净空，人员
 必须守在急停旁。

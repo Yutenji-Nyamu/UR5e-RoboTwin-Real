@@ -45,7 +45,16 @@ def build_train_command(
     transitions = int(dataset["data/state"].shape[0])
     if transitions < 1:
         raise ValueError(f"empty DP dataset: {zarr_path}")
-    batch_size = train.batch_size or min(128, transitions)
+    if "meta/episode_ends" in dataset:
+        episode_ends = [int(value) for value in dataset["meta/episode_ends"][:]]
+        episode_starts = [0, *episode_ends[:-1]]
+        shortest_episode = min(end - start for start, end in zip(episode_starts, episode_ends))
+    else:
+        shortest_episode = transitions
+    # RoboTwin drops incomplete batches for both train and validation. Keeping
+    # the automatic batch within one episode guarantees a validation batch for
+    # small real datasets while retaining the upstream batch 128 when possible.
+    batch_size = train.batch_size or min(128, shortest_episode)
     val_ratio = train.val_ratio if train.val_ratio is not None else (0.0 if train.episode_count == 1 else 0.02)
     experiment = f"{train.task_name}-robot_dp-real"
     return [
@@ -88,11 +97,11 @@ def run_training(
     environment = os.environ.copy()
     environment["CUDA_VISIBLE_DEVICES"] = train.gpu
     environment["HYDRA_FULL_ERROR"] = "1"
-    print(f"[TRAIN] {shlex.join(command)}")
+    print(f"[TRAIN] {shlex.join(command)}", flush=True)
     # RoboTwin names checkpoints with a relative path, so use the run directory
     # as cwd while keeping its model/training code untouched.
     subprocess.run(command, cwd=output_dir, env=environment, check=True)
-    print(f"[OUTPUT] {output_dir}")
+    print(f"[OUTPUT] {output_dir}", flush=True)
     return output_dir
 
 

@@ -126,6 +126,7 @@ def process_run(
             "format": "robotwin_dp_real_v1",
             "task": task_name,
             "task_config": task_config,
+            "selection": "outcome=success",
             "source_run_ids": source_run_ids,
             "source_schema_versions": source_schema_versions,
             "state_layout": "tcp6,dummy_gripper,tcp6,physical_gripper",

@@ -45,11 +45,16 @@ ur5e-real train-dp ZARR_PATH \
 ```
 
 不加 `--debug` 即沿用 RoboTwin `robot_dp_14.yaml`：horizon 8、3步观测、6步动作、
-10 Hz、batch 128和600 epoch。训练目录及checkpoint自动写入
+10 Hz和600 epoch。batch默认不超过128，并在小数据集上自动缩到最短episode以内，
+保证留出的验证轨迹至少产生一个batch。训练目录及checkpoint自动写入
 `/data/robotics/ur5e-real/checkpoints/dp/`。
 
-2026-09-04 已用一条真实轨迹完成原生 Dataset 读取、2 epoch GPU训练并生成两个
-可重新加载的checkpoint。
+默认每300轮保存一次，即第300和600轮；每轮train/validation loss都写入运行目录的
+`logs.json.txt`。
+
+2026-09-04 首次正式运行纳入6条成功轨迹（869个transition），最后1条留作验证，
+其余5条训练；600 epoch约15.6分钟完成，`300.ckpt`和`600.ckpt`均已生成并通过
+留出轨迹离线加载。2条中止轨迹保留在raw中，但未进入该数据版本。
 
 ## ACT（保留的旧适配）
 

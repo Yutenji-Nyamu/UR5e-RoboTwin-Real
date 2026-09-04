@@ -107,8 +107,9 @@ full six-action chunks. This checkpoint validates the pipeline, not task quality
   measured TCP.
 - Connect DP arm motion, then enable the gripper.
 
-Formal inference uses the Local-mode robot-side servoJ program. It does not use
-the Remote-mode socket replay path.
+Formal inference remains in Remote mode. A socket sends the robot-side servoJ
+program once at startup; state feedback and action targets then use RTDE. This
+does not reuse the socket `movel` replay path.
 
 ### 5. Formal data and evaluation
 
@@ -126,6 +127,7 @@ src/ur5e_real/control/                # chunk timing and 500 Hz execution
 ur5e-real process-dp                  # HDF5 -> Zarr
 ur5e-real train-dp                    # invoke pinned upstream training code
 ur5e-real infer-dp                    # offline / shadow / execute
+ur5e-infer-init; ur5e-infer           # fixed initialization and live entry point
 ```
 
 The adapter remains thin: model code is neither copied nor maintained here, and
@@ -144,6 +146,6 @@ baseline above. Later decisions are:
 4. Consider early replanning or chunk fusion only if complete six-step execution
    shows a measured problem.
 
-The immediate next step is a Local-mode servoJ hold, millimetre move, and a
-six-target sequence. After that, collect formal data and execute a formally
-trained checkpoint.
+The immediate next step is to keep PolyScope in Remote and run
+`ur5e-infer 600 --execute --chunks 1` to verify automatic startup, servoJ hold,
+and one six-target sequence. Then run a complete episode.

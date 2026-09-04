@@ -10,6 +10,7 @@ from ur5e_real.adapters.robotwin_dp.infer_dp import RealObservationEncoder, obse
 from ur5e_real.adapters.robotwin_dp.train_dp import TrainConfig, build_train_command, run_training
 from ur5e_real.control.chunk import ChunkStreamConfig, interpolated_tcp_targets, limit_tcp_target
 from ur5e_real.control.gripper_policy import GripperCommandConfig, GripperPolicy
+from ur5e_real.operator import resolve_dp_checkpoint
 
 
 class FakeGripper:
@@ -24,6 +25,14 @@ class FakeGripper:
 
 
 class DiffusionPolicyAdapterTest(unittest.TestCase):
+    def test_checkpoint_short_name_resolution(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data_root = Path(directory)
+            checkpoint = data_root / "checkpoints" / "dp" / "run" / "checkpoints" / "task" / "600.ckpt"
+            checkpoint.parent.mkdir(parents=True)
+            checkpoint.touch()
+            self.assertEqual(resolve_dp_checkpoint("600", data_root), checkpoint.resolve())
+
     def test_observation_layout_and_rotation_continuity(self):
         image = np.zeros((480, 640, 3), dtype=np.uint8)
         vector = np.arange(14, dtype=np.float32)

@@ -31,13 +31,14 @@ an unclean volume state, not permission checks or the automount design.
   addresses live only in untracked `configs/lab.yaml`.
 - Dashboard `29999` supplies status, URScript `30001` serves initialization,
   capture, and manual replay, and RTDE `30004` carries state and servoJ targets.
-- Use `Remote Control` for initialization, freedrive, capture, and socket replay.
-- Use `Local` with the robot-side RTDE servoJ program running for policy output.
+- Use `Remote Control` for initialization, freedrive, capture, socket replay,
+  and DP execution.
+- The DP command sends the robot-side servoJ program automatically; manually
+  switching to Local and playing a URP is no longer required.
 
-The repository tracks readable `robot_programs/servoj_control_loop.script` and
-the RTDE XML. The historical project also contains the previously used
-`translation_sample_servoj.urp`; load and confirm it during the next servoJ
-session, then decide whether to retain an exported URP as a robot asset here.
+The repository directly uses the tracked `robot_programs/servoj_control_loop.script`
+and RTDE XML. The historical `translation_sample_servoj.urp` remains reference
+material and is no longer a daily runtime prerequisite.
 
 ### Gripper
 
@@ -104,7 +105,8 @@ both cameras, so the old copied CH341 driver is unnecessary.
 | RTDE receive | `python examples/smoke/rtde_read.py --config configs/lab.yaml --samples 10` | Continuous 10 Hz TCP output |
 | Capture/replay | See [operator quick reference](runbooks/operator_workflows.md) | One end-to-end hardware session is already complete |
 | Offline DP | See the [training guide](runbooks/train.md) | Conversion, batch, short train, and checkpoint reload pass |
-| servoJ | Run the URP in Local mode, then hold/small-step/sequence | Measured TCP follows continuously |
+| servoJ | `ur5e-infer 600 --execute --chunks 1` | Automatic startup and continuous measured TCP tracking |
 | Online DP | See the [inference guide](runbooks/infer.md) | Shadow passes; execute follows servoJ validation |
 
-The next step is servoJ hold, millimeter-scale motion, and a six-target sequence.
+The next step is one-chunk validation of automatic startup, servoJ hold, and a
+six-target sequence.

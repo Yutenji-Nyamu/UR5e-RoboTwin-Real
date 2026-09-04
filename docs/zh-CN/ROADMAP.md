@@ -59,7 +59,8 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 - `SocketMovelReplayBackend`：Remote模式、批量 `movel`、开环计时；仅用于手动
   重播和可选对照基线。
-- `RtdeServoJBackend`：Local模式机器人程序、500 Hz设点与反馈；学习策略默认后端。
+- `RtdeServoJBackend`：Remote模式自动启动机器人程序、500 Hz RTDE设点与反馈；
+  学习策略默认后端。
 
 两者绝不自动切换，详见 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md)。
 
@@ -126,6 +127,6 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 ## 人员与自动化分工
 
-人员负责断路器、工作区、急停、Local/Remote模式、URP加载/播放和安全起点。
-自动化负责诊断、配置、命令、日志、测试、图表、适配和提交。每次实际输出前，
+人员负责断路器、工作区、急停、Remote模式和安全起点。自动化负责启动控制程序、
+诊断、配置、命令、日志、测试、图表、适配和提交。每次实际输出前，
 自动化只需说明准确设备、后端和有边界动作，由现场人员确认一次。

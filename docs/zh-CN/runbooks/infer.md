@@ -2,7 +2,7 @@
 
 [English](../../runbooks/infer.md)
 
-先进入统一环境和仓库：
+底层命令可先进入统一环境和仓库：
 
 ```bash
 conda activate RoboTwinSimReal
@@ -21,31 +21,39 @@ ur5e-real infer-dp --checkpoint CHECKPOINT \
 ## 2. 真机 shadow
 
 ```bash
-ur5e-real infer-dp --checkpoint CHECKPOINT \
-  --config configs/lab.yaml --shadow --chunks 10
+ur5e-infer 600 --shadow --chunks 10
 ```
 
 连接双相机和只读 RTDE，只打印预测，不发送机械臂或夹爪命令。`--chunks 0` 表示运行
-到 `Ctrl+C`。当前真实链路已完成2个chunk测试，稳态单次推理约0.84秒。
+到 `Ctrl+C`。`600` 会自动解析为当前唯一的 `600.ckpt`，也可以传完整路径。当前真实
+链路已完成2个chunk测试，稳态单次推理约0.84秒。
 
 ## 3. 真机执行
 
-先在 PolyScope **Remote Control** 下初始化：
+PolyScope保持 **Remote Control**。初始化会自动检查设备、低速回原位并打开夹爪：
 
 ```bash
-ur5e-policy-init
+ur5e-infer-init
 ```
 
-然后把 PolyScope 切到 **Local**，启动由
-`robot_programs/servoj_control_loop.script` 创建的机器人端程序，再执行一个chunk：
+布置场景后，第一次只执行一个chunk：
 
 ```bash
-ur5e-real infer-dp --checkpoint CHECKPOINT \
-  --config configs/lab.yaml --execute --chunks 1
+ur5e-infer 600 --execute --chunks 1
 ```
 
-每次推理保持 RoboTwin 原生6步输出并依次执行；每个10 Hz TCP目标在底层插值为
-500 Hz RTDE servoJ设点。夹爪读取第14维；需要暂时禁用时加 `--no-gripper`。
+确认servoJ链路后，完整运行使用：
 
-离线和shadow已经实测；`--execute`代码已接好，下一次现场从servoJ保持和毫米级小步
-验证开始，再接正式训练模型。
+```bash
+ur5e-infer 600 --execute
+```
+
+该命令自动选择项目环境、目录、`configs/lab.yaml`与RoboTwin路径，并通过socket只发送
+一次 `servoj_control_loop.script`；实际状态读取和动作下发均走RTDE。默认50个chunk，
+即RoboTwin原有的300 action上限；可按 `Ctrl+C` 提前停止。
+
+每次推理保持RoboTwin原生6步输出并依次执行；每个10 Hz TCP目标在底层插值为500 Hz
+RTDE servoJ设点。夹爪读取第14维；需要暂时禁用时加 `--no-gripper`。
+
+离线和shadow已经实测；`--execute`代码已接好，下一次现场先用 `--chunks 1` 验证
+自动启动、servoJ保持和小步动作，再运行完整episode。

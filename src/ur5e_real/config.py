@@ -48,6 +48,7 @@ class CollectionConfig:
 class ServoJConfig:
     frequency_hz: int
     config_xml: Path
+    program_script: Path
     mode: int = 2
     connect_timeout_s: float = 15.0
 
@@ -137,6 +138,10 @@ def load_config(path: str | Path) -> LabConfig:
         servoj=ServoJConfig(
             frequency_hz=int(servoj.get("frequency_hz", 500)),
             config_xml=_resolve(base, str(servoj.get("config_xml", "../robot_programs/control_loop_configuration.xml"))),
+            program_script=_resolve(
+                base,
+                str(servoj.get("program_script", "../robot_programs/servoj_control_loop.script")),
+            ),
             mode=int(servoj.get("mode", 2)),
             connect_timeout_s=float(servoj.get("connect_timeout_s", 15.0)),
         ),

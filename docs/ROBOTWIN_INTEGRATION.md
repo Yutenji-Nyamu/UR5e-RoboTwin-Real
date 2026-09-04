@@ -62,7 +62,7 @@ and later decisions.
 | Backend | Advantage | Limitation | Role |
 |---|---|---|---|
 | socket + batched `movel` | Very simple; already proven for recorded trajectories | Open-loop timing; replacing scripts can interrupt motion; no high-rate watchdog | Manual replay and optional first end-to-end baseline |
-| RTDE input + servoJ URP | Continuous setpoints, measured state, tracking checks, watchdog, smooth interpolation | Requires a running PolyScope program and commissioning | Default ACT/DP learned-policy backend |
+| RTDE input + servoJ | Continuous setpoints, measured state, tracking checks, watchdog, smooth interpolation | Robot-side loop still requires commissioning | Default ACT/DP learned-policy backend; program starts automatically |
 
 A six-step DP chunk can be sent through either backend, so choosing RTDE does not
 change the policy output. The ACT RTDE loop is now reused as DP's 500 Hz execution

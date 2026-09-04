@@ -34,6 +34,16 @@ After initialization, restore the recorded scene before executing the replay.
 See the [one-page operator guide](docs/runbooks/operator_workflows.md) for the
 complete fixed procedure and safety checks.
 
+Live DP inference:
+
+```bash
+ur5e-infer-init
+ur5e-infer 600 --execute
+```
+
+`600` is the checkpoint number; a full path is also accepted. Add `--chunks 1`
+for the first commissioning run. See [DP inference](docs/runbooks/infer.md).
+
 ## Diffusion Policy quick path
 
 ```bash
@@ -54,8 +64,7 @@ ur5e-real train-dp ZARR_PATH \
 
 # Offline inference, then live shadow inference
 ur5e-real infer-dp --checkpoint CHECKPOINT --episode HDF5_EPISODE --index 20
-ur5e-real infer-dp --checkpoint CHECKPOINT \
-  --config configs/lab.yaml --shadow --chunks 10
+ur5e-infer 600 --shadow --chunks 10
 ```
 
 See [training](docs/runbooks/train.md) and [inference](docs/runbooks/infer.md)
@@ -68,8 +77,9 @@ hardware commissioning, data management, training, and inference documentation
 is indexed in [`docs/README.md`](docs/README.md).
 
 The Diffusion Policy path now passes HDF5, Zarr, native training, offline
-checkpoint loading, and live shadow inference; see [training](docs/runbooks/train.md)
-and [inference](docs/runbooks/infer.md).
+checkpoint loading, and live shadow inference. The RTDE servoJ execution entry
+point is packaged and awaits its first small-motion commissioning run; see
+[training](docs/runbooks/train.md) and [inference](docs/runbooks/infer.md).
 
 Each raw trajectory has one `session_<RUN_ID>.json` index containing task,
 timestamps, duration, counts, notes, review history, and

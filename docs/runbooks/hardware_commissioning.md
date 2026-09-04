@@ -26,10 +26,10 @@ Checked on 2026-09-01:
 4. Verify Ethernet is connected and the robot address matches `configs/lab.yaml`.
 5. Do not load or start a motion program for the read-only checks below.
 
-Remote Control must first be enabled in PolyScope settings. Use Remote mode for
-external URScript/freedrive/manual replay. Use the validated Local-mode URP for
-the RTDE servoJ path. Mode changes are human actions; automation must not switch
-them silently.
+Enable and keep Remote Control in PolyScope settings. External URScript,
+freedrive, manual replay, and DP execution all use Remote mode. `ur5e-infer`
+starts the robot-side servoJ program automatically while action targets remain
+on RTDE.
 
 ## 2. Read-only robot checks
 
@@ -70,8 +70,8 @@ These require a human at the workcell and an explicit `--execute`:
    gripper opening.
 3. Support the arm and test freedrive start/stop.
 4. Record a short path; dry-run its replay; execute one bounded segment.
-5. Separately load the servoJ URP and validate hold, millimetre step, ramp, and
-   watchdog stop.
+5. Run `ur5e-infer 600 --execute --chunks 1` to validate automatic servoJ
+   startup, hold, small motion, and stop.
 
 Never combine the first gripper, freedrive, replay, and servoJ tests into one
 command. Each device must have an independently understood failure mode.

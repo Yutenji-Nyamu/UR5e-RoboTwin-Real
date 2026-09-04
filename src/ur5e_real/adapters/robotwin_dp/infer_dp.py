@@ -13,9 +13,11 @@ from ...control.chunk import ChunkStreamConfig, stream_tcp_target
 from ...control.gripper_policy import GripperCommandConfig, GripperPolicy
 from ...control.servoj import ServoJController, ServoJStreamConfig
 from ...data.schema import nearest_rotation_vector
+from ...hardware.dashboard import require_external_motion_ready
 from ...hardware.gripper import GripperSerial
 from ...hardware.realsense import DualColorCamera
 from ...hardware.rtde import RtdeOutputConfig, RtdeTcpClient
+from ...hardware.urscript import send_urscript
 
 DP_IMAGE_SIZE = (320, 240)  # width, height
 
@@ -187,6 +189,20 @@ def _servo(lab: LabConfig) -> ServoJController:
     )
 
 
+def _start_servoj_program(lab: LabConfig) -> None:
+    require_external_motion_ready(lab.robot.host)
+    script = lab.servoj.program_script
+    if not script.is_file():
+        raise FileNotFoundError(script)
+    send_urscript(
+        script.read_text(encoding="utf-8"),
+        lab.robot.host,
+        lab.robot.script_port,
+        lab.robot.socket_timeout_s,
+    )
+    print(f"[CONTROL] robot-side servoJ program started: {script.name}")
+
+
 def run_shadow(
     lab: LabConfig,
     robotwin_root: Path,
@@ -252,12 +268,13 @@ def run_execute(
     )
     gripper_policy = GripperPolicy(gripper, GripperCommandConfig()) if gripper is not None else None
     stream_config = ChunkStreamConfig(policy_hz=inference.policy_hz, servo_hz=lab.servoj.frequency_hz)
-    cameras.start()
-    controller.connect_and_start()
-    model.reset_obs()
-    print("[EXECUTE] streaming each 6-action DP chunk through RTDE servoJ")
     chunk_index = 0
     try:
+        cameras.start()
+        _start_servoj_program(lab)
+        controller.connect_and_start()
+        model.reset_obs()
+        print("[EXECUTE] streaming each 6-action DP chunk through RTDE servoJ")
         while inference.chunks == 0 or chunk_index < inference.chunks:
             tcp = controller.get_latest_tcp()
             pair = cameras.read()

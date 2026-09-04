@@ -16,6 +16,7 @@ collection:
   data_root: ../runtime-data
 servoj:
   config_xml: ../robot_programs/control_loop_configuration.xml
+  program_script: ../robot_programs/servoj_control_loop.script
 """
 
 
@@ -32,6 +33,7 @@ class ConfigTest(unittest.TestCase):
             self.assertEqual(cfg.cameras.warmup_frames, 60)
             self.assertEqual(cfg.collection.data_root, Path(directory) / "runtime-data")
             self.assertEqual(cfg.servoj.config_xml, Path(directory) / "robot_programs/control_loop_configuration.xml")
+            self.assertEqual(cfg.servoj.program_script, Path(directory) / "robot_programs/servoj_control_loop.script")
 
     def test_rejects_same_camera_twice(self):
         with tempfile.TemporaryDirectory() as directory:

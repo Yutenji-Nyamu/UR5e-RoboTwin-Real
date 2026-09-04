@@ -95,8 +95,8 @@ RoboTwin 仿真原始14维向量表示双臂关节位置；真机适配层复用
 - 低层执行器完成10 Hz到500 Hz插值，并记录预测、下发目标和实测TCP；
 - 再接DP，先机械臂，最后启用夹爪。
 
-正式推理使用 Local 模式下运行的机器人端 servoJ 程序，不复用 Remote 模式的
-socket手动重播链路。
+正式推理保持Remote模式：socket只在启动时发送一次机器人端servoJ程序，随后状态
+反馈和动作目标全部使用RTDE；它不复用socket `movel`手动重播链路。
 
 ### 5. 正式数据与评估
 
@@ -112,6 +112,7 @@ src/ur5e_real/control/                # chunk定时与500 Hz执行
 ur5e-real process-dp                  # HDF5 -> Zarr
 ur5e-real train-dp                    # 调用固定上游训练代码
 ur5e-real infer-dp                    # offline / shadow / execute
+ur5e-infer-init; ur5e-infer           # 固定真机初始化与一键在线入口
 ```
 
 先保持适配层很薄，不复制 RoboTwin 的模型代码，也不直接修改被忽略的上游工作树。
@@ -126,5 +127,5 @@ ur5e-real infer-dp                    # offline / shadow / execute
 3. 只有头部基线跑通后，再决定是否把腕部相机加入模型；
 4. 只有完整6步执行出现实测问题后，再讨论提前重规划或 chunk 融合。
 
-最近的下一步是：在PolyScope Local模式验证servoJ保持、毫米级小步和一段6目标序列；
-通过后再收集正式数据并执行正式训练模型。
+最近的下一步是：保持PolyScope Remote，用 `ur5e-infer 600 --execute --chunks 1`
+验证自动启动、servoJ保持和一段6目标序列；通过后再运行完整episode。

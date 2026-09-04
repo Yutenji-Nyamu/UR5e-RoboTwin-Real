@@ -55,6 +55,10 @@ def policy_init() -> int:
     return _init_command("policy")
 
 
+def infer_init() -> int:
+    return _init_command("infer")
+
+
 def collect() -> int:
     from .collection.session import run_collection
     from .data.session_manifest import review_session
@@ -101,6 +105,65 @@ def _session_path(value: str) -> Path:
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
     return action_dir / filename
+
+
+def resolve_dp_checkpoint(value: str, data_root: Path) -> Path:
+    candidate = Path(value).expanduser()
+    if candidate.is_file():
+        return candidate.resolve()
+    if candidate.parent != Path("."):
+        raise FileNotFoundError(candidate)
+
+    filename = value if value.endswith(".ckpt") else f"{value}.ckpt"
+    checkpoint_root = data_root / "checkpoints" / "dp"
+    matches = sorted(path.resolve() for path in checkpoint_root.rglob(filename) if path.is_file())
+    if not matches:
+        raise FileNotFoundError(f"no {filename} under {checkpoint_root}")
+    if len(matches) > 1:
+        paths = "\n".join(f"  {path}" for path in matches)
+        raise RuntimeError(f"checkpoint name {filename} is ambiguous; pass a full path:\n{paths}")
+    return matches[0]
+
+
+def infer() -> int:
+    from .adapters.robotwin_dp.infer_dp import InferenceConfig, run_execute, run_shadow
+
+    parser = argparse.ArgumentParser(
+        prog="ur5e-infer",
+        description="run one RoboTwin DP checkpoint with the local lab configuration",
+    )
+    parser.add_argument("checkpoint", help="full checkpoint path, or a unique name such as 600")
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--shadow", action="store_true", help="predict from live cameras without commands")
+    mode.add_argument("--execute", action="store_true", help="execute through RTDE servoJ")
+    parser.add_argument(
+        "--chunks",
+        type=int,
+        default=50,
+        help="six-action chunks to run (default: 50 = RoboTwin's 300-action episode; 0 until Ctrl+C)",
+    )
+    parser.add_argument("--gpu", default="0")
+    parser.add_argument("--no-gripper", action="store_true")
+    args = parser.parse_args()
+    if args.chunks < 0:
+        parser.error("--chunks must be non-negative")
+
+    _enter_repository()
+    cfg = load_config(LAB_CONFIG)
+    checkpoint = resolve_dp_checkpoint(args.checkpoint, cfg.collection.data_root)
+    inference = InferenceConfig(
+        chunks=args.chunks,
+        gpu=args.gpu,
+        enable_gripper=not args.no_gripper,
+    )
+    mode_name = "shadow" if args.shadow else "execute"
+    print(f"[INFER] mode={mode_name} chunks={args.chunks} checkpoint={checkpoint}")
+    robotwin_root = REPOSITORY / ".third_party" / "RoboTwin"
+    if args.shadow:
+        run_shadow(cfg, robotwin_root, checkpoint, inference)
+    else:
+        run_execute(cfg, robotwin_root, checkpoint, inference)
+    return 0
 
 
 def replay() -> int:

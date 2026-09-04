@@ -29,13 +29,12 @@
   `configs/lab.yaml`。
 - Dashboard `29999` 用于状态，URScript `30001` 用于初始化/采集/手动重播，RTDE
   `30004` 用于状态和servoJ设点。
-- `Remote Control`：初始化、freedrive、采集、socket重播。
-- `Local`：加载并运行机器人端RTDE servoJ程序，然后由电脑发送设点。
+- `Remote Control`：初始化、freedrive、采集、socket重播和DP执行。
+- DP执行命令自动发送机器人端servoJ程序，不再要求手动切Local或播放URP。
 
-当前仓库保留可读的
-`robot_programs/servoj_control_loop.script` 和 RTDE XML。旧项目另有已经使用过的
-`translation_sample_servoj.urp`；下一次servoJ调试时现场加载/确认一次，再决定是否
-把导出的URP作为机器人资产纳入新仓库。
+当前仓库保留并直接使用
+`robot_programs/servoj_control_loop.script` 和 RTDE XML。旧项目的
+`translation_sample_servoj.urp` 仅作为历史参考，不再是日常运行前置条件。
 
 ### 夹爪
 
@@ -97,7 +96,7 @@ librealsense udev规则已经识别CH340与两台相机，无需再编译旧CH34
 | RTDE读 | `python examples/smoke/rtde_read.py --config configs/lab.yaml --samples 10` | 10 Hz TCP连续输出 |
 | 采集/重播 | 见[采集与重播速查](runbooks/operator_workflows.md) | 已完成一条端到端实机验证 |
 | DP离线 | 见[训练手册](runbooks/train.md) | 转换、batch、短训练和checkpoint重载已通过 |
-| servoJ | PolyScope Local运行URP，再做保持/小步/序列 | 实测TCP跟随连续 |
+| servoJ | `ur5e-infer 600 --execute --chunks 1` | 自动启动且实测TCP跟随连续 |
 | DP在线 | 见[推理手册](runbooks/infer.md) | shadow已通过；下一步验证servoJ后执行 |
 
-当前下一步是servoJ保持、毫米级小步和6步目标序列。
+当前下一步是用单个chunk验证自动启动、servoJ保持和6步目标序列。

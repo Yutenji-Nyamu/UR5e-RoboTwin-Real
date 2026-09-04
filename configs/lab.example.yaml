@@ -29,5 +29,6 @@ collection:
 servoj:
   frequency_hz: 500
   config_xml: "../robot_programs/control_loop_configuration.xml"
+  program_script: "../robot_programs/servoj_control_loop.script"
   mode: 2
   connect_timeout_s: 15.0

@@ -86,6 +86,11 @@ class ServoJController:
         self._latest_runtime_state = int(state.runtime_state)
         self._target_tcp = list(self._latest_tcp)
 
+        # Seed the registers with the measured pose before enabling servoJ, so
+        # the robot-side loop never observes the temporary zero initialization.
+        for index, value in enumerate(self._latest_tcp):
+            setattr(setpoint, f"input_double_register_{index}", float(value))
+        connection.send(setpoint)
         watchdog.input_int_register_0 = cfg.servoj_mode
         connection.send(watchdog)
         self._connection = connection
@@ -126,7 +131,8 @@ class ServoJController:
             self._thread.join(timeout=1.0)
         if self._watchdog is not None and self._connection is not None:
             try:
-                self._watchdog.input_int_register_0 = 0
+                # Mode 3 exits robot_programs/servoj_control_loop.script.
+                self._watchdog.input_int_register_0 = 3
                 self._connection.send(self._watchdog)
             except Exception:
                 pass

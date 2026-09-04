@@ -65,8 +65,8 @@ replanning, or chunk fusion is useful. See
 
 - `SocketMovelReplayBackend`: Remote mode, batched `movel`, open-loop timing;
   manual replay and optional comparison baseline only.
-- `RtdeServoJBackend`: Local-mode robot program, 500 Hz setpoints and feedback;
-  default learned-policy backend.
+- `RtdeServoJBackend`: robot program started automatically in Remote mode, with
+  500 Hz RTDE setpoints and feedback; default learned-policy backend.
 
 The backends never switch automatically. See
 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md).
@@ -139,8 +139,8 @@ Status: shadow is complete; live execution follows gate 4 servoJ validation.
 
 ## Human–automation handoff
 
-The human owns breakers, workcell clearance, emergency stop, Local/Remote mode,
-URP loading/play, and safe start pose. Automation owns diagnostics, configs,
-commands, logs, tests, plots, adapters, and commits. Immediately before any
+The human owns breakers, workcell clearance, emergency stop, Remote mode, and
+the safe start pose. Automation owns control-program startup, diagnostics,
+configs, commands, logs, tests, plots, adapters, and commits. Immediately before any
 output, the exact device, backend, and bounded action are stated once for human
 confirmation.

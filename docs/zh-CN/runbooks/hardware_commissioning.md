@@ -24,9 +24,9 @@
 4. 确认网线连接，机器人地址与 `configs/lab.yaml` 一致。
 5. 下面的只读检查不需要加载或运行运动程序。
 
-应先在 PolyScope 设置中启用 Remote Control。外部 URScript、freedrive 和手动
-重播使用 Remote 模式；RTDE servoJ 使用已经验证的 Local 模式 URP。模式切换由
-现场人员完成，自动化不能静默切换。
+应先在 PolyScope 设置中启用并保持 Remote Control。外部 URScript、freedrive、
+手动重播和DP执行均使用Remote模式；`ur5e-infer` 自动启动机器人端servoJ程序，
+动作目标仍由RTDE发送。
 
 ## 2. 机器人只读检查
 
@@ -63,7 +63,7 @@ D435i 刚启动的彩色帧可能偏暗、严重偏色，这是自动曝光和�
    `--execute` 验证低速回原位及打开夹爪。
 3. 扶住机械臂，分别测试 freedrive 开启与停止。
 4. 录制一段短轨迹；先 dry-run；再只执行一个重播段。
-5. 独立加载 servoJ URP，依次验证保持、毫米级小步、平滑斜坡和 watchdog 停止。
+5. 运行 `ur5e-infer 600 --execute --chunks 1`，验证servoJ自动启动、保持、小步和停止。
 
 不要把首次夹爪、freedrive、重播和 servoJ 测试合并为一次运行；每个设备必须有
 独立、可理解的故障边界。

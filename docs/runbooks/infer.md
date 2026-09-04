@@ -2,7 +2,7 @@
 
 [简体中文](../zh-CN/runbooks/infer.md)
 
-Enter the shared environment and repository:
+For low-level commands, first enter the shared environment and repository:
 
 ```bash
 conda activate RoboTwinSimReal
@@ -22,34 +22,44 @@ latency, and label error without connecting hardware.
 ## 2. Live shadow mode
 
 ```bash
-ur5e-real infer-dp --checkpoint CHECKPOINT \
-  --config configs/lab.yaml --shadow --chunks 10
+ur5e-infer 600 --shadow --chunks 10
 ```
 
 This connects both cameras and read-only RTDE, prints predictions, and sends no
-robot or gripper command. `--chunks 0` runs until `Ctrl+C`. The real chain has
+robot or gripper command. `--chunks 0` runs until `Ctrl+C`. `600` resolves to
+the only current `600.ckpt`; a full path is also accepted. The real chain has
 passed two chunks; measured steady inference was about 0.84 seconds.
 
 ## 3. Live execution
 
-Initialize under PolyScope **Remote Control**:
+Keep PolyScope in **Remote Control**. Initialization checks devices, returns to
+home at low speed, and opens the gripper:
 
 ```bash
-ur5e-policy-init
+ur5e-infer-init
 ```
 
-Then switch PolyScope to **Local**, start the robot-side program built from
-`robot_programs/servoj_control_loop.script`, and execute one chunk:
+After arranging the scene, execute one chunk for the first commissioning run:
 
 ```bash
-ur5e-real infer-dp --checkpoint CHECKPOINT \
-  --config configs/lab.yaml --execute --chunks 1
+ur5e-infer 600 --execute --chunks 1
 ```
+
+After servoJ is confirmed, run a complete episode with:
+
+```bash
+ur5e-infer 600 --execute
+```
+
+This command selects the project environment, directory, `configs/lab.yaml`,
+and RoboTwin path. A socket sends `servoj_control_loop.script` once; all state
+feedback and action targets then use RTDE. The default 50 chunks equal
+RoboTwin's original 300-action limit, and `Ctrl+C` stops early.
 
 Each inference preserves and executes all six native RoboTwin actions. Every
 10 Hz TCP target is interpolated into the 500 Hz RTDE servoJ stream. The gripper
 uses element 14; add `--no-gripper` to disable it temporarily.
 
-Offline and shadow modes are hardware-tested. The `--execute` path is
-implemented; the next on-site step is a servoJ hold and millimeter-scale move
-before attaching a fully trained model.
+Offline and shadow modes are hardware-tested. Execute is wired; the next live
+session first uses `--chunks 1` to verify automatic program startup, servoJ hold,
+and small motion before running a complete episode.

@@ -60,6 +60,8 @@ The first full run on 2026-09-04 included six successful episodes (869
 transitions), held out the last episode for validation, and trained on the
 other five. All 600 epochs finished in about 15.6 minutes; both `300.ckpt` and
 `600.ckpt` were produced and loaded successfully against the held-out episode.
+Training loss converged, while validation plateaued after roughly 300 epochs
+and rose slightly near the end, so both checkpoints remain for live comparison.
 Two aborted sessions remain in raw storage but were excluded from this dataset.
 
 ## ACT (retained adapter)

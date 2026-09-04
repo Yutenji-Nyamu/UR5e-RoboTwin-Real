@@ -2,8 +2,8 @@
 
 [简体中文](zh-CN/ROADMAP.md)
 
-Status: 2026-09-04. Devices, capture, and manual replay are commissioned; DP
-offline data and servoJ are next. RoboTwin stays above one narrow policy adapter.
+Status: 2026-09-04. Devices, capture, replay, the offline DP path, and shadow
+pass; a small servoJ test is next. RoboTwin stays above one narrow policy adapter.
 
 ## Fixed principles
 
@@ -40,10 +40,10 @@ current 14-value compatibility layout the initial mapping is
 | UR5e network/Dashboard | Reachable; PolyScope 5.13, `RUNNING`, safety `NORMAL` | Human verifies mode before output |
 | RTDE receive | 10 Hz capture used for a complete session | Recheck 500 Hz feedback with servoJ |
 | Serial gripper | Stable by-id path; open and close tested | Policy gripper decoding |
-| Dual RealSense | Dual capture and 60-frame warmup tested | Live DP shadow input |
+| Dual RealSense | Dual capture, 60-frame warmup, and DP shadow tested | Formal data capture |
 | socket replay | Session `20260903_182752` replayed completely | Keep as an independent regression path |
 | RTDE servoJ | ACT client, recipe, and robot program exist | Hold, small step, ramp, watchdog |
-| Diffusion Policy | Pinned upstream data, training, and six-action inference inspected | One-session Zarr and offline batch |
+| Diffusion Policy | 227-step Zarr, native batch, GPU train, checkpoint load, offline, and shadow pass | Live execution after servoJ |
 
 ## Chunk execution
 
@@ -53,14 +53,13 @@ or overlapping-chunk fusion.
 
 Before reaching the robot, every chunk passes:
 
-1. finite values, coordinate meaning, and rotation-vector continuity;
-2. workspace and per-step speed limits;
-3. 10 Hz to 500 Hz interpolation for servoJ;
-4. RTDE runtime state and measured TCP feedback.
+1. rotation-vector continuity and per-step speed limits;
+2. 10 Hz to 500 Hz interpolation for servoJ;
+3. RTDE runtime state and measured TCP feedback.
 
-Log raw prediction, commanded target, and measured TCP separately. Early
-replanning or chunk fusion is compared only if the full six-step baseline shows
-a measured problem. See [`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md).
+After measuring the full six-step baseline, decide whether more logging, early
+replanning, or chunk fusion is useful. See
+[`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md).
 
 ## Motion backends
 
@@ -82,6 +81,8 @@ The backends never switch automatically. See
 
 Exit: one canonical episode produces a correct upstream DP batch and decodes to
 the same single-arm meaning.
+
+Status: complete.
 
 ### 1 — Read-only devices
 
@@ -123,6 +124,9 @@ Exit: configured safety limits and measured rate/latency pass.
 
 Exit: repeatable checkpoint loading and sane chunks without robot output.
 
+Status: conversion, training, reload, and shadow pipeline checks are complete;
+the current checkpoint is not a task-quality model.
+
 ### 6 — Shadow then live
 
 - Shadow: live inputs, predictions logged, no commands.
@@ -130,6 +134,8 @@ Exit: repeatable checkpoint loading and sane chunks without robot output.
 - Full six-step RTDE execution after trace review; enable debounced gripper last.
 
 Exit: repeatable trials with stop reasons and raw/guarded/measured logs.
+
+Status: shadow is complete; live execution follows gate 4 servoJ validation.
 
 ## Human–automation handoff
 

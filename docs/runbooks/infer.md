@@ -1,26 +1,55 @@
-# Infer on the real UR5e
+# RoboTwin DP inference
 
 [简体中文](../zh-CN/runbooks/infer.md)
 
-1. Run the hardware doctor and move the arm to a validated start pose.
-2. Switch PolyScope to Local mode.
-3. Start the robot-side servoJ loop using the existing validated URP or create a
-   program from `robot_programs/servoj_control_loop.script`.
-4. First validate paths and task configuration without motion:
+Enter the shared environment and repository:
 
 ```bash
-ur5e-real infer-act --config configs/lab.yaml \
-  --task pick_block_bowl --task-config simple --episodes 15 \
-  --checkpoint policy_best.ckpt
+conda activate RoboTwinSimReal
+cd ~/UR5e_RoboTwin_Real
 ```
 
-5. With the workspace clear and a person at the emergency stop, add `--execute`.
+## 1. Offline inference
 
-Inference maps the physical head camera to `cam_high`, the wrist camera to
-`cam_right_wrist`, and duplicates the wrist image for the unused
-`cam_left_wrist` channel. The single physical arm is duplicated into the ACT
-left/right arm slots; the unused left gripper remains zero to match conversion.
+```bash
+ur5e-real infer-dp --checkpoint CHECKPOINT \
+  --episode HDF5_EPISODE --index 20 --output prediction.npz
+```
 
-ACT receives measured TCP/runtime state and writes TCP setpoints through RTDE
-input registers. The running PolyScope loop performs IK and servoJ; this is not
-the socket `movel` replay path.
+This reads recorded images and state, then reports a six-action prediction,
+latency, and label error without connecting hardware.
+
+## 2. Live shadow mode
+
+```bash
+ur5e-real infer-dp --checkpoint CHECKPOINT \
+  --config configs/lab.yaml --shadow --chunks 10
+```
+
+This connects both cameras and read-only RTDE, prints predictions, and sends no
+robot or gripper command. `--chunks 0` runs until `Ctrl+C`. The real chain has
+passed two chunks; measured steady inference was about 0.84 seconds.
+
+## 3. Live execution
+
+Initialize under PolyScope **Remote Control**:
+
+```bash
+ur5e-policy-init
+```
+
+Then switch PolyScope to **Local**, start the robot-side program built from
+`robot_programs/servoj_control_loop.script`, and execute one chunk:
+
+```bash
+ur5e-real infer-dp --checkpoint CHECKPOINT \
+  --config configs/lab.yaml --execute --chunks 1
+```
+
+Each inference preserves and executes all six native RoboTwin actions. Every
+10 Hz TCP target is interpolated into the 500 Hz RTDE servoJ stream. The gripper
+uses element 14; add `--no-gripper` to disable it temporarily.
+
+Offline and shadow modes are hardware-tested. The `--execute` path is
+implemented; the next on-site step is a servoJ hold and millimeter-scale move
+before attaching a fully trained model.

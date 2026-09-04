@@ -25,3 +25,12 @@ dependencies:
       - ipython
       - torch==2.4.1+cu121
       - torchvision==0.19.1+cu121
+      - diffusers==0.34.0
+      - zarr==2.18.3
+      - numcodecs==0.13.1
+      - hydra-core==1.2.0
+      - omegaconf==2.3.0
+      - numba==0.61.2
+      - dill==0.3.8
+      - pytest==8.4.2
+      - ruff==0.12.12

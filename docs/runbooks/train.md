@@ -1,21 +1,65 @@
-# Train RoboTwin ACT
+# RoboTwin Diffusion Policy training
 
 [简体中文](../zh-CN/runbooks/train.md)
 
-Bootstrap the exact upstream tree, convert real episodes, then run the tracked
-training wrapper:
+Enter the shared environment and repository:
 
 ```bash
-scripts/bootstrap_robotwin.sh
-ur5e-real process-act OUTPUT_RUN \
-  --task pick_block_bowl --task-config simple --episodes 15
-scripts/train_act.sh pick_block_bowl simple 15 0 0
+conda activate RoboTwinSimReal
+cd ~/UR5e_RoboTwin_Real
 ```
 
-The processed dataset and checkpoints live inside the ignored upstream runtime
-tree. The adapter writes the required `SIM_TASK_CONFIGS.json` entry there; no
-generated data or modification of RoboTwin is committed to this repository.
+## 1. Build training data from successful sessions
 
-A production DP training wrapper is not implemented yet. Do not reuse the ACT
-command and present it as DP; first complete the vector/Zarr adapter and offline
-round-trip gate in the roadmap.
+```bash
+ur5e-real convert --config configs/lab.yaml \
+  --task pick_place_cube --task-config simple
+```
+
+Save the printed `HDF5_RUN` path; `N` is the number of successful episodes.
+Convert it to RoboTwin DP Zarr:
+
+```bash
+ur5e-real process-dp HDF5_RUN \
+  --task pick_place_cube --task-config simple --episodes N
+```
+
+The Zarr defaults to `/data/robotics/ur5e-real/converted/dp/`. It contains the
+head camera, 14-dimensional TCP/gripper state, and
+`action[t] = state[t+1]`.
+
+## 2. Smoke training
+
+```bash
+ur5e-real train-dp ZARR_PATH \
+  --task pick_place_cube --task-config simple --episodes N \
+  --debug --batch-size 8
+```
+
+`--debug` retains the RoboTwin model but limits training to two epochs and at
+most three steps per epoch. Validation is automatically disabled for a
+single-episode dataset.
+
+## 3. Full training
+
+```bash
+ur5e-real train-dp ZARR_PATH \
+  --task pick_place_cube --task-config simple --episodes N
+```
+
+Without `--debug`, this preserves RoboTwin `robot_dp_14.yaml`: horizon 8,
+three observations, six actions, 10 Hz, batch 128, and 600 epochs. Run output
+and checkpoints are written under `/data/robotics/ur5e-real/checkpoints/dp/`.
+
+On 2026-09-04 one real episode passed the native Dataset read, two-epoch GPU
+training, and production of two reloadable checkpoints.
+
+## ACT (retained adapter)
+
+```bash
+ur5e-real process-act HDF5_RUN \
+  --task pick_place_cube --task-config simple --episodes N
+scripts/train_act.sh pick_place_cube simple N 0 0
+```
+
+ACT and DP remain parallel adapters; DP is the current main path.

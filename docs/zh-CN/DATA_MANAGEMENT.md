@@ -21,8 +21,9 @@
 ```text
 /data/robotics/ur5e-real/
 ├── raw/                 # 采集器写入，只追加session
-├── converted/           # 按schema版本组织的数据集
-├── checkpoints/         # policy/dataset/train-run层级
+├── converted/run_*/     # 可追溯到raw run ID的规范HDF5
+├── converted/dp/        # RoboTwin DP Zarr
+├── checkpoints/dp/      # dataset/seed/训练运行层级
 └── logs/                # 验证、训练、shadow、实机评估
 ```
 
@@ -46,6 +47,7 @@
 同步CSV继续作为逐帧索引。`ur5e-real review` 在 manifest 的 `reviews` 中追加带时间
 的结论，并把顶层 `outcome` 设为最新结论；它不改写已采集的传感器/动作文件。
 转换时只选任务名匹配且 `outcome=success` 的run；每个HDF5 episode保留源run ID。
+DP Zarr继续记录全部源run ID、schema版本、状态布局、动作语义和图像尺寸。
 
 ## 保留规则
 

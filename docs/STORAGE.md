@@ -2,17 +2,18 @@
 
 [简体中文](zh-CN/STORAGE.md)
 
-Inventory updated: 2026-09-03.
+Inventory updated: 2026-09-04.
 
 ## Active layout
 
 | Device | Filesystem | State | Role |
 |---|---|---|---|
-| 1 TB Lenovo NVMe | ext4 | 937 GiB usable, 428 GiB used, 462 GiB available | OS, source, Git, Conda/venv, active small files |
-| 4 TB Seagate HDD | NTFS3 | mounted at `/data`, 709 GiB used, 3.0 TiB available | datasets, recordings, checkpoints, archives |
+| 1 TB Lenovo NVMe | ext4 | 937 GiB usable, 429 GiB used, 461 GiB available | OS, source, Git, Conda/venv, active small files |
+| 4 TB Seagate HDD | NTFS3 | mounted at `/data`, 712 GiB used, 3.0 TiB available | datasets, recordings, checkpoints, archives |
 
 The HDD is persistently configured by UUID in `/etc/fstab` with `nofail` and a
-systemd automount. Accounts `zhangw`, `ur5`, and `wlf` belong to `robotdata`;
+systemd automount. On 2026-09-04 `ntfsfix` repaired the MFT mirror and cleared
+the dirty flag; automount passed again. Accounts `zhangw`, `ur5`, and `wlf` belong to `robotdata`;
 `/data/robotics` is setgid group-writable. A pre-change fstab backup is retained
 at `/etc/fstab.codex-backup-20260901`.
 
@@ -25,7 +26,7 @@ DETwinVLA (208.1 GiB), DexVLA (89.5 GiB), Pi0.5 checkpoints and training data
 (about 74.8 GiB), ACT data and models (about 21 GiB), and large download
 archives/model shards (about 17.4 GiB) now live under
 `/data/robotics/shared`. Symlinks remain at their old locations, so existing
-commands keep working; the NVMe now has about 462 GiB available.
+commands keep working; the NVMe now has about 461 GiB available.
 
 Re-downloadable pip/Conda caches should be cleaned instead. Conda environments,
 Git worktrees, and caches that create many small files stay off NTFS.

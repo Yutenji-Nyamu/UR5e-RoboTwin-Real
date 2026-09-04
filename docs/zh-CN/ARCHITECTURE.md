@@ -41,14 +41,14 @@ RoboTwin策略适配层  <---->  固定上游工作树
 ActionChunk(tcp targets[N,6], gripper[N], dt)
           |
           v
-安全限制 -> 重叠融合 -> 插值 -> RTDE servoJ + 串口夹爪
+TCP速度限制 -> 10 Hz到500 Hz插值 -> RTDE servoJ + 串口夹爪
 ```
 
 只有适配层可以把单臂7维状态编码为上游兼容向量。当前14维布局为
 `[tcp(6), dummy_gripper, tcp(6), physical_gripper]`；HDF5历史组名
 `joint_action` 不代表这6个数变成UR关节角，它们仍是TCP位姿。DP训练前必须用
-数据往返测试固定这一约定。
+数据往返测试已固定这一约定。
 
-策略不拥有socket、串口、相机或安全决策，只返回带时间戳的chunk；真机执行器
-决定允许下发哪些内容。调试门见 [`ROADMAP.md`](ROADMAP.md)，上游位置与后端
+策略不拥有socket、串口或相机，只返回chunk；真机执行器负责速度限制、插值和下发。
+调试顺序见 [`ROADMAP.md`](ROADMAP.md)，上游位置与后端
 选择见 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md)。

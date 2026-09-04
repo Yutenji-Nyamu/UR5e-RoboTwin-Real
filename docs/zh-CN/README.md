@@ -23,8 +23,8 @@
 - [环境设置](runbooks/setup.md)
 - [数据采集](runbooks/collect.md)
 - [手动重播](runbooks/replay.md)
-- [ACT 训练](runbooks/train.md)
-- [真机推理](runbooks/infer.md)
+- [Diffusion Policy 训练](runbooks/train.md)
+- [Diffusion Policy 推理](runbooks/infer.md)
 
 英文文档是公开接口的基准版本，中文镜像用于本地协作。操作或接口变化应在同一
 提交中同步更新两种语言。

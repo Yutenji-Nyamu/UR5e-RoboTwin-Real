@@ -2,9 +2,9 @@
 
 [简体中文](zh-CN/DIFFUSION_POLICY_PLAN.md)
 
-Status: 2026-09-04. This document keeps the shared context for taking real
-sessions through DP training and real execution. Commands move into runbooks
-only after they are implemented and commissioned.
+Status: 2026-09-04. Data conversion, native training, offline inference, and
+live shadow pass; servoJ execution is next. Commands are in the training and
+inference runbooks.
 
 ## Goal and boundary
 
@@ -31,7 +31,8 @@ semantics. It lives at `.third_party/RoboTwin` at commit
 | Data | Session `20260903_182752` was recorded, reviewed, and saved successfully |
 | Replay | All three socket `movel` segments and both gripper events replayed successfully |
 | Historical ACT | Proves real image input, model loading, RTDE read/write, and 500 Hz servoJ integration; it consumed only the first ACT chunk action |
-| RoboTwin DP | Native path is confirmed as HDF5 `joint_action/vector` to Zarr, Hydra training, then six predicted actions |
+| RoboTwin DP | HDF5 `joint_action/vector` to Zarr, Hydra training, checkpoint, and six-action prediction ran end to end |
+| Shadow | Two chunks passed with both cameras and read-only RTDE; steady inference was about 0.84 seconds and sent no command |
 | servoJ | Client, RTDE recipe, and robot script are migrated; hold/small-step/continuous-path tests remain on the new stack |
 
 One episode is enough to test conversion, batching, forward passes, checkpoint
@@ -63,7 +64,7 @@ measurements justify them.
 
 ## Implementation stages
 
-### 1. Convert one session
+### 1. Convert one session (complete)
 
 - Add `/joint_action/vector` to canonical HDF5.
 - Add `adapters/robotwin_dp` to produce upstream Zarr keys:
@@ -72,10 +73,11 @@ measurements justify them.
 - Check images, 14-value state, next-step action, and episode boundaries on the
   current session.
 
-Done means RoboTwin `RobotImageDataset` loads a batch and its values trace back
-to the same TCP, gripper, and image samples.
+The current session produced 227 transitions. Native RoboTwin
+`RobotImageDataset` loaded `(B,8,3,240,320)` images plus `(B,8,14)` state and
+action tensors.
 
-### 2. One-episode training smoke test
+### 2. One-episode training smoke test (complete)
 
 - Complete and pin the DP Python dependencies.
 - Use `val_ratio=0` for a single episode, which cannot be split into both train
@@ -84,20 +86,21 @@ to the same TCP, gripper, and image samples.
   reload.
 - Plot all six predicted actions against labels on the same trajectory.
 
-These are smoke-test overrides; the first formal baseline still tries the
-original RoboTwin configuration.
+The A6000 completed two epochs with batch 8 and three steps per epoch, producing
+and reloading two checkpoints. These are smoke overrides; formal training keeps
+the original RoboTwin configuration.
 
-### 3. Offline and live shadow inference
+### 3. Offline and live shadow inference (complete)
 
 - Run frame-by-frame inference over recorded data and log predictions and
   latency without robot output.
 - Feed live RTDE and head-camera observations into the three-step history.
 - Log complete six-action chunks without sending setpoints.
 
-Done means continuous operation is stable and output scale, range, and latency
-are understood.
+Offline prediction/label comparison is saved, and live shadow completed two
+full six-action chunks. This checkpoint validates the pipeline, not task quality.
 
-### 4. servoJ and policy execution
+### 4. servoJ and policy execution (in progress)
 
 - Without a model, test hold, a millimetre target, and one 10 Hz target sequence.
 - Interpolate 10 Hz targets to 500 Hz while logging prediction, command, and
@@ -115,13 +118,14 @@ the Remote-mode socket replay path.
 - Associate every checkpoint with dataset ID, config, seed, upstream commit, and
   this repository commit.
 
-## Planned code entry points
+## Implemented code entry points
 
 ```text
 src/ur5e_real/adapters/robotwin_dp/   # HDF5/Zarr, model and semantic adapters
 src/ur5e_real/control/                # chunk timing and 500 Hz execution
-scripts/train_dp.sh                   # pinned upstream path and training options
-ur5e-real process-dp / infer-dp       # final command entry points
+ur5e-real process-dp                  # HDF5 -> Zarr
+ur5e-real train-dp                    # invoke pinned upstream training code
+ur5e-real infer-dp                    # offline / shadow / execute
 ```
 
 The adapter remains thin: model code is neither copied nor maintained here, and
@@ -140,6 +144,6 @@ baseline above. Later decisions are:
 4. Consider early replanning or chunk fusion only if complete six-step execution
    shows a measured problem.
 
-The immediate work is to restore `/data`, complete DP dependencies, implement
-conversion, and run an offline batch plus short training test on the existing
-session. This stage does not move the robot.
+The immediate next step is a Local-mode servoJ hold, millimetre move, and a
+six-target sequence. After that, collect formal data and execute a formally
+trained checkpoint.

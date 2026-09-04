@@ -13,11 +13,11 @@
 | GPU | NVIDIA RTX A6000 48 GB，驱动 `580.95.05` | DP训练与推理 |
 | Python | Conda `RoboTwinSimReal`，Python `3.10.18` | 统一真机与策略环境 |
 | PyTorch | `2.4.1+cu121`，CUDA可用 | RoboTwin模型运行 |
-| 数据盘 | 4 TB Seagate NTFS3，目标挂载点 `/data` | raw、转换数据、checkpoint和日志 |
+| 数据盘 | 4 TB Seagate NTFS3，自动挂载到 `/data` | raw、转换数据、checkpoint和日志 |
 | RoboTwin | `.third_party/RoboTwin`，固定提交 `21072034...` | 上游模型与训练代码 |
 
-2026-09-04检查时，4 TB硬盘仍被系统识别为 `/dev/sda2`，但 `data.mount` 当前失败；
-开始DP转换前需要先恢复 `/data`，原始session不应改放回系统盘。
+2026-09-04 已修复NTFS的MFT镜像与dirty标记，systemd自动挂载恢复正常；当前剩余
+约3.0 TiB。该故障来自卷未干净卸载，不是权限检查或按需挂载设计造成的。
 
 ## 真机一次性准备
 
@@ -76,15 +76,13 @@ scripts/bootstrap_robotwin.sh
 
 ### DP附加依赖
 
-当前环境已有 PyTorch、Torchvision、Diffusers、Zarr 2.x、NumCodecs、OpenCV、HDF5、
-Einops 和 WandB。固定上游DP还需要而当前缺少：
+`environment.yml` 已锁定完整DP运行栈，其中上游额外需要：
 
-- `hydra-core==1.2.0` 与 `omegaconf`：读取上游训练配置；
-- `numba`：Zarr序列批采样；
-- `dill`：保存和加载DP checkpoint。
+- `hydra-core==1.2.0` 与 `omegaconf==2.3.0`：读取上游训练配置；
+- `numba==0.61.2`：Zarr序列批采样；
+- `dill==0.3.8`：保存和加载DP checkpoint。
 
-第一轮离线实现会把验证过的准确版本写入 `environment.yml`，而不是要求现场长期
-执行零散的 `pip install`。
+这些版本已安装到 `RoboTwinSimReal` 并通过训练与checkpoint加载。
 
 不需要为本项目安装ROS，也不需要把完整RoboTwin复制进仓库。当前内核和
 librealsense udev规则已经识别CH340与两台相机，无需再编译旧CH341驱动副本。
@@ -98,9 +96,8 @@ librealsense udev规则已经识别CH340与两台相机，无需再编译旧CH34
 | 单相机画面 | `python examples/smoke/realsense.py --config configs/lab.yaml --frames 3` | 串号映射正确、预热后画面正常 |
 | RTDE读 | `python examples/smoke/rtde_read.py --config configs/lab.yaml --samples 10` | 10 Hz TCP连续输出 |
 | 采集/重播 | 见[采集与重播速查](runbooks/operator_workflows.md) | 已完成一条端到端实机验证 |
-| DP离线 | 转换器 -> 一个batch -> 短训练 -> checkpoint重载 | 不连接机械臂即可完成 |
+| DP离线 | 见[训练手册](runbooks/train.md) | 转换、batch、短训练和checkpoint重载已通过 |
 | servoJ | PolyScope Local运行URP，再做保持/小步/序列 | 实测TCP跟随连续 |
-| DP在线 | 先shadow，再启用执行 | 6步预测、时延和实测轨迹可记录 |
+| DP在线 | 见[推理手册](runbooks/infer.md) | shadow已通过；下一步验证servoJ后执行 |
 
-调试只沿表格向下一层推进：离线DP问题不碰机械臂；servoJ问题不加载模型；硬件单项
-失败先用对应 smoke 命令定位。
+当前下一步是servoJ保持、毫米级小步和6步目标序列。

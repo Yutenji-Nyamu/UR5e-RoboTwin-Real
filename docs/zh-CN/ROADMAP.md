@@ -2,8 +2,8 @@
 
 [English](../ROADMAP.md)
 
-状态：2026-09-04。设备、采集与手动重播已通过，下一步是DP离线数据链路和servoJ。
-RoboTwin 始终位于窄策略适配层之上。
+状态：2026-09-04。设备、采集、重播、DP离线链路和shadow已通过，下一步是servoJ
+小步验证。RoboTwin 始终位于窄策略适配层之上。
 
 ## 固定原则
 
@@ -36,10 +36,10 @@ RoboTwin 始终位于窄策略适配层之上。
 | UR5e 网络/Dashboard | 连通；PolyScope 5.13，`RUNNING`，安全 `NORMAL` | 输出前由人确认模式 |
 | RTDE 读取 | 10 Hz采集已用于完整session | servoJ时复测500 Hz反馈 |
 | 串口夹爪 | 稳定by-id路径；打开/闭合均已实测 | 策略夹爪解码 |
-| 双 RealSense | 双路采集及60帧预热已实测 | DP在线shadow |
+| 双 RealSense | 双路采集、60帧预热和DP shadow已实测 | 正式数据采集 |
 | socket 重播 | session `20260903_182752` 已完整重播成功 | 保持为独立回归链路 |
 | RTDE servoJ | ACT 客户端、recipe、机器人程序均存在 | 保持、小步、斜坡、watchdog |
-| Diffusion Policy | 已核对固定上游数据、训练与6步推理代码 | 一条数据的Zarr与离线batch |
+| Diffusion Policy | 227步Zarr、原生batch、GPU训练、checkpoint加载、offline和shadow已通过 | servoJ后再做实机执行 |
 
 ## Chunk 执行
 
@@ -48,13 +48,12 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 每个 chunk 到达机器人前依次经过：
 
-1. 数值、坐标系和旋转向量连续化；
-2. 工作空间与单步速度限制；
-3. servoJ 的10 Hz到500 Hz插值；
-4. RTDE运行状态和实测TCP反馈。
+1. 旋转向量连续化和单步速度限制；
+2. servoJ 的10 Hz到500 Hz插值；
+3. RTDE运行状态和实测TCP反馈。
 
-原始预测、下发目标和实际TCP分别记录。只有完整6步基线出现实测问题，才比较提前
-重规划或chunk融合。详细语义见 [`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md)。
+完整6步基线实测后，再决定是否需要额外日志、提前重规划或chunk融合。详细语义见
+[`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md)。
 
 ## 运动后端
 
@@ -72,6 +71,8 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 - 用合成 episode 测试时间对齐、旋转连续性和插值。
 
 退出条件：一个规范episode可生成正确DP batch，并解码回相同单臂语义。
+
+状态：已完成。
 
 ### 1 — 只读设备
 
@@ -111,6 +112,8 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 退出条件：不输出机器人命令时，可复现加载checkpoint且chunk数值合理。
 
+状态：已完成转换、训练、加载和shadow管线验证；当前模型不用于任务效果评价。
+
 ### 6 — Shadow再实机
 
 - Shadow：输入真实传感器，只记录预测，不下发。
@@ -118,6 +121,8 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 - 轨迹审查后执行完整6步RTDE；最后启用带去抖的夹爪。
 
 退出条件：试验可复现，并记录停止原因及原始/保护/实测轨迹。
+
+状态：shadow已完成；实机执行等待第4门的servoJ验证。
 
 ## 人员与自动化分工
 

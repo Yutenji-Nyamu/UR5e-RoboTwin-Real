@@ -1,18 +1,62 @@
-# 训练 RoboTwin ACT
+# RoboTwin Diffusion Policy 训练
 
 [English](../../runbooks/train.md)
 
-先bootstrap准确上游版本，再转换真实episode并运行受跟踪的训练包装脚本：
+先进入统一环境和仓库：
 
 ```bash
-scripts/bootstrap_robotwin.sh
-ur5e-real process-act OUTPUT_RUN \
-  --task pick_block_bowl --task-config simple --episodes 15
-scripts/train_act.sh pick_block_bowl simple 15 0 0
+conda activate RoboTwinSimReal
+cd ~/UR5e_RoboTwin_Real
 ```
 
-处理后数据和checkpoint位于被忽略的上游运行树中。适配器会写入所需的
-`SIM_TASK_CONFIGS.json` 项；生成数据和RoboTwin运行时改动都不提交到本仓库。
+## 1. 从成功轨迹构建训练数据
 
-DP尚未提供正式训练包装命令；在数据适配与离线往返测试完成前，不复制ACT命令
-假装DP流程已经可用。
+```bash
+ur5e-real convert --config configs/lab.yaml \
+  --task pick_place_cube --task-config simple
+```
+
+记下输出的 `HDF5_RUN` 路径；`N` 是纳入的成功轨迹数。再生成 RoboTwin DP Zarr：
+
+```bash
+ur5e-real process-dp HDF5_RUN \
+  --task pick_place_cube --task-config simple --episodes N
+```
+
+Zarr 默认写到 `/data/robotics/ur5e-real/converted/dp/`。它使用头部相机、14维
+TCP/夹爪状态，以及 `action[t] = state[t+1]`。
+
+## 2. 冒烟训练
+
+```bash
+ur5e-real train-dp ZARR_PATH \
+  --task pick_place_cube --task-config simple --episodes N \
+  --debug --batch-size 8
+```
+
+`--debug` 沿用 RoboTwin 模型，只把训练缩为2个epoch、每个epoch最多3步。单轨迹时
+验证集比例自动设为0。
+
+## 3. 正式训练
+
+```bash
+ur5e-real train-dp ZARR_PATH \
+  --task pick_place_cube --task-config simple --episodes N
+```
+
+不加 `--debug` 即沿用 RoboTwin `robot_dp_14.yaml`：horizon 8、3步观测、6步动作、
+10 Hz、batch 128和600 epoch。训练目录及checkpoint自动写入
+`/data/robotics/ur5e-real/checkpoints/dp/`。
+
+2026-09-04 已用一条真实轨迹完成原生 Dataset 读取、2 epoch GPU训练并生成两个
+可重新加载的checkpoint。
+
+## ACT（保留的旧适配）
+
+```bash
+ur5e-real process-act HDF5_RUN \
+  --task pick_place_cube --task-config simple --episodes N
+scripts/train_act.sh pick_place_cube simple N 0 0
+```
+
+ACT 与 DP 是并列适配器；正式方向当前为 DP。

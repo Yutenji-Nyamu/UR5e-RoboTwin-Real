@@ -2,8 +2,8 @@
 
 [English](../DIFFUSION_POLICY_PLAN.md)
 
-状态：2026-09-04。本文维护 DP 从真实数据到实机执行的共同上下文；具体操作命令在
-实现并验收后再进入 runbook。
+状态：2026-09-04。数据转换、官方训练、离线推理和真机shadow已通过；servoJ实机
+执行是下一阶段。具体命令见训练与推理runbook。
 
 ## 目标与边界
 
@@ -29,7 +29,8 @@
 | 数据 | session `20260903_182752` 已成功记录、复核和保存 |
 | 重播 | 同一 session 的三段 socket `movel` 与两次夹爪事件已完整重播成功 |
 | 旧 ACT | 已证明真实双相机观测、模型加载、RTDE读写和500 Hz servoJ的接法；旧实现每次只取ACT chunk第1步 |
-| RoboTwin DP | 原生流程已核对：HDF5 `joint_action/vector` -> Zarr -> Hydra训练 -> 6步预测 |
+| RoboTwin DP | HDF5 `joint_action/vector` -> Zarr -> Hydra训练 -> checkpoint -> 6步预测已实跑 |
+| shadow | 双相机和只读RTDE已连续完成2个chunk；稳态推理约0.84秒，未发送命令 |
 | servoJ | 客户端、RTDE recipe和机器人端脚本已迁入；新仓库内尚未重新做保持/小步/连续轨迹实测 |
 
 一条数据足以验证转换、batch、前向、checkpoint加载和单episode过拟合；它不能用来
@@ -58,7 +59,7 @@ RoboTwin 仿真原始14维向量表示双臂关节位置；真机适配层复用
 
 ## 实施阶段
 
-### 1. 单条数据打通转换
+### 1. 单条数据打通转换（完成）
 
 - 在规范 HDF5 中增加 `/joint_action/vector`；
 - 新增 `adapters/robotwin_dp`，生成上游所需的 Zarr：
@@ -66,27 +67,29 @@ RoboTwin 仿真原始14维向量表示双臂关节位置；真机适配层复用
 - 保留源 run ID、schema版本和转换器提交；
 - 用当前一条 session 检查图像、14维状态、next-step动作和episode边界。
 
-完成标志：RoboTwin `RobotImageDataset` 能读取一个 batch，转换前后可追溯到同一
-TCP、夹爪和图像帧。
+当前轨迹生成227个transition；RoboTwin原生 `RobotImageDataset` 已读取
+`(B,8,3,240,320)` 图像、`(B,8,14)` 状态和动作。
 
-### 2. 单episode训练烟雾测试
+### 2. 单episode训练烟雾测试（完成）
 
 - 补齐并锁定 DP Python 依赖；
 - 一条数据时使用 `val_ratio=0`，因为无法同时划分训练集和验证集；
 - 用较小 batch 和少量 epoch 验证loss下降、保存checkpoint并重新加载；
 - 对同一轨迹画出6步预测与标签。
 
-这些只是烟雾测试参数；正式基线仍先尝试 RoboTwin 原始配置。
+已在A6000上用batch 8完成2 epoch/每epoch 3步，并生成、加载两个checkpoint。这些
+只是烟雾测试参数；正式基线仍使用 RoboTwin 原始配置。
 
-### 3. 离线与在线 shadow
+### 3. 离线与在线 shadow（完成）
 
 - 对录制数据逐帧推理，不连接机械臂输出，记录预测和推理耗时；
 - 接入真实 RTDE 与头部相机，维持3步观测队列；
 - 在线只保存原始6步预测，不发送设点。
 
-完成标志：连续运行稳定，输出量纲、范围和延迟清楚。
+离线预测与标签对比已保存；真机shadow已完成2个完整6步chunk。当前模型只是管线
+验证模型，不用于判断任务效果。
 
-### 4. servoJ 与策略执行
+### 4. servoJ 与策略执行（进行中）
 
 - 先不用模型，分别验证保持、毫米级目标和一段10 Hz目标序列；
 - 低层执行器完成10 Hz到500 Hz插值，并记录预测、下发目标和实测TCP；
@@ -101,13 +104,14 @@ socket手动重播链路。
 - 先收集一小批一致示范，跑完整训练/评估，再决定是否扩充；
 - checkpoint始终关联dataset ID、配置、seed、上游提交和本仓库提交。
 
-## 计划中的代码入口
+## 已实现的代码入口
 
 ```text
 src/ur5e_real/adapters/robotwin_dp/   # HDF5/Zarr、模型加载、观测与动作适配
 src/ur5e_real/control/                # chunk定时与500 Hz执行
-scripts/train_dp.sh                   # 固定上游路径和训练参数
-ur5e-real process-dp / infer-dp       # 最终命令入口
+ur5e-real process-dp                  # HDF5 -> Zarr
+ur5e-real train-dp                    # 调用固定上游训练代码
+ur5e-real infer-dp                    # offline / shadow / execute
 ```
 
 先保持适配层很薄，不复制 RoboTwin 的模型代码，也不直接修改被忽略的上游工作树。
@@ -122,5 +126,5 @@ ur5e-real process-dp / infer-dp       # 最终命令入口
 3. 只有头部基线跑通后，再决定是否把腕部相机加入模型；
 4. 只有完整6步执行出现实测问题后，再讨论提前重规划或 chunk 融合。
 
-最近的下一步是：恢复 `/data` 可访问、补齐 DP 依赖、实现转换器，并用现有一条
-session完成离线 batch 和短训练测试；此阶段不会运动机器人。
+最近的下一步是：在PolyScope Local模式验证servoJ保持、毫米级小步和一段6目标序列；
+通过后再收集正式数据并执行正式训练模型。

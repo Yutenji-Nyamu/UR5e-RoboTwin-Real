@@ -26,8 +26,9 @@ evaluation result traceable to immutable source data.
 ```text
 /data/robotics/ur5e-real/
 ├── raw/                 # collector-owned, append-only sessions
-├── converted/           # schema-versioned datasets
-├── checkpoints/         # policy/dataset/train-run hierarchy
+├── converted/run_*/     # canonical HDF5 traceable to raw run IDs
+├── converted/dp/        # RoboTwin DP Zarr
+├── checkpoints/dp/      # dataset/seed/training-run hierarchy
 └── logs/                # validation, training, shadow and live evaluation
 ```
 
@@ -57,7 +58,8 @@ The sync CSV remains the frame-level index. `ur5e-real review` appends a timed
 entry to `reviews` and sets the top-level `outcome` to the latest result; it does
 not rewrite captured sensor/action files. Conversion selects only runs whose
 task matches and whose `outcome=success`; every HDF5 episode retains its source
-run ID.
+run ID. DP Zarr retains all source run IDs, schema versions, state layout,
+action semantics, and image size.
 
 ## Retention
 

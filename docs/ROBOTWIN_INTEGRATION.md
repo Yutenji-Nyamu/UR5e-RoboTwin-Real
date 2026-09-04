@@ -11,7 +11,7 @@ into the ignored `.third_party/RoboTwin` directory and checks out commit
 ```text
 UR5e_RoboTwin_Real (tracked, owned here)
 ├── hardware / control / collection / data
-├── adapters/robotwin_act and future adapters/robotwin_dp
+├── adapters/robotwin_act and adapters/robotwin_dp
 ├── integrations/robotwin (lock metadata and narrow patches)
 └── .third_party/RoboTwin (ignored, reproducible upstream checkout)
 ```
@@ -45,16 +45,14 @@ The pinned RoboTwin DP baseline defines:
 - runner frequency `10 Hz`;
 - a 14-value dual-arm compatibility vector.
 
-These are upstream model semantics and stay unchanged by default. Early
-commissioning may cap how many predicted steps are physically sent, but that is
-a safety gate—not a model/configuration change. Permanent changes to horizon,
-frequency, action representation, or replanning require measured latency,
-tracking, or task-success evidence and an explicit decision record.
+These upstream model semantics remain unchanged. The adapter executes all six
+steps and applies only TCP velocity limits plus 10 Hz-to-500 Hz interpolation
+below the model boundary.
 
-The current converter still needs the upstream-required
-`/joint_action/vector` and a tested DP Zarr adapter. The initial compatibility
-mapping remains `[tcp(6), dummy_gripper, tcp(6), physical_gripper]` so collection,
-training, and inference share exactly one meaning.
+The converter now produces upstream `/joint_action/vector` and a DP Zarr tested
+with the native Dataset. The compatibility mapping is
+`[tcp(6), dummy_gripper, tcp(6), physical_gripper]`, so collection, training,
+and inference share exactly one meaning.
 The first baseline keeps upstream head-only input and complete six-action
 execution; see [`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md) for stages
 and later decisions.
@@ -67,7 +65,5 @@ and later decisions.
 | RTDE input + servoJ URP | Continuous setpoints, measured state, tracking checks, watchdog, smooth interpolation | Requires a running PolyScope program and commissioning | Default ACT/DP learned-policy backend |
 
 A six-step DP chunk can be sent through either backend, so choosing RTDE does not
-change the policy output. Because the ACT RTDE loop already exists, socket motion
-is not simpler overall for a closed-loop policy. We retain both behind an
-explicit backend boundary and compare the same conservative test chunk; there is
-never an automatic fallback between them.
+change the policy output. The ACT RTDE loop is now reused as DP's 500 Hz execution
+layer. Socket remains the manual-replay backend; the two never switch automatically.

@@ -10,6 +10,8 @@ from pathlib import Path
 from typing import Any
 
 from ...config import LabConfig, load_config
+from ...control.chunk import ChunkStreamConfig, limit_tcp_target
+from ...control.gripper_policy import GripperCommandConfig, GripperPolicy
 from ...control.servoj import ServoJController, ServoJStreamConfig
 from ...hardware.gripper import GripperSerial
 from ...hardware.realsense import DualColorCamera
@@ -133,59 +135,6 @@ def build_images(head, wrist, camera_names: list[str], device: Any):
     return torch.from_numpy(values).to(device).unsqueeze(0)
 
 
-def limit_tcp_step(current, desired, dt: float, inference: InferenceConfig):
-    import numpy as np
-
-    current = np.asarray(current, dtype=np.float32)
-    desired = np.asarray(desired, dtype=np.float32)
-    target = current + inference.action_delta_scale * (desired - current)
-    translation = target[:3] - current[:3]
-    rotation = target[3:] - current[3:]
-    max_translation = inference.max_linear_velocity * dt
-    max_rotation = inference.max_angular_velocity * dt
-    translation_norm = float(np.linalg.norm(translation))
-    rotation_norm = float(np.linalg.norm(rotation))
-    if translation_norm > max_translation and translation_norm > 1e-9:
-        translation *= max_translation / translation_norm
-    if rotation_norm > max_rotation and rotation_norm > 1e-9:
-        rotation *= max_rotation / rotation_norm
-    return np.concatenate([current[:3] + translation, current[3:] + rotation]).astype(np.float32)
-
-
-class GripperPolicy:
-    def __init__(self, gripper: GripperSerial, config: InferenceConfig) -> None:
-        self.gripper = gripper
-        self.config = config
-        self.state = "wait_close"
-        self.close_streak = 0
-        self.open_streak = 0
-        self.last_command_at = 0.0
-        self.cycles = 0
-        self.estimated = 0.0
-
-    def step(self, predicted: float, now: float) -> None:
-        if self.cycles >= self.config.maximum_cycles:
-            return
-        interval_ok = now - self.last_command_at >= self.config.minimum_command_interval_s
-        if self.state == "wait_close":
-            self.close_streak = self.close_streak + 1 if predicted >= self.config.close_threshold else 0
-            if self.close_streak >= self.config.stable_count and interval_ok:
-                self.gripper.close()
-                self.last_command_at = now
-                self.estimated = 1.0
-                self.state = "wait_open"
-                self.open_streak = 0
-        elif self.state == "wait_open":
-            self.open_streak = self.open_streak + 1 if predicted <= self.config.open_threshold else 0
-            if self.open_streak >= self.config.stable_count and interval_ok:
-                self.gripper.open()
-                self.last_command_at = now
-                self.estimated = 0.0
-                self.cycles += 1
-                self.state = "done" if self.cycles >= self.config.maximum_cycles else "wait_close"
-                self.close_streak = 0
-
-
 def run_inference(
     lab: LabConfig,
     robotwin_root: Path,
@@ -230,7 +179,21 @@ def run_inference(
         if enable_gripper
         else None
     )
-    gripper_policy = GripperPolicy(gripper, inference) if gripper is not None else None
+    gripper_config = GripperCommandConfig(
+        close_threshold=inference.close_threshold,
+        open_threshold=inference.open_threshold,
+        stable_count=inference.stable_count,
+        minimum_command_interval_s=inference.minimum_command_interval_s,
+        maximum_cycles=inference.maximum_cycles,
+    )
+    gripper_policy = GripperPolicy(gripper, gripper_config) if gripper is not None else None
+    motion_config = ChunkStreamConfig(
+        policy_hz=inference.inference_hz,
+        servo_hz=lab.servoj.frequency_hz,
+        max_linear_velocity=inference.max_linear_velocity,
+        max_angular_velocity=inference.max_angular_velocity,
+        action_delta_scale=inference.action_delta_scale,
+    )
     cameras.start()
     controller.connect_and_start()
     period = 1.0 / inference.inference_hz
@@ -254,7 +217,7 @@ def run_inference(
                 prediction = policy(qpos_tensor, image_tensor)
             raw = prediction[0, 0].detach().cpu().numpy()
             action = raw * stats["action_std"] + stats["action_mean"]
-            target = limit_tcp_step(np.asarray(tcp), action[:6], period, inference)
+            target = limit_tcp_target(np.asarray(tcp), action[:6], period, motion_config)
             controller.set_target_tcp(target)
             if gripper_policy is not None:
                 gripper_policy.step(float(action[13]), time.monotonic())

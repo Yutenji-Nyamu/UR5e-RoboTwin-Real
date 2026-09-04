@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
-from .schema import CAMERA_GROUP_MAP, SCHEMA_VERSION
+from .schema import CAMERA_GROUP_MAP, SCHEMA_VERSION, tcp_gripper_vectors
 
 
 @dataclass(frozen=True)
@@ -121,6 +121,8 @@ def write_episode(path: Path, poses, gripper, head_paths: list[Path], wrist_path
         raise ValueError("episode arrays have different lengths")
     if length == 0:
         raise ValueError(f"session {run_id} contains no aligned samples")
+    vectors = tcp_gripper_vectors(poses, gripper)
+    poses = vectors[:, :6]
     path.parent.mkdir(parents=True, exist_ok=True)
     with h5py.File(path, "w") as handle:
         handle.attrs["schema_version"] = SCHEMA_VERSION
@@ -130,6 +132,7 @@ def write_episode(path: Path, poses, gripper, head_paths: list[Path], wrist_path
         action.create_dataset("left_gripper", data=np.zeros(length, dtype=np.float32))
         action.create_dataset("right_arm", data=poses)
         action.create_dataset("right_gripper", data=gripper)
+        action.create_dataset("vector", data=vectors)
 
         observation = handle.create_group("observation")
         encoded_type = h5py.vlen_dtype(np.dtype("uint8"))

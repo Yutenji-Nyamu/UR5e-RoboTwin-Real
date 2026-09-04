@@ -51,6 +51,10 @@ def replay_init() -> int:
     return _init_command("replay")
 
 
+def policy_init() -> int:
+    return _init_command("policy")
+
+
 def collect() -> int:
     from .collection.session import run_collection
     from .data.session_manifest import review_session

@@ -23,8 +23,8 @@
 - [Setup](runbooks/setup.md)
 - [Collection](runbooks/collect.md)
 - [Manual replay](runbooks/replay.md)
-- [ACT training](runbooks/train.md)
-- [Real inference](runbooks/infer.md)
+- [Diffusion Policy training](runbooks/train.md)
+- [Diffusion Policy inference](runbooks/infer.md)
 
 English documents are canonical for public interfaces. A maintained Chinese
 mirror is available under [`zh-CN`](zh-CN); operational changes should update

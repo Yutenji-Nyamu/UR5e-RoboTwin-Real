@@ -11,7 +11,7 @@
 ```text
 UR5e_RoboTwin_Real（本仓库跟踪、维护）
 ├── hardware / control / collection / data
-├── adapters/robotwin_act 与未来的 adapters/robotwin_dp
+├── adapters/robotwin_act 与 adapters/robotwin_dp
 ├── integrations/robotwin（版本信息与小补丁）
 └── .third_party/RoboTwin（忽略、可复现的上游工作树）
 ```
@@ -43,14 +43,12 @@ UR5e_RoboTwin_Real（本仓库跟踪、维护）
 - 运行频率 `10 Hz`；
 - 14维双臂兼容向量。
 
-这些是上游模型语义，默认不改。早期验机可以限制实际下发的预测步数，但这只是
-安全门，不是模型配置变化。若要长期改变 horizon、频率、动作表示或重规划方式，
-必须先有延迟、跟踪误差或任务成功率证据，并记录明确决策。
+这些上游模型语义保持不改。适配层完整执行6步，只在下层做TCP速度限制与
+10 Hz到500 Hz插值。
 
-当前转换器还缺上游 DP 需要的 `/joint_action/vector` 和经过测试的 DP Zarr 适配。
-初始兼容映射保持为
+当前转换器已生成 `/joint_action/vector` 和经过原生Dataset验证的DP Zarr。兼容映射为
 `[tcp(6), dummy_gripper, tcp(6), physical_gripper]`，保证采集、训练、推理含义一致。
-第一版沿用上游的头部单相机输入和完整6步执行；具体阶段与待决策项见
+第一版沿用上游的头部单相机输入和完整6步执行；当前状态与待决策项见
 [`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md)。
 
 ## 为什么不默认用 socket 重播执行 DP？
@@ -61,5 +59,4 @@ UR5e_RoboTwin_Real（本仓库跟踪、维护）
 | RTDE 输入 + servoJ URP | 连续设点、状态反馈、误差检查、watchdog、平滑插值 | 需要运行 PolyScope 程序并单独验机 | ACT/DP 正式学习策略后端 |
 
 DP 的6步 chunk 可通过任一后端执行，因此选择 RTDE 不会改变模型输出。已有 ACT
-RTDE 循环可以复用，整体上 socket 对闭环策略并不更简单。两个后端保留清晰接口，
-可用相同的保守 chunk 做对比，但绝不自动相互回退。
+RTDE 循环已复用为DP的500 Hz执行层。socket继续服务手动重播；两者不自动切换。

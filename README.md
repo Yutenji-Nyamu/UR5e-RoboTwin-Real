@@ -40,5 +40,9 @@ Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architectur
 hardware commissioning, data management, training, and inference documentation
 is indexed in [`docs/README.md`](docs/README.md).
 
+The Diffusion Policy path now passes HDF5, Zarr, native training, offline
+checkpoint loading, and live shadow inference; see [training](docs/runbooks/train.md)
+and [inference](docs/runbooks/infer.md).
+
 Commands that move hardware require PolyScope **Remote Control**, a clear
 workspace, and an operator at the emergency stop.

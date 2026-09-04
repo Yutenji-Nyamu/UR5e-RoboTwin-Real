@@ -35,5 +35,8 @@ ur5e-replay <RUN_ID> --execute
 数据统一存放在4TB共享盘的 `/data/robotics/ur5e-real`。架构、硬件调试、数据管理、
 训练和推理文档见 [`docs/zh-CN/README.md`](docs/zh-CN/README.md)。
 
+Diffusion Policy 主链已打通到 HDF5、Zarr、官方训练、checkpoint离线加载和真机
+shadow；命令见[训练](docs/zh-CN/runbooks/train.md)与[推理](docs/zh-CN/runbooks/infer.md)。
+
 执行任何运动命令前，PolyScope 必须处于 **Remote Control**，工作区必须净空，人员
 必须守在急停旁。

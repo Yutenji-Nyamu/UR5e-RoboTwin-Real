@@ -82,6 +82,41 @@ def _parser() -> argparse.ArgumentParser:
     infer_act.add_argument("--no-gripper", action="store_true")
     infer_act.add_argument("--execute", action="store_true", help="actually stream commands to the robot")
 
+    process_dp = sub.add_parser("process-dp", help="convert real HDF5 episodes to RoboTwin DP Zarr")
+    process_dp.add_argument("run_root")
+    process_dp.add_argument("--task", required=True)
+    process_dp.add_argument("--task-config", default="simple")
+    process_dp.add_argument("--episodes", type=int, required=True)
+    process_dp.add_argument("--output")
+    process_dp.add_argument("--overwrite", action="store_true")
+
+    train_dp = sub.add_parser("train-dp", help="train RoboTwin DP on a converted real dataset")
+    train_dp.add_argument("zarr_path")
+    train_dp.add_argument("--robotwin-root", default=".third_party/RoboTwin")
+    train_dp.add_argument("--task", required=True)
+    train_dp.add_argument("--task-config", default="simple")
+    train_dp.add_argument("--episodes", type=int, required=True)
+    train_dp.add_argument("--seed", type=int, default=0)
+    train_dp.add_argument("--gpu", default="0")
+    train_dp.add_argument("--debug", action="store_true")
+    train_dp.add_argument("--batch-size", type=int)
+    train_dp.add_argument("--val-ratio", type=float)
+    train_dp.add_argument("--output-dir")
+
+    infer_dp = sub.add_parser("infer-dp", help="run RoboTwin DP offline, shadow, or through RTDE servoJ")
+    infer_dp.add_argument("--robotwin-root", default=".third_party/RoboTwin")
+    infer_dp.add_argument("--checkpoint", required=True)
+    dp_mode = infer_dp.add_mutually_exclusive_group(required=True)
+    dp_mode.add_argument("--episode", help="offline HDF5 episode; never connects hardware")
+    dp_mode.add_argument("--shadow", action="store_true", help="live inference without sending commands")
+    dp_mode.add_argument("--execute", action="store_true", help="execute full chunks through RTDE servoJ")
+    infer_dp.add_argument("--config", help="lab config required for shadow or execute")
+    infer_dp.add_argument("--index", type=int, default=2)
+    infer_dp.add_argument("--output")
+    infer_dp.add_argument("--chunks", type=int, default=1, help="live chunks; 0 means until Ctrl+C")
+    infer_dp.add_argument("--gpu", default="0")
+    infer_dp.add_argument("--no-gripper", action="store_true")
+
     return parser
 
 
@@ -195,6 +230,69 @@ def main(argv: list[str] | None = None) -> int:
             execute=args.execute,
             enable_gripper=not args.no_gripper,
         )
+        return 0
+
+    if args.command == "process-dp":
+        from .adapters.robotwin_dp.process_data import process_run
+
+        process_run(
+            Path(args.run_root),
+            args.task,
+            args.task_config,
+            args.episodes,
+            output_path=Path(args.output) if args.output else None,
+            overwrite=args.overwrite,
+        )
+        return 0
+
+    if args.command == "train-dp":
+        from .adapters.robotwin_dp.train_dp import TrainConfig, run_training
+
+        run_training(
+            Path(args.robotwin_root),
+            Path(args.zarr_path),
+            TrainConfig(
+                task_name=args.task,
+                task_config=args.task_config,
+                episode_count=args.episodes,
+                seed=args.seed,
+                gpu=args.gpu,
+                debug=args.debug,
+                batch_size=args.batch_size,
+                val_ratio=args.val_ratio,
+            ),
+            output_dir=Path(args.output_dir) if args.output_dir else None,
+        )
+        return 0
+
+    if args.command == "infer-dp":
+        from .adapters.robotwin_dp.infer_dp import InferenceConfig as DPInferenceConfig
+        from .adapters.robotwin_dp.infer_dp import run_execute, run_offline, run_shadow
+
+        inference = DPInferenceConfig(
+            chunks=args.chunks,
+            gpu=args.gpu,
+            enable_gripper=not args.no_gripper,
+        )
+        robotwin_root = Path(args.robotwin_root).expanduser().resolve()
+        checkpoint = Path(args.checkpoint).expanduser().resolve()
+        if args.episode:
+            run_offline(
+                robotwin_root,
+                checkpoint,
+                Path(args.episode).expanduser().resolve(),
+                inference,
+                index=args.index,
+                output=Path(args.output) if args.output else None,
+            )
+            return 0
+        if not args.config:
+            raise SystemExit("--config is required with --shadow or --execute")
+        lab = load_config(args.config)
+        if args.shadow:
+            run_shadow(lab, robotwin_root, checkpoint, inference)
+        else:
+            run_execute(lab, robotwin_root, checkpoint, inference)
         return 0
 
     raise AssertionError(f"unhandled command: {args.command}")

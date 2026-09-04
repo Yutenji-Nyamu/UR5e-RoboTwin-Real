@@ -24,6 +24,20 @@ data = [
   "h5py==3.14.0",
   "matplotlib>=3.10,<4",
 ]
+dp = [
+  "dill==0.3.8",
+  "diffusers==0.34.0",
+  "einops==0.8.1",
+  "h5py==3.14.0",
+  "hydra-core==1.2.0",
+  "numba==0.61.2",
+  "numcodecs==0.13.1",
+  "opencv-python==4.11.0.86",
+  "omegaconf==2.3.0",
+  "torch==2.4.1",
+  "torchvision==0.19.1",
+  "zarr==2.18.3",
+]
 dev = [
   "pytest>=8,<9",
   "ruff>=0.12,<1",
@@ -35,6 +49,7 @@ ur5e-collect-init = "ur5e_real.operator:collect_init"
 ur5e-collect = "ur5e_real.operator:collect"
 ur5e-replay-init = "ur5e_real.operator:replay_init"
 ur5e-replay = "ur5e_real.operator:replay"
+ur5e-policy-init = "ur5e_real.operator:policy_init"
 
 [tool.setuptools.packages.find]
 where = ["src"]

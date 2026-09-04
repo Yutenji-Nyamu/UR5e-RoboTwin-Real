@@ -2,16 +2,17 @@
 
 [English](../STORAGE.md)
 
-盘点更新：2026-09-03。
+盘点更新：2026-09-04。
 
 ## 当前布局
 
 | 设备 | 文件系统 | 状态 | 定位 |
 |---|---|---|---|
-| 1TB Lenovo NVMe | ext4 | 可用937 GiB，已用428 GiB，剩余462 GiB | 系统、源码、Git、Conda/venv、活跃小文件 |
-| 4TB Seagate HDD | NTFS3 | 挂载到 `/data`，已用709 GiB，剩余3.0 TiB | 数据集、录制、checkpoint、归档 |
+| 1TB Lenovo NVMe | ext4 | 可用937 GiB，已用429 GiB，剩余461 GiB | 系统、源码、Git、Conda/venv、活跃小文件 |
+| 4TB Seagate HDD | NTFS3 | 挂载到 `/data`，已用712 GiB，剩余3.0 TiB | 数据集、录制、checkpoint、归档 |
 
-HDD 已按 UUID 写入 `/etc/fstab`，使用 `nofail` 和 systemd automount。
+HDD 已按 UUID 写入 `/etc/fstab`，使用 `nofail` 和 systemd automount。2026-09-04
+已用 `ntfsfix` 修复MFT镜像并清除dirty标记，自动挂载重新实测通过。
 `zhangw`、`ur5`、`wlf` 均加入 `robotdata`；`/data/robotics` 为组可写并继承组。
 修改前的 fstab 备份位于 `/etc/fstab.codex-backup-20260901`。
 
@@ -23,7 +24,7 @@ Unix链接/权限的工作负载继续留在ext4。
 DETwinVLA（208.1 GiB）、DexVLA（89.5 GiB）、Pi0.5 checkpoint与训练数据
 （约74.8 GiB）、ACT数据与模型（约21 GiB），以及下载目录的大型归档/模型分片
 （约17.4 GiB）已经迁入 `/data/robotics/shared`。旧位置保留软链接，因此原命令
-无需改路径；NVMe现有约462 GiB余量。
+无需改路径；NVMe现有约461 GiB余量。
 
 可重新下载的pip/Conda缓存适合直接清理；Conda环境、Git工作树和频繁产生大量
 小文件的缓存不迁到NTFS。

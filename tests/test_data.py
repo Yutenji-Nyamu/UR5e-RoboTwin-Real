@@ -7,8 +7,10 @@ from pathlib import Path
 import cv2
 import h5py
 import numpy as np
+import zarr
 
 from ur5e_real.adapters.robotwin_act.process_data import process_run
+from ur5e_real.adapters.robotwin_dp.process_data import process_run as process_dp_run
 from ur5e_real.data.convert_hdf5 import align_nearest, convert_raw_sessions
 
 
@@ -47,8 +49,8 @@ class AlignmentTest(unittest.TestCase):
                     ]
                 )
                 writer.writerow([0.0, 0, 0, 0, 0, 0, 0, 0])
-                writer.writerow([1.0, 1, 2, 3, 4, 5, 6, 1])
-                writer.writerow([2.0, 2, 3, 4, 5, 6, 7, 0])
+                writer.writerow([1.0, 1, 2, 3, 0.4, 0.5, 0.6, 1])
+                writer.writerow([2.0, 2, 3, 4, 0.5, 0.6, 0.7, 0])
 
             with (action_dir / "sync_action_cam_test.csv").open("w", newline="", encoding="utf-8") as handle:
                 writer = csv.writer(handle)
@@ -75,6 +77,7 @@ class AlignmentTest(unittest.TestCase):
             episode = converted / "task" / "simple" / "data" / "episode0.hdf5"
             with h5py.File(episode, "r") as handle:
                 self.assertEqual(handle["joint_action/right_arm"].shape, (3, 6))
+                self.assertEqual(handle["joint_action/vector"].shape, (3, 14))
                 self.assertEqual(handle["observation/head_camera/rgb"].shape, (3,))
 
             act_root = root / "RoboTwin" / "policy" / "ACT"
@@ -84,7 +87,18 @@ class AlignmentTest(unittest.TestCase):
                 self.assertEqual(handle["observations/qpos"].shape, (2, 14))
                 self.assertEqual(handle["action"].shape, (2, 14))
                 np.testing.assert_allclose(handle["observations/qpos"][0], [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-                np.testing.assert_allclose(handle["action"][0], [1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 1])
+                np.testing.assert_allclose(
+                    handle["action"][0],
+                    [1, 2, 3, 0.4, 0.5, 0.6, 0, 1, 2, 3, 0.4, 0.5, 0.6, 1],
+                )
+
+            dp_output = process_dp_run(converted, "task", "simple", 1)
+            dp = zarr.open_group(str(dp_output), mode="r")
+            self.assertEqual(dp["data/head_camera"].shape, (2, 3, 240, 320))
+            self.assertEqual(dp["data/state"].shape, (2, 14))
+            self.assertEqual(dp["data/action"].shape, (2, 14))
+            np.testing.assert_array_equal(dp["meta/episode_ends"][:], [2])
+            np.testing.assert_allclose(dp["data/action"][0], dp["data/state"][1])
 
 
 if __name__ == "__main__":

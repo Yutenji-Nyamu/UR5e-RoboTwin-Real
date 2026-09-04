@@ -47,18 +47,17 @@ RoboTwin policy adapter  <---->  pinned upstream checkout
 ActionChunk(tcp targets[N,6], gripper[N], dt)
           |
           v
-safety limits -> overlap blend -> interpolation -> RTDE servoJ + serial gripper
+TCP velocity limits -> 10 Hz-to-500 Hz interpolation -> RTDE servoJ + serial gripper
 ```
 
 Only an adapter may encode the single-arm seven-value state into an upstream
 compatibility vector. For the current 14-value RoboTwin layout that mapping is
 `[tcp(6), dummy_gripper, tcp(6), physical_gripper]`; the legacy HDF5 group name
 `joint_action` does not change the fact that these six values are TCP pose, not
-UR joint angles. This convention must be covered by dataset round-trip tests
-before Diffusion Policy training.
+UR joint angles. Dataset round-trip tests now lock this convention.
 
-The policy never owns sockets, serial ports, cameras, or safety decisions. It
-returns a timestamped chunk; the real-robot executor decides how much of that
-chunk may be applied. The detailed commissioning gates are in
+The policy never owns sockets, serial ports, or cameras. It returns a chunk; the
+real-robot executor handles velocity limits, interpolation, and transmission.
+The detailed commissioning order is in
 [`ROADMAP.md`](ROADMAP.md); upstream location and backend choices are in
 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md).

@@ -14,12 +14,12 @@ point.
 | GPU | NVIDIA RTX A6000 48 GB, driver `580.95.05` | DP training and inference |
 | Python | Conda `RoboTwinSimReal`, Python `3.10.18` | Shared hardware/policy environment |
 | PyTorch | `2.4.1+cu121`, CUDA available | RoboTwin model runtime |
-| Data disk | 4 TB Seagate NTFS3, intended mount `/data` | Raw data, conversions, checkpoints, and logs |
+| Data disk | 4 TB Seagate NTFS3, automounted at `/data` | Raw data, conversions, checkpoints, and logs |
 | RoboTwin | `.third_party/RoboTwin` at pinned commit `21072034...` | Upstream model and training code |
 
-On 2026-09-04 the 4 TB drive was still visible as `/dev/sda2`, but `data.mount`
-was failing. Restore `/data` before DP conversion; do not relocate canonical raw
-sessions back onto the system disk.
+On 2026-09-04 the NTFS MFT mirror and dirty flag were repaired and systemd
+automount was restored; about 3.0 TiB remains available. The failure came from
+an unclean volume state, not permission checks or the automount design.
 
 ## One-time real-hardware setup
 
@@ -81,16 +81,14 @@ and data root.
 
 ### Additional DP dependencies
 
-The environment already has PyTorch, Torchvision, Diffusers, Zarr 2.x,
-NumCodecs, OpenCV, HDF5, Einops, and WandB. The pinned upstream DP also requires
-these currently missing modules:
+`environment.yml` now locks the complete DP runtime. The pinned upstream adds:
 
-- `hydra-core==1.2.0` and `omegaconf` for upstream training configuration;
-- `numba` for batched Zarr sequence sampling;
-- `dill` for DP checkpoint save/load.
+- `hydra-core==1.2.0` and `omegaconf==2.3.0` for training configuration;
+- `numba==0.61.2` for batched Zarr sequence sampling;
+- `dill==0.3.8` for checkpoint save/load.
 
-The first offline implementation will put tested exact versions into
-`environment.yml` instead of relying on recurring ad-hoc `pip install` commands.
+These versions are installed in `RoboTwinSimReal` and have passed training and
+checkpoint loading.
 
 This project does not require ROS or a full RoboTwin copy inside the repository.
 The current kernel and librealsense udev setup already recognize the CH340 and
@@ -105,10 +103,8 @@ both cameras, so the old copied CH341 driver is unnecessary.
 | Camera view | `python examples/smoke/realsense.py --config configs/lab.yaml --frames 3` | Correct identities and normal post-warmup frames |
 | RTDE receive | `python examples/smoke/rtde_read.py --config configs/lab.yaml --samples 10` | Continuous 10 Hz TCP output |
 | Capture/replay | See [operator quick reference](runbooks/operator_workflows.md) | One end-to-end hardware session is already complete |
-| Offline DP | conversion -> one batch -> short train -> checkpoint reload | Completes without a robot connection |
+| Offline DP | See the [training guide](runbooks/train.md) | Conversion, batch, short train, and checkpoint reload pass |
 | servoJ | Run the URP in Local mode, then hold/small-step/sequence | Measured TCP follows continuously |
-| Online DP | Shadow first, then enable execution | Six predictions, latency, and measured trajectory are logged |
+| Online DP | See the [inference guide](runbooks/infer.md) | Shadow passes; execute follows servoJ validation |
 
-Move down only one layer at a time: offline DP does not touch the robot, servoJ
-testing does not load a model, and a failed device begins with its small smoke
-command.
+The next step is servoJ hold, millimeter-scale motion, and a six-target sequence.

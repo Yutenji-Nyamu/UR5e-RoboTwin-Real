@@ -167,6 +167,12 @@ def infer() -> int:
         default=0.20,
         help="socket TCP linear speed limit in m/s (default: 0.20)",
     )
+    parser.add_argument(
+        "--diffusion-steps",
+        type=int,
+        default=100,
+        help="diffusion denoising steps per chunk (default: 100)",
+    )
     args = parser.parse_args()
     if args.chunks < 0:
         parser.error("--chunks must be non-negative")
@@ -181,6 +187,7 @@ def infer() -> int:
         backend=args.backend,
         smoothing_alpha=args.smooth_alpha,
         max_linear_velocity=args.max_linear_speed,
+        diffusion_steps=args.diffusion_steps,
     )
     mode_name = "shadow" if args.shadow else "execute"
     backend = "read-only" if args.shadow else args.backend

@@ -6,7 +6,11 @@ from unittest import mock
 import numpy as np
 import zarr
 
-from ur5e_real.adapters.robotwin_dp.infer_dp import RealObservationEncoder, observation_from_vector
+from ur5e_real.adapters.robotwin_dp.infer_dp import (
+    InferenceConfig as DPInferenceConfig,
+    RealObservationEncoder,
+    observation_from_vector,
+)
 from ur5e_real.adapters.robotwin_dp.train_dp import TrainConfig, build_train_command, run_training
 from ur5e_real.control.chunk import (
     ChunkStreamConfig,
@@ -15,7 +19,11 @@ from ur5e_real.control.chunk import (
     limit_tcp_target,
 )
 from ur5e_real.control.gripper_policy import GripperCommandConfig, GripperPolicy
-from ur5e_real.control.socket_speedl import SocketSpeedLConfig, smoothed_speedl_target
+from ur5e_real.control.socket_speedl import (
+    SocketSpeedLConfig,
+    smoothed_speedl_target,
+    tracking_speedl_velocity,
+)
 from ur5e_real.operator import resolve_dp_checkpoint
 
 
@@ -122,6 +130,16 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
         policy.step(0.3, now=1.2)
         policy.step(0.3, now=1.3)
         self.assertEqual(gripper.commands, ["close", "open"])
+
+    def test_socket_pose_tracker_slows_near_target_and_obeys_limits(self):
+        config = SocketSpeedLConfig(tracking_gain=10.0, max_linear_velocity=0.2)
+        fast = tracking_speedl_velocity(np.zeros(6), [0.1, 0, 0, 0, 0, 0], config)
+        slow = tracking_speedl_velocity(np.zeros(6), [0.005, 0, 0, 0, 0, 0], config)
+        self.assertAlmostEqual(float(fast[0]), 0.2, places=6)
+        self.assertAlmostEqual(float(slow[0]), 0.05, places=6)
+
+    def test_dp_inference_step_override_defaults_to_upstream(self):
+        self.assertEqual(DPInferenceConfig().diffusion_steps, 100)
 
     def test_training_command_preserves_upstream_defaults(self):
         with tempfile.TemporaryDirectory() as directory:

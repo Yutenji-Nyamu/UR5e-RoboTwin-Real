@@ -13,13 +13,17 @@ from ...config import LabConfig, load_config
 from ...control.chunk import ChunkStreamConfig, stream_tcp_chunk
 from ...control.gripper_policy import GripperCommandConfig, GripperPolicy
 from ...control.servoj import ServoJController, ServoJStreamConfig
-from ...control.socket_speedl import SocketSpeedLConfig, smoothed_speedl_target
+from ...control.socket_speedl import (
+    ContinuousSocketSpeedLController,
+    SocketSpeedLConfig,
+    smoothed_speedl_target,
+)
 from ...data.schema import nearest_rotation_vector
 from ...hardware.dashboard import require_external_motion_ready
 from ...hardware.gripper import GripperSerial
 from ...hardware.realsense import DualColorCamera, LatestDualColorCamera
 from ...hardware.rtde import LatestRtdeTcpClient, RtdeOutputConfig, RtdeTcpClient
-from ...hardware.urscript import send_urscript, speedl_command, stopl_command
+from ...hardware.urscript import send_urscript
 
 DP_IMAGE_SIZE = (320, 240)  # width, height
 
@@ -35,6 +39,7 @@ class InferenceConfig:
     backend: str = "socket"
     smoothing_alpha: float = 0.7
     max_linear_velocity: float = 0.20
+    diffusion_steps: int = 100
 
 
 def _image_chw(image, image_size: tuple[int, int] = DP_IMAGE_SIZE):
@@ -100,8 +105,13 @@ def load_model(robotwin_root: Path, checkpoint: Path, inference: InferenceConfig
     sys.path.insert(0, str(dp_root))
     from dp_model import DP
 
+    if not 1 <= inference.diffusion_steps <= 100:
+        raise ValueError("diffusion_steps must be in [1, 100]")
     print(f"[MODEL] {checkpoint}")
-    return DP(str(checkpoint), n_obs_steps=n_obs_steps, n_action_steps=n_action_steps)
+    model = DP(str(checkpoint), n_obs_steps=n_obs_steps, n_action_steps=n_action_steps)
+    model.policy.num_inference_steps = inference.diffusion_steps
+    print(f"[MODEL] diffusion inference steps: {inference.diffusion_steps}")
+    return model
 
 
 def _decode_jpeg(encoded):
@@ -348,6 +358,7 @@ def _run_execute_socket(
         max_linear_velocity=inference.max_linear_velocity,
     )
     robot: socket.socket | None = None
+    tracker: ContinuousSocketSpeedLController | None = None
     previous_target = None
     chunk_index = 0
     try:
@@ -357,9 +368,14 @@ def _run_execute_socket(
         robot = socket.create_connection(
             (lab.robot.host, lab.robot.script_port), timeout=lab.robot.socket_timeout_s
         )
+        initial_state = states.read()
+        if initial_state is None:
+            raise RuntimeError("RTDE has not produced an initial TCP pose")
+        tracker = ContinuousSocketSpeedLController(robot, states.read, motion)
+        tracker.start(initial_state[1])
         model.reset_obs()
         print(
-            f"[EXECUTE] socket speedL at {inference.policy_hz:g} Hz; "
+            f"[EXECUTE] continuous socket speedL at {inference.policy_hz:g} Hz; "
             f"target EMA alpha={inference.smoothing_alpha:g}; "
             f"linear limit={inference.max_linear_velocity:g}m/s"
         )
@@ -383,16 +399,10 @@ def _run_execute_socket(
                 if state is None:
                     continue
                 tcp = state[1]
-                previous_target, velocity = smoothed_speedl_target(
+                previous_target, _ = smoothed_speedl_target(
                     tcp, action[:6], previous_target, motion
                 )
-                robot.sendall(
-                    speedl_command(
-                        velocity,
-                        acceleration=motion.acceleration,
-                        duration_s=1.0 / motion.policy_hz,
-                    ).encode("utf-8")
-                )
+                tracker.set_target(previous_target)
                 if gripper_policy is not None:
                     gripper_policy.step(float(action[13]))
                 deadline += 1.0 / motion.policy_hz
@@ -410,11 +420,9 @@ def _run_execute_socket(
     except KeyboardInterrupt:
         print("\n[STOP] DP execution interrupted")
     finally:
+        if tracker is not None:
+            tracker.stop()
         if robot is not None:
-            try:
-                robot.sendall(stopl_command().encode("utf-8"))
-            except Exception:
-                pass
             robot.close()
         states.stop()
         cameras.stop()
@@ -463,6 +471,12 @@ def main(argv: list[str] | None = None) -> int:
         default=0.20,
         help="socket TCP linear speed limit in m/s (default: 0.20)",
     )
+    parser.add_argument(
+        "--diffusion-steps",
+        type=int,
+        default=100,
+        help="diffusion denoising steps per chunk (default: 100)",
+    )
     args = parser.parse_args(argv)
     inference = InferenceConfig(
         chunks=args.chunks,
@@ -471,6 +485,7 @@ def main(argv: list[str] | None = None) -> int:
         backend=args.backend,
         smoothing_alpha=args.smooth_alpha,
         max_linear_velocity=args.max_linear_speed,
+        diffusion_steps=args.diffusion_steps,
     )
     robotwin_root = args.robotwin_root.expanduser().resolve()
     checkpoint = args.checkpoint.expanduser().resolve()

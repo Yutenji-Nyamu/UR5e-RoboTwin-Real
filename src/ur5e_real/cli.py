@@ -124,6 +124,7 @@ def _parser() -> argparse.ArgumentParser:
     infer_dp.add_argument("--backend", choices=("socket", "rtde"), default="socket")
     infer_dp.add_argument("--smooth-alpha", type=float, default=0.7)
     infer_dp.add_argument("--max-linear-speed", type=float, default=0.20)
+    infer_dp.add_argument("--diffusion-steps", type=int, default=100)
 
     return parser
 
@@ -289,6 +290,7 @@ def main(argv: list[str] | None = None) -> int:
             backend=args.backend,
             smoothing_alpha=args.smooth_alpha,
             max_linear_velocity=args.max_linear_speed,
+            diffusion_steps=args.diffusion_steps,
         )
         robotwin_root = Path(args.robotwin_root).expanduser().resolve()
         checkpoint = Path(args.checkpoint).expanduser().resolve()

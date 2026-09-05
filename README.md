@@ -38,11 +38,11 @@ Live DP inference:
 
 ```bash
 ur5e-infer-init
-ur5e-infer <TRAIN_TIMESTAMP>:600 --execute --backend socket
+ur5e-infer 20260905_150221:300 --execute --backend socket
 ```
 
 The timestamp and epoch identify a checkpoint, for example
-`20260905_150221:600`. Add `--chunks 1 --no-gripper` for the first run. The
+`20260905_150221:300`. Add `--chunks 1 --no-gripper` for the first run. The
 socket backend follows the `speedl` path already proven by the historical ACT
 deployment; RTDE remains an explicit experimental alternative. See
 [DP inference](docs/runbooks/infer.md).
@@ -68,7 +68,7 @@ ur5e-real train-dp ZARR_PATH \
 
 # Offline inference, then live shadow inference
 ur5e-real infer-dp --checkpoint CHECKPOINT --episode HDF5_EPISODE --index 20
-ur5e-infer 600 --shadow --chunks 10
+ur5e-infer 20260905_150221:300 --shadow --chunks 10
 ```
 
 See [training](docs/runbooks/train.md) and [inference](docs/runbooks/infer.md)

@@ -43,7 +43,7 @@ current 14-value compatibility layout the initial mapping is
 | Dual RealSense | Dual capture, 60-frame warmup, and DP shadow tested | Formal data capture |
 | socket replay | Session `20260903_182752` replayed completely | Keep as an independent regression path |
 | RTDE servoJ | ACT client, recipe, and robot program exist | Hold, small step, ramp, watchdog |
-| Diffusion Policy | 227-step Zarr, native batch, GPU train, checkpoint load, offline, and shadow pass | Live execution after servoJ |
+| Diffusion Policy | Zarr, native batch, GPU train, checkpoint load, offline, and shadow pass | One arm-only socket chunk, then gripper; servoJ separately |
 
 ## Chunk execution
 

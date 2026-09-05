@@ -22,12 +22,12 @@ latency, and label error without connecting hardware.
 ## 2. Live shadow mode
 
 ```bash
-ur5e-infer <TRAIN_TIMESTAMP>:600 --shadow --chunks 10
+ur5e-infer 20260905_150221:300 --shadow --chunks 10
 ```
 
 This connects both cameras and read-only RTDE, prints predictions, and sends no
 robot or gripper command. `--chunks 0` runs until `Ctrl+C`. Pass a full path or
-`<TRAIN_TIMESTAMP>:<EPOCH>` so same-epoch checkpoints remain unambiguous.
+`TRAIN_TIMESTAMP:EPOCH` so same-epoch checkpoints remain unambiguous.
 
 ## 3. Live execution
 
@@ -43,14 +43,14 @@ historically successful ACT deployment. It reads RTDE feedback and sends
 `speedl` over socket 30001; no PolyScope RTDE program is required:
 
 ```bash
-ur5e-infer <TRAIN_TIMESTAMP>:600 --execute \
+ur5e-infer 20260905_150221:300 --execute \
   --backend socket --smooth-alpha 0.7 --chunks 1 --no-gripper
 ```
 
 After confirming motion, run the complete episode with the gripper enabled:
 
 ```bash
-ur5e-infer <TRAIN_TIMESTAMP>:600 --execute \
+ur5e-infer 20260905_150221:300 --execute \
   --backend socket --smooth-alpha 0.7
 ```
 
@@ -61,7 +61,7 @@ disables it, while smaller values trade response for more smoothing. The default
 The RTDE servoJ implementation remains an explicit experimental alternative:
 
 ```bash
-ur5e-infer <TRAIN_TIMESTAMP>:600 --execute --backend rtde --chunks 1 --no-gripper
+ur5e-infer 20260905_150221:300 --execute --backend rtde --chunks 1 --no-gripper
 ```
 
 It injects the robot-side servoJ script and writes RTDE input registers. Script

@@ -14,7 +14,7 @@ RoboTwin 策略适配的一站式流程。本仓库负责真机与数据，RoboT
 
 ```bash
 ur5e-collect-init
-ur5e-collect <任务名> --note "可选的场景备注"
+ur5e-collect pick_place_cube --note "可选的场景备注"
 ```
 
 采集中按 `c` 闭合夹爪、`o` 打开夹爪、`q` 结束；随后输入 `s`、`f` 或 `a`，标记
@@ -24,7 +24,7 @@ ur5e-collect <任务名> --note "可选的场景备注"
 
 ```bash
 ur5e-replay-init
-ur5e-replay <RUN_ID> --execute
+ur5e-replay RUN_ID --execute
 ```
 
 初始化完成后，先恢复录制时的场景，再执行重播。完整固定流程和检查项见
@@ -34,10 +34,10 @@ DP真机推理：
 
 ```bash
 ur5e-infer-init
-ur5e-infer <训练时间戳>:600 --execute --backend socket
+ur5e-infer 20260905_150221:300 --execute --backend socket
 ```
 
-时间戳与epoch共同标识checkpoint，例如 `20260905_150221:600`。第一次调试加
+时间戳与epoch共同标识checkpoint，例如 `20260905_150221:300`。第一次调试加
 `--chunks 1 --no-gripper`。`socket` 是旧ACT已经实际运动成功的 `speedl` 链路；
 `rtde` 保留为并列实验后端。完整说明见[《DP推理》](docs/zh-CN/runbooks/infer.md)。
 
@@ -62,7 +62,7 @@ ur5e-real train-dp ZARR_PATH \
 
 # 先离线推理，再接真机shadow
 ur5e-real infer-dp --checkpoint CHECKPOINT --episode HDF5_EPISODE --index 20
-ur5e-infer 600 --shadow --chunks 10
+ur5e-infer 20260905_150221:300 --shadow --chunks 10
 ```
 
 完整参数见[训练](docs/zh-CN/runbooks/train.md)与[推理](docs/zh-CN/runbooks/infer.md)。

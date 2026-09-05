@@ -105,8 +105,8 @@ both cameras, so the old copied CH341 driver is unnecessary.
 | RTDE receive | `python examples/smoke/rtde_read.py --config configs/lab.yaml --samples 10` | Continuous 10 Hz TCP output |
 | Capture/replay | See [operator quick reference](runbooks/operator_workflows.md) | One end-to-end hardware session is already complete |
 | Offline DP | See the [training guide](runbooks/train.md) | Conversion, batch, short train, and checkpoint reload pass |
-| socket policy output | `ur5e-infer <TIME>:600 --execute --backend socket --chunks 1 --no-gripper` | One bounded model chunk visibly moves the arm |
-| RTDE servoJ | Same command with `--backend rtde` | A separate known-displacement test passes |
-| Online DP | See the [inference guide](runbooks/infer.md) | Shadow and selected backend pass |
+| socket policy output | `ur5e-infer 20260905_150221:300 --execute --backend socket --chunks 1 --no-gripper` | Pending one bounded live DP chunk |
+| RTDE servoJ | Same command with `--backend rtde` | Script start passes; known displacement remains pending |
+| Online DP | See the [inference guide](runbooks/infer.md) | Shadow passes; physical DP motion remains pending |
 
 The next step is one arm-only socket chunk; servoJ remains a separate test.

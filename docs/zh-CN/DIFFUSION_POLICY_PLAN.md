@@ -14,7 +14,7 @@
   -> 训练与 checkpoint
   -> 离线回放评估
   -> 在线 shadow inference
-  -> RTDE servoJ 实机执行
+  -> 明确选择socket speedL或RTDE servoJ实机执行
 ```
 
 本仓库负责采集、数据语义、真机观测和执行；固定版本 RoboTwin 只负责 DP 模型、
@@ -47,7 +47,7 @@
 | 监督动作 | `action[t] = state[t+1]`，是绝对 TCP 目标，不是 delta |
 | 旋转 | 写入训练数据前先连续化等价旋转向量，避免接近 pi 时的数值跳支 |
 | chunk | 按上游顺序完整执行6步，再进行下一次推理 |
-| 真机输出 | 6个10 Hz目标由底层插值为500 Hz RTDE servoJ设点；这不改变DP模型配置 |
+| 真机输出 | 保留6个10 Hz目标；模型下层明确选择首测socket speedL或500 Hz RTDE servoJ，不改变DP配置 |
 | 夹爪 | 从每步第14维解码，沿用现有阈值/去抖逻辑 |
 
 RoboTwin 仿真原始14维向量表示双臂关节位置；真机适配层复用它的形状，但明确编码为

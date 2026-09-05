@@ -21,7 +21,7 @@ ur5e-real convert --config configs/lab.yaml \
 ```bash
 ur5e-real process-dp HDF5_RUN \
   --task pick_place_cube --task-config simple --episodes N \
-  --output /data/robotics/ur5e-real/converted/dp/<数据版本>.zarr \
+  --output /data/robotics/ur5e-real/converted/dp/DATA_VERSION.zarr \
   --trim-static-edges
 ```
 
@@ -63,9 +63,10 @@ ur5e-real train-dp ZARR_PATH \
 因此先保留两个checkpoint做真机对照。2条中止轨迹保留在raw中，但未进入该数据版本。
 
 2026-09-05 新版本纳入17条成功轨迹，源HDF5为 `run_20260905_150058`；按上述规则由
-2109裁为1562 transitions。训练目录自身带时间戳，checkpoint可用
-`<训练时间戳>:300` 或 `<训练时间戳>:600` 唯一指定。简短变更记录位于
-`/data/robotics/ur5e-real/DATA_LOG.md`。
+2109裁为1562 transitions。训练 `20260905_150221` 已完成600 epoch并生成两个
+checkpoint。验证曲线约在250--300轮最低，之后训练loss继续下降、验证loss上升；因此
+首测用 `20260905_150221:300`，`20260905_150221:600` 保留作对照。曲线为训练目录下
+的 `loss_curve.png`；简短变更记录位于 `/data/robotics/ur5e-real/DATA_LOG.md`。
 
 ## ACT（保留的旧适配）
 

@@ -22,7 +22,7 @@ Convert it to RoboTwin DP Zarr:
 ```bash
 ur5e-real process-dp HDF5_RUN \
   --task pick_place_cube --task-config simple --episodes N \
-  --output /data/robotics/ur5e-real/converted/dp/<DATA_VERSION>.zarr \
+  --output /data/robotics/ur5e-real/converted/dp/DATA_VERSION.zarr \
   --trim-static-edges
 ```
 
@@ -73,9 +73,12 @@ Two aborted sessions remain in raw storage but were excluded from this dataset.
 
 The 2026-09-05 version contains 17 successful episodes from
 `run_20260905_150058`, reducing 2109 to 1562 transitions with the edge rule
-above. Training directories carry timestamps; select checkpoints uniquely with
-`<TRAIN_TIMESTAMP>:300` or `<TRAIN_TIMESTAMP>:600`. Brief data changes are
-recorded in `/data/robotics/ur5e-real/DATA_LOG.md`.
+above. Run `20260905_150221` completed 600 epochs and produced both checkpoints.
+The validation curve bottoms around epochs 250--300 and then rises while train
+loss keeps falling, so use `20260905_150221:300` first and retain
+`20260905_150221:600` as a comparison. The loss plot is `loss_curve.png` in the
+run directory. Brief data changes are recorded in
+`/data/robotics/ur5e-real/DATA_LOG.md`.
 
 ## ACT (retained adapter)
 

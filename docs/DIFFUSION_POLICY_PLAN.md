@@ -15,7 +15,7 @@ real raw session
   -> training and checkpoint
   -> offline playback evaluation
   -> live shadow inference
-  -> RTDE servoJ execution
+  -> explicit socket speedL or RTDE servoJ execution
 ```
 
 This repository owns capture, data meaning, live observations, and execution.
@@ -50,7 +50,7 @@ success.
 | Supervision | `action[t] = state[t+1]`; the action is an absolute TCP target, not a delta |
 | Rotation | Make equivalent rotation vectors continuous before writing training data |
 | Chunk | Execute all six actions in upstream order, then infer again |
-| Robot output | Interpolate six 10 Hz targets into 500 Hz RTDE servoJ setpoints below the model boundary |
+| Robot output | Preserve six 10 Hz targets; explicitly select socket speedL (first baseline) or 500 Hz RTDE servoJ below the model boundary |
 | Gripper | Decode element 14 with the existing threshold/debounce semantics |
 
 RoboTwin simulation uses the original 14 values as dual-arm joint positions.

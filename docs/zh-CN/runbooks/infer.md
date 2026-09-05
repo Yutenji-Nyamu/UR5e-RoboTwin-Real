@@ -21,11 +21,11 @@ ur5e-real infer-dp --checkpoint CHECKPOINT \
 ## 2. 真机 shadow
 
 ```bash
-ur5e-infer <训练时间戳>:600 --shadow --chunks 10
+ur5e-infer 20260905_150221:300 --shadow --chunks 10
 ```
 
 连接双相机和只读RTDE，只打印预测，不发送机械臂或夹爪命令。`--chunks 0` 表示运行
-到 `Ctrl+C`。checkpoint可传完整路径，或传 `<训练时间戳>:<epoch>`，避免多个同名
+到 `Ctrl+C`。checkpoint可传完整路径，或传 `训练时间戳:epoch`，避免多个同名
 `600.ckpt` 混淆。
 
 ## 3. 真机执行
@@ -40,14 +40,14 @@ ur5e-infer-init
 发送 `speedl`，不需要在PolyScope手动运行RTDE程序：
 
 ```bash
-ur5e-infer <训练时间戳>:600 --execute \
+ur5e-infer 20260905_150221:300 --execute \
   --backend socket --smooth-alpha 0.7 --chunks 1 --no-gripper
 ```
 
 确认运动后，完整运行并启用夹爪：
 
 ```bash
-ur5e-infer <训练时间戳>:600 --execute \
+ur5e-infer 20260905_150221:300 --execute \
   --backend socket --smooth-alpha 0.7
 ```
 
@@ -57,7 +57,7 @@ ur5e-infer <训练时间戳>:600 --execute \
 RTDE servoJ版本保留为明确的并列实验：
 
 ```bash
-ur5e-infer <训练时间戳>:600 --execute --backend rtde --chunks 1 --no-gripper
+ur5e-infer 20260905_150221:300 --execute --backend rtde --chunks 1 --no-gripper
 ```
 
 它会临时发送机器人端servoJ脚本，再用RTDE写寄存器；当前只确认脚本运行，尚未通过

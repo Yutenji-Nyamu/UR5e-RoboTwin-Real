@@ -39,7 +39,7 @@
 | 双 RealSense | 双路采集、60帧预热和DP shadow已实测 | 正式数据采集 |
 | socket 重播 | session `20260903_182752` 已完整重播成功 | 保持为独立回归链路 |
 | RTDE servoJ | ACT 客户端、recipe、机器人程序均存在 | 保持、小步、斜坡、watchdog |
-| Diffusion Policy | 227步Zarr、原生batch、GPU训练、checkpoint加载、offline和shadow已通过 | servoJ后再做实机执行 |
+| Diffusion Policy | Zarr、原生batch、GPU训练、checkpoint加载、offline和shadow已通过 | 先测一个仅机械臂socket chunk，再接夹爪；servoJ另测 |
 
 ## Chunk 执行
 

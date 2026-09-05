@@ -100,16 +100,17 @@ the original RoboTwin configuration.
 Offline prediction/label comparison is saved, and live shadow completed two
 full six-action chunks. This checkpoint validates the pipeline, not task quality.
 
-### 4. servoJ and policy execution (in progress)
+### 4. policy execution backends (in progress)
 
-- Without a model, test hold, a millimetre target, and one 10 Hz target sequence.
-- Interpolate 10 Hz targets to 500 Hz while logging prediction, command, and
-  measured TCP.
+- First commission DP with the historical RTDE-read/socket-`speedl` path and
+  selectable target EMA (`alpha=0.7` by default).
+- Keep RTDE servoJ as an explicit A/B backend; prove it first with a known
+  millimetre displacement before using it for policy evaluation.
 - Connect DP arm motion, then enable the gripper.
 
-Formal inference remains in Remote mode. A socket sends the robot-side servoJ
-program once at startup; state feedback and action targets then use RTDE. This
-does not reuse the socket `movel` replay path.
+Formal inference remains in Remote mode. `--backend socket` does not require a
+PolyScope RTDE program; `--backend rtde` injects the servoJ loop. Neither backend
+changes the six-action policy output or switches automatically.
 
 ### 5. Formal data and evaluation
 
@@ -146,6 +147,5 @@ baseline above. Later decisions are:
 4. Consider early replanning or chunk fusion only if complete six-step execution
    shows a measured problem.
 
-The immediate next step is to keep PolyScope in Remote and run
-`ur5e-infer 600 --execute --chunks 1` to verify automatic startup, servoJ hold,
-and one six-target sequence. Then run a complete episode.
+The immediate next step is one arm-only socket chunk with a timestamp-qualified
+checkpoint. After that works, enable the gripper; test RTDE servoJ separately.

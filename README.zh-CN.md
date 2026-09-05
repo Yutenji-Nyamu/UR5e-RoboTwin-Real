@@ -34,11 +34,12 @@ DP真机推理：
 
 ```bash
 ur5e-infer-init
-ur5e-infer 600 --execute
+ur5e-infer <训练时间戳>:600 --execute --backend socket
 ```
 
-`600` 是checkpoint编号；也可传完整路径。第一次调试加 `--chunks 1`，完整说明见
-[《DP推理》](docs/zh-CN/runbooks/infer.md)。
+时间戳与epoch共同标识checkpoint，例如 `20260905_150221:600`。第一次调试加
+`--chunks 1 --no-gripper`。`socket` 是旧ACT已经实际运动成功的 `speedl` 链路；
+`rtde` 保留为并列实验后端。完整说明见[《DP推理》](docs/zh-CN/runbooks/infer.md)。
 
 ## Diffusion Policy 快速流程
 
@@ -52,7 +53,8 @@ ur5e-real convert --config configs/lab.yaml \
 
 # N是成功轨迹数；记下输出的 ZARR_PATH
 ur5e-real process-dp HDF5_RUN \
-  --task pick_place_cube --task-config simple --episodes N
+  --task pick_place_cube --task-config simple --episodes N \
+  --output ZARR_PATH --trim-static-edges
 
 # 正式训练；默认600 epoch，在第300和600轮保存checkpoint
 ur5e-real train-dp ZARR_PATH \
@@ -71,13 +73,14 @@ ur5e-infer 600 --shadow --chunks 10
 训练和推理文档见 [`docs/zh-CN/README.md`](docs/zh-CN/README.md)。
 
 Diffusion Policy 主链已打通到 HDF5、Zarr、官方训练、checkpoint离线加载和真机
-shadow；RTDE servoJ执行入口已封装，等待首次小步实测。命令见
+shadow。真机执行可明确选择已验证基础链路的socket `speedl`或实验性的RTDE servoJ。命令见
 [训练](docs/zh-CN/runbooks/train.md)与[推理](docs/zh-CN/runbooks/infer.md)。
 
 每条raw轨迹由 `session_<RUN_ID>.json` 索引，记录任务、起止时间、时长、样本数、
 备注、复核历史和 `success/failure/aborted`。图像、RTDE与夹爪文件原样保留；失败或
 中止数据不会训练，但也不会自动删除。`ur5e-real sessions --config configs/lab.yaml`
-可随时查看汇总。HDF5与Zarr均保留源run ID，checkpoint配置再引用对应Zarr路径。
+可随时查看汇总。HDF5与Zarr均保留源run ID和裁剪范围，checkpoint配置再引用对应
+Zarr路径；数据变更简记在 `/data/robotics/ur5e-real/DATA_LOG.md`。
 
 执行任何运动命令前，PolyScope 必须处于 **Remote Control**，工作区必须净空，人员
 必须守在急停旁。

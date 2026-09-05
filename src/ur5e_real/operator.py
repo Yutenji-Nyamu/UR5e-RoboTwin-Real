@@ -114,11 +114,18 @@ def resolve_dp_checkpoint(value: str, data_root: Path) -> Path:
     if candidate.parent != Path("."):
         raise FileNotFoundError(candidate)
 
-    filename = value if value.endswith(".ckpt") else f"{value}.ckpt"
+    run_hint = None
+    checkpoint_name = value
+    if ":" in value:
+        run_hint, checkpoint_name = value.rsplit(":", 1)
+    filename = checkpoint_name if checkpoint_name.endswith(".ckpt") else f"{checkpoint_name}.ckpt"
     checkpoint_root = data_root / "checkpoints" / "dp"
     matches = sorted(path.resolve() for path in checkpoint_root.rglob(filename) if path.is_file())
+    if run_hint:
+        matches = [path for path in matches if run_hint in str(path)]
     if not matches:
-        raise FileNotFoundError(f"no {filename} under {checkpoint_root}")
+        qualifier = f" in run matching {run_hint}" if run_hint else ""
+        raise FileNotFoundError(f"no {filename}{qualifier} under {checkpoint_root}")
     if len(matches) > 1:
         paths = "\n".join(f"  {path}" for path in matches)
         raise RuntimeError(f"checkpoint name {filename} is ambiguous; pass a full path:\n{paths}")
@@ -132,10 +139,13 @@ def infer() -> int:
         prog="ur5e-infer",
         description="run one RoboTwin DP checkpoint with the local lab configuration",
     )
-    parser.add_argument("checkpoint", help="full checkpoint path, or a unique name such as 600")
+    parser.add_argument(
+        "checkpoint",
+        help="path, unique epoch such as 600, or timestamp-qualified ID such as 20260905_120000:600",
+    )
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--shadow", action="store_true", help="predict from live cameras without commands")
-    mode.add_argument("--execute", action="store_true", help="execute through RTDE servoJ")
+    mode.add_argument("--execute", action="store_true", help="execute through the selected motion backend")
     parser.add_argument(
         "--chunks",
         type=int,
@@ -144,6 +154,13 @@ def infer() -> int:
     )
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--no-gripper", action="store_true")
+    parser.add_argument("--backend", choices=("socket", "rtde"), default="socket")
+    parser.add_argument(
+        "--smooth-alpha",
+        type=float,
+        default=0.7,
+        help="socket target EMA; 1 disables smoothing (default: 0.7)",
+    )
     args = parser.parse_args()
     if args.chunks < 0:
         parser.error("--chunks must be non-negative")
@@ -155,9 +172,15 @@ def infer() -> int:
         chunks=args.chunks,
         gpu=args.gpu,
         enable_gripper=not args.no_gripper,
+        backend=args.backend,
+        smoothing_alpha=args.smooth_alpha,
     )
     mode_name = "shadow" if args.shadow else "execute"
-    print(f"[INFER] mode={mode_name} chunks={args.chunks} checkpoint={checkpoint}")
+    backend = "read-only" if args.shadow else args.backend
+    print(
+        f"[INFER] mode={mode_name} backend={backend} chunks={args.chunks} "
+        f"checkpoint={checkpoint}"
+    )
     robotwin_root = REPOSITORY / ".third_party" / "RoboTwin"
     if args.shadow:
         run_shadow(cfg, robotwin_root, checkpoint, inference)

@@ -21,12 +21,19 @@ Convert it to RoboTwin DP Zarr:
 
 ```bash
 ur5e-real process-dp HDF5_RUN \
-  --task pick_place_cube --task-config simple --episodes N
+  --task pick_place_cube --task-config simple --episodes N \
+  --output /data/robotics/ur5e-real/converted/dp/<DATA_VERSION>.zarr \
+  --trim-static-edges
 ```
 
 The Zarr defaults to `/data/robotics/ur5e-real/converted/dp/`. It contains the
 head camera, 14-dimensional TCP/gripper state, and
-`action[t] = state[t+1]`.
+`action[t] = state[t+1]`. `--trim-static-edges` removes only contiguous idle
+prefixes and suffixes using 2 mm/1 degree thresholds while retaining three
+context frames at each edge; interior pauses remain. Source run IDs, original
+lengths, and exact trim bounds are stored in Zarr attributes. Put the episode
+count, trim rule, and HDF5 timestamp in the filename and avoid `--overwrite`,
+so pre- and post-trim variants coexist.
 
 ## 2. Smoke training
 
@@ -63,6 +70,12 @@ other five. All 600 epochs finished in about 15.6 minutes; both `300.ckpt` and
 Training loss converged, while validation plateaued after roughly 300 epochs
 and rose slightly near the end, so both checkpoints remain for live comparison.
 Two aborted sessions remain in raw storage but were excluded from this dataset.
+
+The 2026-09-05 version contains 17 successful episodes from
+`run_20260905_150058`, reducing 2109 to 1562 transitions with the edge rule
+above. Training directories carry timestamps; select checkpoints uniquely with
+`<TRAIN_TIMESTAMP>:300` or `<TRAIN_TIMESTAMP>:600`. Brief data changes are
+recorded in `/data/robotics/ur5e-real/DATA_LOG.md`.
 
 ## ACT (retained adapter)
 

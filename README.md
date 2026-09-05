@@ -38,11 +38,14 @@ Live DP inference:
 
 ```bash
 ur5e-infer-init
-ur5e-infer 600 --execute
+ur5e-infer <TRAIN_TIMESTAMP>:600 --execute --backend socket
 ```
 
-`600` is the checkpoint number; a full path is also accepted. Add `--chunks 1`
-for the first commissioning run. See [DP inference](docs/runbooks/infer.md).
+The timestamp and epoch identify a checkpoint, for example
+`20260905_150221:600`. Add `--chunks 1 --no-gripper` for the first run. The
+socket backend follows the `speedl` path already proven by the historical ACT
+deployment; RTDE remains an explicit experimental alternative. See
+[DP inference](docs/runbooks/infer.md).
 
 ## Diffusion Policy quick path
 
@@ -56,7 +59,8 @@ ur5e-real convert --config configs/lab.yaml \
 
 # N is the successful-episode count; save the printed ZARR_PATH
 ur5e-real process-dp HDF5_RUN \
-  --task pick_place_cube --task-config simple --episodes N
+  --task pick_place_cube --task-config simple --episodes N \
+  --output ZARR_PATH --trim-static-edges
 
 # Full training: 600 epochs, checkpoints at epochs 300 and 600
 ur5e-real train-dp ZARR_PATH \
@@ -76,9 +80,9 @@ Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architectur
 hardware commissioning, data management, training, and inference documentation
 is indexed in [`docs/README.md`](docs/README.md).
 
-The Diffusion Policy path now passes HDF5, Zarr, native training, offline
-checkpoint loading, and live shadow inference. The RTDE servoJ execution entry
-point is packaged and awaits its first small-motion commissioning run; see
+The Diffusion Policy path passes HDF5, Zarr, native training, checkpoint loading,
+and live shadow inference. Execution explicitly selects the historically proven
+socket `speedl` foundation or the experimental RTDE servoJ backend; see
 [training](docs/runbooks/train.md) and [inference](docs/runbooks/infer.md).
 
 Each raw trajectory has one `session_<RUN_ID>.json` index containing task,
@@ -87,7 +91,9 @@ timestamps, duration, counts, notes, review history, and
 failed or aborted sessions are excluded from training but never deleted
 automatically. List them with
 `ur5e-real sessions --config configs/lab.yaml`. HDF5 and Zarr retain source run
-IDs, and every checkpoint configuration points back to its Zarr dataset.
+IDs and trim bounds, and every checkpoint configuration points back to its Zarr
+dataset. Data changes are briefly logged in
+`/data/robotics/ur5e-real/DATA_LOG.md`.
 
 Commands that move hardware require PolyScope **Remote Control**, a clear
 workspace, and an operator at the emergency stop.

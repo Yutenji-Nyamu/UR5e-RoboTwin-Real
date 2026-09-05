@@ -20,11 +20,16 @@ ur5e-real convert --config configs/lab.yaml \
 
 ```bash
 ur5e-real process-dp HDF5_RUN \
-  --task pick_place_cube --task-config simple --episodes N
+  --task pick_place_cube --task-config simple --episodes N \
+  --output /data/robotics/ur5e-real/converted/dp/<数据版本>.zarr \
+  --trim-static-edges
 ```
 
 Zarr 默认写到 `/data/robotics/ur5e-real/converted/dp/`。它使用头部相机、14维
-TCP/夹爪状态，以及 `action[t] = state[t+1]`。
+TCP/夹爪状态，以及 `action[t] = state[t+1]`。`--trim-static-edges` 仅裁每条轨迹
+最前、最后的连续静止区：默认阈值2 mm/1°，两端各保留3帧，不裁中间停顿；源run ID、
+原长度和实际裁剪范围均写入Zarr属性。文件名应包含轨迹数、裁剪规则和HDF5时间戳；
+不使用 `--overwrite`，因此裁前裁后版本并存。
 
 ## 2. 冒烟训练
 
@@ -56,6 +61,11 @@ ur5e-real train-dp ZARR_PATH \
 其余5条训练；600 epoch约15.6分钟完成，`300.ckpt`和`600.ckpt`均已生成并通过
 留出轨迹离线加载。训练loss已收敛，验证loss约300轮后进入平台并在末段轻微回升，
 因此先保留两个checkpoint做真机对照。2条中止轨迹保留在raw中，但未进入该数据版本。
+
+2026-09-05 新版本纳入17条成功轨迹，源HDF5为 `run_20260905_150058`；按上述规则由
+2109裁为1562 transitions。训练目录自身带时间戳，checkpoint可用
+`<训练时间戳>:300` 或 `<训练时间戳>:600` 唯一指定。简短变更记录位于
+`/data/robotics/ur5e-real/DATA_LOG.md`。
 
 ## ACT（保留的旧适配）
 

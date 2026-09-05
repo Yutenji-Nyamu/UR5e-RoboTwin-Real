@@ -22,13 +22,9 @@ UR5e_RoboTwin_Real（本仓库跟踪、维护）
 
 ## 现有 ACT 真机链路
 
-迁移后的 ACT 读写都使用 RTDE：
-
-1. 工作站以500 Hz接收 `actual_TCP_pose` 和运行状态；
-2. ACT 输出 TCP/夹爪动作；
-3. 工作站把6维 TCP 写入 RTDE 输入寄存器；
-4. PolyScope 中运行的控制循环读取寄存器、求逆解，并每2 ms调用 `servoj`；
-5. 串口夹爪独立执行。
+第一次确认能够驱动真机的策略链路，是RTDE读取 `actual_TCP_pose`，再通过30001端口
+发送限幅后的 `speedl(..., t=0.1)`；后续版本对目标做了 `alpha=0.7` 的EMA。旧项目也有
+RTDE寄存器/servoJ实验，但本仓库尚未用已知位移证明它确实跟随。
 
 模型设置了 `chunk_size=50`，但当前适配器只使用 `prediction[0,0]`；真正的 chunk
 调度尚未实现。
@@ -43,20 +39,21 @@ UR5e_RoboTwin_Real（本仓库跟踪、维护）
 - 运行频率 `10 Hz`；
 - 14维双臂兼容向量。
 
-这些上游模型语义保持不改。适配层完整执行6步，只在下层做TCP速度限制与
-10 Hz到500 Hz插值。
+这些上游模型语义保持不改。适配层完整执行6步，下层明确选择历史socket speedL
+执行器或实验性的500 Hz RTDE servoJ执行器。
 
 当前转换器已生成 `/joint_action/vector` 和经过原生Dataset验证的DP Zarr。兼容映射为
 `[tcp(6), dummy_gripper, tcp(6), physical_gripper]`，保证采集、训练、推理含义一致。
 第一版沿用上游的头部单相机输入和完整6步执行；当前状态与待决策项见
 [`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md)。
 
-## 为什么不默认用 socket 重播执行 DP？
+## 运动后端
 
 | 后端 | 优点 | 局限 | 定位 |
 |---|---|---|---|
-| socket + 批量 `movel` | 简单；已在录制轨迹重播中验证 | 开环计时；替换脚本可能打断运动；缺少高频 watchdog | 手动重播，可作为首次端到端基线 |
-| RTDE输入 + servoJ | 连续设点、状态反馈、误差检查、watchdog、平滑插值 | 机器人端循环仍需单独验机 | ACT/DP正式学习策略后端；程序自动启动 |
+| socket `speedl` | 基于第一次成功ACT执行；无需PolyScope RTDE程序 | 10 Hz命令；慢推理期间会暂停 | DP首次验机默认；目标EMA可调 |
+| RTDE输入 + servoJ | 500 Hz设点和机器人端lookahead | 寄存器写运动仍需已知位移验证 | 明确的实验后端 |
+| socket + 批量 `movel` | 已由录制轨迹重播验证 | 开环分段计时 | 仅手动重播 |
 
-DP 的6步 chunk 可通过任一后端执行，因此选择 RTDE 不会改变模型输出。已有 ACT
-RTDE 循环已复用为DP的500 Hz执行层。socket继续服务手动重播；两者不自动切换。
+DP的6步chunk可通过任一策略后端执行，不改变模型输出。用 `--backend socket` 或
+`--backend rtde` 明确选择；两者不自动切换。

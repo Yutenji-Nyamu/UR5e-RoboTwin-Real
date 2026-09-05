@@ -8,6 +8,46 @@ from pathlib import Path
 DEFAULT_IMAGE_SIZE = (320, 240)  # width, height; RoboTwin D435 baseline
 
 
+def motion_bounds(
+    vectors,
+    *,
+    linear_threshold_m: float = 0.002,
+    angular_threshold_rad: float = 0.0174533,
+    lead_in_steps: int = 3,
+    tail_steps: int = 3,
+) -> tuple[int, int]:
+    """Keep the active interval plus short stationary context at both ends."""
+    import numpy as np
+
+    values = np.asarray(vectors)
+    if values.ndim != 2 or values.shape[1] != 14:
+        raise ValueError("state vectors must have shape (steps, 14)")
+    if min(linear_threshold_m, angular_threshold_rad, lead_in_steps, tail_steps) < 0:
+        raise ValueError("motion thresholds, lead-in, and tail must be non-negative")
+    if len(values) < 2:
+        return 0, len(values)
+
+    def changed_from(reference):
+        translated = np.linalg.norm(values[:, :3] - reference[:3], axis=1) > linear_threshold_m
+        rotated = np.linalg.norm(values[:, 3:6] - reference[3:6], axis=1) > angular_threshold_rad
+        gripper_changed = np.abs(values[:, 13] - reference[13]) > 0.5
+        return translated | rotated | gripper_changed
+
+    origin = values[0]
+    start_candidates = np.flatnonzero(changed_from(origin))
+    if not len(start_candidates):
+        return 0, len(values)
+    start = max(0, int(start_candidates[0]) - lead_in_steps)
+
+    end_candidates = np.flatnonzero(changed_from(values[-1]))
+    stop = (
+        min(len(values), int(end_candidates[-1]) + 1 + tail_steps)
+        if len(end_candidates)
+        else len(values)
+    )
+    return (start, stop) if stop - start >= 2 else (0, len(values))
+
+
 def _decode_resize(encoded, image_size: tuple[int, int]):
     import cv2
     import numpy as np
@@ -60,6 +100,11 @@ def process_run(
     output_path: Path | None = None,
     image_size: tuple[int, int] = DEFAULT_IMAGE_SIZE,
     overwrite: bool = False,
+    trim_static_edges: bool = False,
+    motion_threshold_mm: float = 2.0,
+    motion_threshold_deg: float = 1.0,
+    lead_in_steps: int = 3,
+    tail_steps: int = 3,
 ) -> Path:
     import numpy as np
     import zarr
@@ -97,6 +142,9 @@ def process_run(
     episode_ends: list[int] = []
     source_run_ids: list[str] = []
     source_schema_versions: list[int] = []
+    trim_start_indices: list[int] = []
+    trim_stop_indices: list[int] = []
+    source_lengths: list[int] = []
     total = 0
     for episode_index in range(episode_count):
         source = source_dir / f"episode{episode_index}.hdf5"
@@ -104,16 +152,38 @@ def process_run(
         length = min(len(vectors), len(images))
         if length < 2:
             raise ValueError(f"{source}: at least two timesteps are required")
-        head = np.stack([_decode_resize(frame, image_size) for frame in images[: length - 1]])
+        trim_start, trim_stop = (
+            motion_bounds(
+                vectors[:length],
+                linear_threshold_m=motion_threshold_mm / 1000.0,
+                angular_threshold_rad=np.deg2rad(motion_threshold_deg),
+                lead_in_steps=lead_in_steps,
+                tail_steps=tail_steps,
+            )
+            if trim_static_edges
+            else (0, length)
+        )
+        if trim_stop - trim_start < 2:
+            raise ValueError(f"{source}: fewer than two timesteps remain after edge trimming")
+        head = np.stack(
+            [_decode_resize(frame, image_size) for frame in images[trim_start : trim_stop - 1]]
+        )
         head = np.moveaxis(head, -1, 1).astype(np.uint8)
         _append(head_store, head)
-        _append(state_store, vectors[: length - 1])
-        _append(action_store, vectors[1:length])
-        total += length - 1
+        _append(state_store, vectors[trim_start : trim_stop - 1])
+        _append(action_store, vectors[trim_start + 1 : trim_stop])
+        transitions = trim_stop - trim_start - 1
+        total += transitions
         episode_ends.append(total)
         source_run_ids.append(run_id)
         source_schema_versions.append(schema_version)
-        print(f"[DP] episode {episode_index}: {length - 1} transitions ({run_id})")
+        trim_start_indices.append(trim_start)
+        trim_stop_indices.append(trim_stop)
+        source_lengths.append(length)
+        print(
+            f"[DP] episode {episode_index}: {transitions} transitions "
+            f"(trimmed head={trim_start}, tail={length - trim_stop}, {run_id})"
+        )
 
     meta.create_dataset(
         "episode_ends",
@@ -129,6 +199,14 @@ def process_run(
             "selection": "outcome=success",
             "source_run_ids": source_run_ids,
             "source_schema_versions": source_schema_versions,
+            "trim_static_edges": trim_static_edges,
+            "trim_start_indices": trim_start_indices,
+            "trim_stop_indices": trim_stop_indices,
+            "source_lengths": source_lengths,
+            "motion_threshold_mm": motion_threshold_mm,
+            "motion_threshold_deg": motion_threshold_deg,
+            "lead_in_steps": lead_in_steps,
+            "tail_steps": tail_steps,
             "state_layout": "tcp6,dummy_gripper,tcp6,physical_gripper",
             "action_semantics": "next_absolute_state",
             "image_size_wh": [width, height],
@@ -147,6 +225,11 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--episodes", type=int, required=True)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--trim-static-edges", action="store_true")
+    parser.add_argument("--motion-threshold-mm", type=float, default=2.0)
+    parser.add_argument("--motion-threshold-deg", type=float, default=1.0)
+    parser.add_argument("--lead-in-steps", type=int, default=3)
+    parser.add_argument("--tail-steps", type=int, default=3)
     args = parser.parse_args(argv)
     process_run(
         args.run_root,
@@ -155,6 +238,11 @@ def main(argv: list[str] | None = None) -> int:
         args.episodes,
         output_path=args.output,
         overwrite=args.overwrite,
+        trim_static_edges=args.trim_static_edges,
+        motion_threshold_mm=args.motion_threshold_mm,
+        motion_threshold_deg=args.motion_threshold_deg,
+        lead_in_steps=args.lead_in_steps,
+        tail_steps=args.tail_steps,
     )
     return 0
 

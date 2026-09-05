@@ -47,7 +47,7 @@ RoboTwin policy adapter  <---->  pinned upstream checkout
 ActionChunk(tcp targets[N,6], gripper[N], dt)
           |
           v
-TCP velocity limits -> 10 Hz-to-500 Hz interpolation -> RTDE servoJ + serial gripper
+TCP limits -> explicit socket speedL or RTDE servoJ backend -> serial gripper
 ```
 
 Only an adapter may encode the single-arm seven-value state into an upstream

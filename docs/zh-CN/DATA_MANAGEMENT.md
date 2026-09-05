@@ -24,10 +24,11 @@
 ├── converted/run_*/     # 可追溯到raw run ID的规范HDF5
 ├── converted/dp/        # RoboTwin DP Zarr
 ├── checkpoints/dp/      # dataset/seed/训练运行层级
-└── logs/                # 验证、训练、shadow、实机评估
+├── logs/                # 验证、训练、shadow、实机评估
+└── DATA_LOG.md          # 每次数据生成、裁剪、训练的一两句人工日志
 ```
 
-使用稳定dataset ID，例如 `pick_block_bowl__20260901__d001__schema-v1`。manifest
+使用可读dataset ID，例如 `pick_place_cube-simple-17-trim2mm-v20260905_150058`。manifest
 记录源run ID、任务/配置、相机/标定、采样率、schema版本、转换器提交、质量结论和
 校验清单。人工备注只追加，不通过重命名或改写raw文件表达。
 
@@ -47,7 +48,8 @@
 同步CSV继续作为逐帧索引。`ur5e-real review` 在 manifest 的 `reviews` 中追加带时间
 的结论，并把顶层 `outcome` 设为最新结论；它不改写已采集的传感器/动作文件。
 转换时只选任务名匹配且 `outcome=success` 的run；每个HDF5 episode保留源run ID。
-DP Zarr继续记录全部源run ID、schema版本、状态布局、动作语义和图像尺寸。
+DP Zarr继续记录全部源run ID、schema版本、状态布局、动作语义和图像尺寸。裁剪版本还
+记录源长度及每条轨迹的精确 `[start, stop)`；raw与HDF5保持不变。
 
 ## 保留规则
 

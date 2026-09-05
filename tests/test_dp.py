@@ -15,6 +15,7 @@ from ur5e_real.control.chunk import (
     limit_tcp_target,
 )
 from ur5e_real.control.gripper_policy import GripperCommandConfig, GripperPolicy
+from ur5e_real.control.socket_speedl import SocketSpeedLConfig, smoothed_speedl_target
 from ur5e_real.operator import resolve_dp_checkpoint
 
 
@@ -37,6 +38,17 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
             checkpoint.parent.mkdir(parents=True)
             checkpoint.touch()
             self.assertEqual(resolve_dp_checkpoint("600", data_root), checkpoint.resolve())
+
+    def test_checkpoint_timestamp_qualified_resolution(self):
+        with tempfile.TemporaryDirectory() as directory:
+            data_root = Path(directory)
+            old = data_root / "checkpoints" / "dp" / "task-20260904_120000" / "600.ckpt"
+            new = data_root / "checkpoints" / "dp" / "task-20260905_120000" / "600.ckpt"
+            old.parent.mkdir(parents=True)
+            new.parent.mkdir(parents=True)
+            old.touch()
+            new.touch()
+            self.assertEqual(resolve_dp_checkpoint("20260905_120000:600", data_root), new.resolve())
 
     def test_observation_layout_and_rotation_continuity(self):
         image = np.zeros((480, 640, 3), dtype=np.uint8)
@@ -74,6 +86,20 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
         self.assertAlmostEqual(float(np.linalg.norm(velocity[49])), 0.05, places=5)
         self.assertAlmostEqual(float(np.linalg.norm(velocity[50])), 0.05, places=5)
         self.assertLessEqual(float(np.linalg.norm(velocity, axis=1).max()), 0.05001)
+
+    def test_socket_speedl_smoothing_is_selectable_and_bounded(self):
+        current = np.zeros(6, dtype=np.float32)
+        desired = np.asarray([0.010, 0, 0, 0, 0, 0], dtype=np.float32)
+        smooth_target, smooth_velocity = smoothed_speedl_target(
+            current, desired, None, SocketSpeedLConfig(smoothing_alpha=0.5)
+        )
+        raw_target, raw_velocity = smoothed_speedl_target(
+            current, desired, None, SocketSpeedLConfig(smoothing_alpha=1.0)
+        )
+        self.assertAlmostEqual(float(smooth_target[0]), 0.0025, places=6)
+        self.assertAlmostEqual(float(raw_target[0]), 0.005, places=6)
+        self.assertLessEqual(float(np.linalg.norm(smooth_velocity[:3])), 0.05001)
+        self.assertLessEqual(float(np.linalg.norm(raw_velocity[:3])), 0.05001)
 
     def test_gripper_hysteresis(self):
         gripper = FakeGripper()

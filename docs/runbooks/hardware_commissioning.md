@@ -70,8 +70,8 @@ These require a human at the workcell and an explicit `--execute`:
    gripper opening.
 3. Support the arm and test freedrive start/stop.
 4. Record a short path; dry-run its replay; execute one bounded segment.
-5. Run `ur5e-infer 600 --execute --chunks 1` to validate automatic servoJ
-   startup, hold, small motion, and stop.
+5. Run one arm-only socket policy chunk from the inference guide; validate
+   RTDE servoJ later with a separate known-displacement test.
 
 Never combine the first gripper, freedrive, replay, and servoJ tests into one
 command. Each device must have an independently understood failure mode.

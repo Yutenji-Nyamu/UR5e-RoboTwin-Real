@@ -10,11 +10,17 @@ import numpy as np
 import zarr
 
 from ur5e_real.adapters.robotwin_act.process_data import process_run
+from ur5e_real.adapters.robotwin_dp.process_data import motion_bounds
 from ur5e_real.adapters.robotwin_dp.process_data import process_run as process_dp_run
 from ur5e_real.data.convert_hdf5 import align_nearest, convert_raw_sessions
 
 
 class AlignmentTest(unittest.TestCase):
+    def test_motion_bounds_keep_short_context(self):
+        vectors = np.zeros((12, 14), dtype=np.float32)
+        vectors[5:9, 0] = 0.003
+        self.assertEqual(motion_bounds(vectors, lead_in_steps=2, tail_steps=2), (3, 11))
+
     def test_nearest_action_indices(self):
         actions = np.asarray([0.0, 1.0, 2.0, 3.0])
         queries = np.asarray([-1.0, 0.49, 0.51, 2.5, 5.0])

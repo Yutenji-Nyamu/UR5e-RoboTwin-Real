@@ -29,11 +29,12 @@ evaluation result traceable to immutable source data.
 ├── converted/run_*/     # canonical HDF5 traceable to raw run IDs
 ├── converted/dp/        # RoboTwin DP Zarr
 ├── checkpoints/dp/      # dataset/seed/training-run hierarchy
-└── logs/                # validation, training, shadow and live evaluation
+├── logs/                # validation, training, shadow and live evaluation
+└── DATA_LOG.md          # one-line notes for data builds, trims, and training
 ```
 
-Use a stable dataset ID such as
-`pick_block_bowl__20260901__d001__schema-v1`. Its manifest lists source run IDs,
+Use a readable dataset ID such as
+`pick_place_cube-simple-17-trim2mm-v20260905_150058`. Its manifest lists source run IDs,
 task/config, cameras/calibration, sample rate, schema version, converter commit,
 quality result, and a checksum inventory. Human notes are additive; they do not
 rename or mutate raw files.
@@ -59,7 +60,8 @@ entry to `reviews` and sets the top-level `outcome` to the latest result; it doe
 not rewrite captured sensor/action files. Conversion selects only runs whose
 task matches and whose `outcome=success`; every HDF5 episode retains its source
 run ID. DP Zarr retains all source run IDs, schema versions, state layout,
-action semantics, and image size.
+action semantics, and image size. Trimmed versions also retain original lengths
+and exact per-episode `[start, stop)` bounds; raw and HDF5 stay unchanged.
 
 ## Retention
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import socket
 import sys
 import time
 from dataclasses import dataclass
@@ -12,12 +13,13 @@ from ...config import LabConfig, load_config
 from ...control.chunk import ChunkStreamConfig, stream_tcp_chunk
 from ...control.gripper_policy import GripperCommandConfig, GripperPolicy
 from ...control.servoj import ServoJController, ServoJStreamConfig
+from ...control.socket_speedl import SocketSpeedLConfig, smoothed_speedl_target
 from ...data.schema import nearest_rotation_vector
 from ...hardware.dashboard import require_external_motion_ready
 from ...hardware.gripper import GripperSerial
 from ...hardware.realsense import DualColorCamera, LatestDualColorCamera
-from ...hardware.rtde import RtdeOutputConfig, RtdeTcpClient
-from ...hardware.urscript import send_urscript
+from ...hardware.rtde import LatestRtdeTcpClient, RtdeOutputConfig, RtdeTcpClient
+from ...hardware.urscript import send_urscript, speedl_command, stopl_command
 
 DP_IMAGE_SIZE = (320, 240)  # width, height
 
@@ -30,6 +32,8 @@ class InferenceConfig:
     chunks: int = 1
     gpu: str = "0"
     enable_gripper: bool = True
+    backend: str = "socket"
+    smoothing_alpha: float = 0.7
 
 
 def _image_chw(image, image_size: tuple[int, int] = DP_IMAGE_SIZE):
@@ -214,17 +218,17 @@ def run_shadow(
     model = load_model(robotwin_root, checkpoint, inference)
     encoder = RealObservationEncoder()
     cameras = LatestDualColorCamera(_camera(lab))
-    rtde = RtdeTcpClient(
-        RtdeOutputConfig(lab.robot.host, lab.robot.rtde_port, inference.policy_hz)
+    states = LatestRtdeTcpClient(
+        RtdeTcpClient(RtdeOutputConfig(lab.robot.host, lab.robot.rtde_port, inference.policy_hz))
     )
     cameras.start()
-    rtde.connect()
+    states.start()
     model.reset_obs()
     print("[SHADOW] running predictions only; no robot or gripper commands")
     chunk_index = 0
     try:
         while inference.chunks == 0 or chunk_index < inference.chunks:
-            state = rtde.receive()
+            state = states.read()
             pair = cameras.read()
             if state is None or pair is None:
                 continue
@@ -236,8 +240,13 @@ def run_shadow(
                 f"[CHUNK {chunk_index}] {len(actions)} actions, {elapsed_ms:.1f}ms, "
                 f"first_tcp={np.round(actions[0, :6], 4).tolist()} gripper={actions[0, 13]:.3f}"
             )
+            deadline = time.monotonic()
             for _ in actions:
-                state = rtde.receive()
+                deadline += 1.0 / inference.policy_hz
+                wait = deadline - time.monotonic()
+                if wait > 0:
+                    time.sleep(wait)
+                state = states.read()
                 pair = cameras.read()
                 if state is not None and pair is not None:
                     model.update_obs(encoder.encode(state[1], 0.0, pair.head, pair.wrist))
@@ -245,11 +254,11 @@ def run_shadow(
     except KeyboardInterrupt:
         print("\n[STOP] shadow inference interrupted")
     finally:
-        rtde.close()
+        states.stop()
         cameras.stop()
 
 
-def run_execute(
+def _run_execute_rtde(
     lab: LabConfig,
     robotwin_root: Path,
     checkpoint: Path,
@@ -312,6 +321,118 @@ def run_execute(
             gripper.shutdown()
 
 
+def _run_execute_socket(
+    lab: LabConfig,
+    robotwin_root: Path,
+    checkpoint: Path,
+    inference: InferenceConfig,
+) -> None:
+    import numpy as np
+
+    model = load_model(robotwin_root, checkpoint, inference)
+    encoder = RealObservationEncoder()
+    cameras = LatestDualColorCamera(_camera(lab))
+    states = LatestRtdeTcpClient(
+        RtdeTcpClient(RtdeOutputConfig(lab.robot.host, lab.robot.rtde_port, inference.policy_hz))
+    )
+    gripper = (
+        GripperSerial(lab.gripper.port, lab.gripper.baudrate, lab.gripper.timeout_s)
+        if inference.enable_gripper
+        else None
+    )
+    gripper_policy = GripperPolicy(gripper, GripperCommandConfig()) if gripper is not None else None
+    motion = SocketSpeedLConfig(
+        policy_hz=inference.policy_hz,
+        smoothing_alpha=inference.smoothing_alpha,
+    )
+    robot: socket.socket | None = None
+    previous_target = None
+    chunk_index = 0
+    try:
+        cameras.start()
+        states.start()
+        require_external_motion_ready(lab.robot.host)
+        robot = socket.create_connection(
+            (lab.robot.host, lab.robot.script_port), timeout=lab.robot.socket_timeout_s
+        )
+        model.reset_obs()
+        print(
+            f"[EXECUTE] socket speedL at {inference.policy_hz:g} Hz; "
+            f"target EMA alpha={inference.smoothing_alpha:g}"
+        )
+        while inference.chunks == 0 or chunk_index < inference.chunks:
+            state = states.read()
+            pair = cameras.read()
+            if state is None or pair is None:
+                continue
+            tcp = state[1]
+            gripper_value = 0.0 if gripper_policy is None else gripper_policy.estimated
+            observation = encoder.encode(tcp, gripper_value, pair.head, pair.wrist)
+            started = time.perf_counter()
+            actions = np.asarray(model.get_action(observation), dtype=np.float32)
+            elapsed_ms = (time.perf_counter() - started) * 1000.0
+            print(f"[CHUNK {chunk_index}] {len(actions)} actions, inference={elapsed_ms:.1f}ms")
+
+            deadline = time.monotonic()
+            captured_observations = []
+            for action in actions:
+                state = states.read()
+                if state is None:
+                    continue
+                tcp = state[1]
+                previous_target, velocity = smoothed_speedl_target(
+                    tcp, action[:6], previous_target, motion
+                )
+                robot.sendall(
+                    speedl_command(
+                        velocity,
+                        acceleration=motion.acceleration,
+                        duration_s=1.0 / motion.policy_hz,
+                    ).encode("utf-8")
+                )
+                if gripper_policy is not None:
+                    gripper_policy.step(float(action[13]))
+                deadline += 1.0 / motion.policy_hz
+                wait = deadline - time.monotonic()
+                if wait > 0:
+                    time.sleep(wait)
+                latest_state = states.read()
+                pair = cameras.read()
+                if latest_state is not None and pair is not None:
+                    gripper_value = 0.0 if gripper_policy is None else gripper_policy.estimated
+                    captured_observations.append((latest_state[1], gripper_value, pair))
+            for tcp, gripper_value, pair in captured_observations:
+                model.update_obs(encoder.encode(tcp, gripper_value, pair.head, pair.wrist))
+            chunk_index += 1
+    except KeyboardInterrupt:
+        print("\n[STOP] DP execution interrupted")
+    finally:
+        if robot is not None:
+            try:
+                robot.sendall(stopl_command().encode("utf-8"))
+            except Exception:
+                pass
+            robot.close()
+        states.stop()
+        cameras.stop()
+        if gripper is not None:
+            gripper.shutdown()
+
+
+def run_execute(
+    lab: LabConfig,
+    robotwin_root: Path,
+    checkpoint: Path,
+    inference: InferenceConfig,
+) -> None:
+    if inference.backend == "socket":
+        _run_execute_socket(lab, robotwin_root, checkpoint, inference)
+    elif inference.backend == "rtde":
+        _run_execute_rtde(lab, robotwin_root, checkpoint, inference)
+    else:
+        raise ValueError(f"unsupported execution backend: {inference.backend}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run RoboTwin DP offline or on the real UR5e")
     parser.add_argument("--robotwin-root", type=Path, default=Path(".third_party/RoboTwin"))
@@ -319,15 +440,28 @@ def main(argv: list[str] | None = None) -> int:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--episode", type=Path, help="offline HDF5 episode; never connects hardware")
     mode.add_argument("--shadow", action="store_true", help="live inference without sending commands")
-    mode.add_argument("--execute", action="store_true", help="execute full chunks through RTDE servoJ")
+    mode.add_argument("--execute", action="store_true", help="execute through the selected motion backend")
     parser.add_argument("--config", help="lab config required for shadow or execute")
     parser.add_argument("--index", type=int, default=2, help="offline observation index")
     parser.add_argument("--output", type=Path, help="optional offline prediction NPZ")
     parser.add_argument("--chunks", type=int, default=1, help="live chunks; 0 means until Ctrl+C")
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--no-gripper", action="store_true")
+    parser.add_argument("--backend", choices=("socket", "rtde"), default="socket")
+    parser.add_argument(
+        "--smooth-alpha",
+        type=float,
+        default=0.7,
+        help="socket target EMA; 1 disables smoothing (default: 0.7)",
+    )
     args = parser.parse_args(argv)
-    inference = InferenceConfig(chunks=args.chunks, gpu=args.gpu, enable_gripper=not args.no_gripper)
+    inference = InferenceConfig(
+        chunks=args.chunks,
+        gpu=args.gpu,
+        enable_gripper=not args.no_gripper,
+        backend=args.backend,
+        smoothing_alpha=args.smooth_alpha,
+    )
     robotwin_root = args.robotwin_root.expanduser().resolve()
     checkpoint = args.checkpoint.expanduser().resolve()
     if args.episode is not None:

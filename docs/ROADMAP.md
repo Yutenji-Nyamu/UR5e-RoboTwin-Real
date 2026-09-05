@@ -64,9 +64,11 @@ replanning, or chunk fusion is useful. See
 ## Motion backends
 
 - `SocketMovelReplayBackend`: Remote mode, batched `movel`, open-loop timing;
-  manual replay and optional comparison baseline only.
+  manual replay only.
+- `SocketSpeedLPolicyBackend`: RTDE state plus 10 Hz socket `speedl`, with
+  selectable target EMA; first learned-policy commissioning backend.
 - `RtdeServoJBackend`: robot program started automatically in Remote mode, with
-  500 Hz RTDE setpoints and feedback; default learned-policy backend.
+  500 Hz RTDE setpoints and feedback; explicit experimental backend.
 
 The backends never switch automatically. See
 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md).
@@ -110,10 +112,10 @@ independent of ML.
 
 Status: one complete capture and replay is finished.
 
-### 4 — servoJ backend
+### 4 — policy motion backends
 
-- Load the robot-side loop; test hold, millimetre step, slow ramp, update loss,
-  tracking limit, and stop latency.
+- Confirm socket speedL with one model chunk; separately test servoJ hold,
+  millimetre step, slow ramp, tracking, and stop latency.
 
 Exit: configured safety limits and measured rate/latency pass.
 
@@ -131,11 +133,13 @@ the current checkpoint is not a task-quality model.
 
 - Shadow: live inputs, predictions logged, no commands.
 - Arm-only conservative chunk; compare socket and RTDE only if useful.
-- Full six-step RTDE execution after trace review; enable debounced gripper last.
+- Full six-step socket execution first; keep RTDE as an explicit A/B test;
+  enable the debounced gripper last.
 
 Exit: repeatable trials with stop reasons and raw/guarded/measured logs.
 
-Status: shadow is complete; live execution follows gate 4 servoJ validation.
+Status: shadow is complete; socket live execution is next, while servoJ remains
+independently gated.
 
 ## Human–automation handoff
 

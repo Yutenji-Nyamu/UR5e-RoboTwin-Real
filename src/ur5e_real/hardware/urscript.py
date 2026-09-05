@@ -45,6 +45,23 @@ def pose_literal(pose: Sequence[float]) -> str:
     return "p[" + ", ".join(f"{float(value):.9f}" for value in pose) + "]"
 
 
+def speedl_command(
+    velocity: Sequence[float], *, acceleration: float = 0.5, duration_s: float = 0.1
+) -> str:
+    if len(velocity) != 6:
+        raise ValueError("TCP velocity must contain six values")
+    if acceleration <= 0 or duration_s <= 0:
+        raise ValueError("acceleration and duration must be positive")
+    values = ", ".join(f"{float(value):.6f}" for value in velocity)
+    return f"speedl([{values}], a={acceleration:.6f}, t={duration_s:.6f})\n"
+
+
+def stopl_command(deceleration: float = 0.5) -> str:
+    if deceleration <= 0:
+        raise ValueError("deceleration must be positive")
+    return f"stopl({deceleration:.6f})\n"
+
+
 def move_linear(
     host: str,
     pose: Sequence[float],

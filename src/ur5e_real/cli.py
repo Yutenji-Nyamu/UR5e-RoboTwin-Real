@@ -89,6 +89,11 @@ def _parser() -> argparse.ArgumentParser:
     process_dp.add_argument("--episodes", type=int, required=True)
     process_dp.add_argument("--output")
     process_dp.add_argument("--overwrite", action="store_true")
+    process_dp.add_argument("--trim-static-edges", action="store_true")
+    process_dp.add_argument("--motion-threshold-mm", type=float, default=2.0)
+    process_dp.add_argument("--motion-threshold-deg", type=float, default=1.0)
+    process_dp.add_argument("--lead-in-steps", type=int, default=3)
+    process_dp.add_argument("--tail-steps", type=int, default=3)
 
     train_dp = sub.add_parser("train-dp", help="train RoboTwin DP on a converted real dataset")
     train_dp.add_argument("zarr_path")
@@ -109,13 +114,15 @@ def _parser() -> argparse.ArgumentParser:
     dp_mode = infer_dp.add_mutually_exclusive_group(required=True)
     dp_mode.add_argument("--episode", help="offline HDF5 episode; never connects hardware")
     dp_mode.add_argument("--shadow", action="store_true", help="live inference without sending commands")
-    dp_mode.add_argument("--execute", action="store_true", help="execute full chunks through RTDE servoJ")
+    dp_mode.add_argument("--execute", action="store_true", help="execute through the selected motion backend")
     infer_dp.add_argument("--config", help="lab config required for shadow or execute")
     infer_dp.add_argument("--index", type=int, default=2)
     infer_dp.add_argument("--output")
     infer_dp.add_argument("--chunks", type=int, default=1, help="live chunks; 0 means until Ctrl+C")
     infer_dp.add_argument("--gpu", default="0")
     infer_dp.add_argument("--no-gripper", action="store_true")
+    infer_dp.add_argument("--backend", choices=("socket", "rtde"), default="socket")
+    infer_dp.add_argument("--smooth-alpha", type=float, default=0.7)
 
     return parser
 
@@ -242,6 +249,11 @@ def main(argv: list[str] | None = None) -> int:
             args.episodes,
             output_path=Path(args.output) if args.output else None,
             overwrite=args.overwrite,
+            trim_static_edges=args.trim_static_edges,
+            motion_threshold_mm=args.motion_threshold_mm,
+            motion_threshold_deg=args.motion_threshold_deg,
+            lead_in_steps=args.lead_in_steps,
+            tail_steps=args.tail_steps,
         )
         return 0
 
@@ -273,6 +285,8 @@ def main(argv: list[str] | None = None) -> int:
             chunks=args.chunks,
             gpu=args.gpu,
             enable_gripper=not args.no_gripper,
+            backend=args.backend,
+            smoothing_alpha=args.smooth_alpha,
         )
         robotwin_root = Path(args.robotwin_root).expanduser().resolve()
         checkpoint = Path(args.checkpoint).expanduser().resolve()

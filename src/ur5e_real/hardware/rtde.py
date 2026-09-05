@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -67,6 +68,60 @@ class RtdeTcpClient:
 
     def __exit__(self, exc_type: Any, exc: Any, traceback: Any) -> None:
         self.close()
+
+
+class LatestRtdeTcpClient:
+    """Continuously receive RTDE so policy inference never leaves stale packets queued."""
+
+    def __init__(self, client: RtdeTcpClient) -> None:
+        self.client = client
+        self._latest: tuple[float, list[float]] | None = None
+        self._error: Exception | None = None
+        self._lock = threading.Lock()
+        self._ready = threading.Event()
+        self._running = False
+        self._thread: threading.Thread | None = None
+
+    def start(self) -> None:
+        self.client.connect()
+        self._running = True
+        self._thread = threading.Thread(target=self._loop, name="ur5e-rtde-state", daemon=True)
+        self._thread.start()
+        if not self._ready.wait(timeout=2.0):
+            self.stop()
+            raise RuntimeError("timed out waiting for the first RTDE state")
+        if self._error is not None:
+            self.stop()
+            raise RuntimeError("RTDE state acquisition failed") from self._error
+
+    def _loop(self) -> None:
+        while self._running:
+            try:
+                state = self.client.receive()
+            except Exception as exc:
+                if self._running:
+                    self._error = exc
+                    self._ready.set()
+                return
+            if state is None:
+                continue
+            latest = (state[0], list(state[1]))
+            with self._lock:
+                self._latest = latest
+            self._ready.set()
+
+    def read(self) -> tuple[float, list[float]] | None:
+        if self._error is not None:
+            raise RuntimeError("RTDE state acquisition failed") from self._error
+        with self._lock:
+            return self._latest
+
+    def stop(self) -> None:
+        self._running = False
+        if self._thread is not None:
+            self._thread.join(timeout=1.0)
+        self.client.close()
+        self._thread = None
 
 
 class RtdeCsvWriter:

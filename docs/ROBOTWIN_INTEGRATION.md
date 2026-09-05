@@ -23,14 +23,11 @@ artifacts and are not committed.
 
 ## Existing ACT real path
 
-The migrated ACT implementation uses RTDE for both directions:
-
-1. the workstation receives `actual_TCP_pose` and runtime state at 500 Hz;
-2. ACT predicts a TCP/gripper action;
-3. the workstation writes six TCP values to RTDE input registers;
-4. the running PolyScope loop reads those registers, solves inverse kinematics,
-   and calls `servoj` every 2 ms;
-5. the serial gripper is commanded independently.
+The first policy path confirmed to move the real arm used RTDE for
+`actual_TCP_pose`, then sent bounded `speedl(..., t=0.1)` commands over socket
+30001. Its later version applied a target EMA with alpha `0.7`. A separate ACT
+RTDE-register/servoJ experiment also exists, but has not yet passed a known
+displacement test in this repository.
 
 The model has `chunk_size=50`, but the current adapter applies only
 `prediction[0,0]`; true chunk scheduling remains future work.
@@ -46,8 +43,8 @@ The pinned RoboTwin DP baseline defines:
 - a 14-value dual-arm compatibility vector.
 
 These upstream model semantics remain unchanged. The adapter executes all six
-steps and applies only TCP velocity limits plus 10 Hz-to-500 Hz interpolation
-below the model boundary.
+steps, then explicitly selects either the historical socket speedL executor or
+the experimental 500 Hz RTDE servoJ executor below the model boundary.
 
 The converter now produces upstream `/joint_action/vector` and a DP Zarr tested
 with the native Dataset. The compatibility mapping is
@@ -57,13 +54,14 @@ The first baseline keeps upstream head-only input and complete six-action
 execution; see [`DIFFUSION_POLICY_PLAN.md`](DIFFUSION_POLICY_PLAN.md) for stages
 and later decisions.
 
-## Why not use socket replay as the DP default?
+## Motion backends
 
 | Backend | Advantage | Limitation | Role |
 |---|---|---|---|
-| socket + batched `movel` | Very simple; already proven for recorded trajectories | Open-loop timing; replacing scripts can interrupt motion; no high-rate watchdog | Manual replay and optional first end-to-end baseline |
-| RTDE input + servoJ | Continuous setpoints, measured state, tracking checks, watchdog, smooth interpolation | Robot-side loop still requires commissioning | Default ACT/DP learned-policy backend; program starts automatically |
+| socket `speedl` | Based on the first successful ACT execution; no PolyScope RTDE program | 10 Hz command timing and a pause during slow inference | Default first DP commissioning path; target EMA is selectable |
+| RTDE input + servoJ | 500 Hz setpoints and robot-side lookahead | Register-write motion still requires a known-displacement test | Explicit experimental backend |
+| socket + batched `movel` | Proven for recorded trajectories | Open-loop segment timing | Manual replay only |
 
-A six-step DP chunk can be sent through either backend, so choosing RTDE does not
-change the policy output. The ACT RTDE loop is now reused as DP's 500 Hz execution
-layer. Socket remains the manual-replay backend; the two never switch automatically.
+A six-step DP chunk can use either learned-policy backend without changing the
+policy output. Select `--backend socket` or `--backend rtde`; the executor never
+switches automatically.

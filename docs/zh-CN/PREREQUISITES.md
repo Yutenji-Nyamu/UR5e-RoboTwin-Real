@@ -96,7 +96,8 @@ librealsense udev规则已经识别CH340与两台相机，无需再编译旧CH34
 | RTDE读 | `python examples/smoke/rtde_read.py --config configs/lab.yaml --samples 10` | 10 Hz TCP连续输出 |
 | 采集/重播 | 见[采集与重播速查](runbooks/operator_workflows.md) | 已完成一条端到端实机验证 |
 | DP离线 | 见[训练手册](runbooks/train.md) | 转换、batch、短训练和checkpoint重载已通过 |
-| servoJ | `ur5e-infer 600 --execute --chunks 1` | 自动启动且实测TCP跟随连续 |
-| DP在线 | 见[推理手册](runbooks/infer.md) | shadow已通过；下一步验证servoJ后执行 |
+| socket策略输出 | `ur5e-infer <时间>:600 --execute --backend socket --chunks 1 --no-gripper` | 一个有界模型chunk可见运动 |
+| RTDE servoJ | 同一命令改为 `--backend rtde` | 独立已知位移测试通过 |
+| DP在线 | 见[推理手册](runbooks/infer.md) | shadow及所选后端均通过 |
 
-当前下一步是用单个chunk验证自动启动、servoJ保持和6步目标序列。
+当前下一步是仅机械臂的单socket chunk；servoJ另行验证。

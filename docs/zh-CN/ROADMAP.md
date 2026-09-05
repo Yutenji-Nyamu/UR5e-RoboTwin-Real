@@ -58,9 +58,11 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 ## 运动后端
 
 - `SocketMovelReplayBackend`：Remote模式、批量 `movel`、开环计时；仅用于手动
-  重播和可选对照基线。
+  重播。
+- `SocketSpeedLPolicyBackend`：RTDE读状态、10 Hz socket `speedl`写动作，目标EMA
+  可调；学习策略首次验机后端。
 - `RtdeServoJBackend`：Remote模式自动启动机器人程序、500 Hz RTDE设点与反馈；
-  学习策略默认后端。
+  明确的实验后端。
 
 两者绝不自动切换，详见 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md)。
 
@@ -99,10 +101,10 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 状态：已完成一次完整采集和重播。
 
-### 4 — servoJ 后端
+### 4 — 策略运动后端
 
-- 加载机器人端循环；测试保持、毫米级小步、慢速斜坡、更新丢失、跟踪限制和
-  停止延迟。
+- 先用一个模型chunk确认socket speedL；servoJ另行测试保持、毫米级小步、慢速
+  斜坡、跟踪和停止延迟。
 
 退出条件：安全限制以及实测频率/延迟通过。
 
@@ -119,11 +121,11 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 - Shadow：输入真实传感器，只记录预测，不下发。
 - 仅机械臂、保守chunk；仅在有价值时比较socket与RTDE。
-- 轨迹审查后执行完整6步RTDE；最后启用带去抖的夹爪。
+- 先执行完整6步socket；RTDE保持明确A/B；最后启用带去抖的夹爪。
 
 退出条件：试验可复现，并记录停止原因及原始/保护/实测轨迹。
 
-状态：shadow已完成；实机执行等待第4门的servoJ验证。
+状态：shadow已完成；下一步实测socket策略执行，servoJ保持独立门控。
 
 ## 人员与自动化分工
 

@@ -41,7 +41,7 @@ RoboTwin策略适配层  <---->  固定上游工作树
 ActionChunk(tcp targets[N,6], gripper[N], dt)
           |
           v
-TCP速度限制 -> 10 Hz到500 Hz插值 -> RTDE servoJ + 串口夹爪
+TCP限幅 -> 明确选择socket speedL或RTDE servoJ后端 -> 串口夹爪
 ```
 
 只有适配层可以把单臂7维状态编码为上游兼容向量。当前14维布局为

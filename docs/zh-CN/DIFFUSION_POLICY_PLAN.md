@@ -89,14 +89,15 @@ RoboTwin 仿真原始14维向量表示双臂关节位置；真机适配层复用
 离线预测与标签对比已保存；真机shadow已完成2个完整6步chunk。当前模型只是管线
 验证模型，不用于判断任务效果。
 
-### 4. servoJ 与策略执行（进行中）
+### 4. 策略执行后端（进行中）
 
-- 先不用模型，分别验证保持、毫米级目标和一段10 Hz目标序列；
-- 低层执行器完成10 Hz到500 Hz插值，并记录预测、下发目标和实测TCP；
+- 先用历史上已经运动成功的“RTDE读 + socket `speedl`写”验DP，目标EMA默认
+  `alpha=0.7`且可调；
+- RTDE servoJ保留为明确的A/B后端，先通过已知毫米位移再用于策略评估；
 - 再接DP，先机械臂，最后启用夹爪。
 
-正式推理保持Remote模式：socket只在启动时发送一次机器人端servoJ程序，随后状态
-反馈和动作目标全部使用RTDE；它不复用socket `movel`手动重播链路。
+正式推理保持Remote模式。`--backend socket`无需PolyScope RTDE程序；
+`--backend rtde`会注入servoJ循环。两者不改变6步策略输出，也不自动切换。
 
 ### 5. 正式数据与评估
 
@@ -127,5 +128,5 @@ ur5e-infer-init; ur5e-infer           # 固定真机初始化与一键在线入�
 3. 只有头部基线跑通后，再决定是否把腕部相机加入模型；
 4. 只有完整6步执行出现实测问题后，再讨论提前重规划或 chunk 融合。
 
-最近的下一步是：保持PolyScope Remote，用 `ur5e-infer 600 --execute --chunks 1`
-验证自动启动、servoJ保持和一段6目标序列；通过后再运行完整episode。
+最近的下一步是用带训练时间戳的checkpoint先执行一个仅机械臂socket chunk；通过后
+启用夹爪，RTDE servoJ另行验证。

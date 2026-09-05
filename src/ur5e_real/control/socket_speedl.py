@@ -11,7 +11,7 @@ class SocketSpeedLConfig:
     policy_hz: float = 10.0
     smoothing_alpha: float = 0.7
     acceleration: float = 0.5
-    max_linear_velocity: float = 0.05
+    max_linear_velocity: float = 0.20
     max_angular_velocity: float = 0.5
 
 
@@ -26,6 +26,8 @@ def smoothed_speedl_target(
 
     if not 0.0 < config.smoothing_alpha <= 1.0:
         raise ValueError("smoothing_alpha must be in (0, 1]")
+    if config.max_linear_velocity <= 0:
+        raise ValueError("max_linear_velocity must be positive")
     duration_s = 1.0 / config.policy_hz
     limits = ChunkStreamConfig(
         policy_hz=config.policy_hz,

@@ -34,6 +34,7 @@ class InferenceConfig:
     enable_gripper: bool = True
     backend: str = "socket"
     smoothing_alpha: float = 0.7
+    max_linear_velocity: float = 0.20
 
 
 def _image_chw(image, image_size: tuple[int, int] = DP_IMAGE_SIZE):
@@ -344,6 +345,7 @@ def _run_execute_socket(
     motion = SocketSpeedLConfig(
         policy_hz=inference.policy_hz,
         smoothing_alpha=inference.smoothing_alpha,
+        max_linear_velocity=inference.max_linear_velocity,
     )
     robot: socket.socket | None = None
     previous_target = None
@@ -358,7 +360,8 @@ def _run_execute_socket(
         model.reset_obs()
         print(
             f"[EXECUTE] socket speedL at {inference.policy_hz:g} Hz; "
-            f"target EMA alpha={inference.smoothing_alpha:g}"
+            f"target EMA alpha={inference.smoothing_alpha:g}; "
+            f"linear limit={inference.max_linear_velocity:g}m/s"
         )
         while inference.chunks == 0 or chunk_index < inference.chunks:
             state = states.read()
@@ -454,6 +457,12 @@ def main(argv: list[str] | None = None) -> int:
         default=0.7,
         help="socket target EMA; 1 disables smoothing (default: 0.7)",
     )
+    parser.add_argument(
+        "--max-linear-speed",
+        type=float,
+        default=0.20,
+        help="socket TCP linear speed limit in m/s (default: 0.20)",
+    )
     args = parser.parse_args(argv)
     inference = InferenceConfig(
         chunks=args.chunks,
@@ -461,6 +470,7 @@ def main(argv: list[str] | None = None) -> int:
         enable_gripper=not args.no_gripper,
         backend=args.backend,
         smoothing_alpha=args.smooth_alpha,
+        max_linear_velocity=args.max_linear_speed,
     )
     robotwin_root = args.robotwin_root.expanduser().resolve()
     checkpoint = args.checkpoint.expanduser().resolve()

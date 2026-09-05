@@ -44,19 +44,22 @@ historically successful ACT deployment. It reads RTDE feedback and sends
 
 ```bash
 ur5e-infer 20260905_150221:300 --execute \
-  --backend socket --smooth-alpha 0.7 --chunks 1 --no-gripper
+  --backend socket --smooth-alpha 0.7 --max-linear-speed 0.20 \
+  --chunks 1 --no-gripper
 ```
 
 After confirming motion, run the complete episode with the gripper enabled:
 
 ```bash
 ur5e-infer 20260905_150221:300 --execute \
-  --backend socket --smooth-alpha 0.7
+  --backend socket --smooth-alpha 0.7 --max-linear-speed 0.20 --chunks 0
 ```
 
 `--smooth-alpha 0.7` applies the target EMA used by the old ACT path; `1.0`
-disables it, while smaller values trade response for more smoothing. The default
-50 chunks equal RoboTwin's original 300-action limit. `Ctrl+C` stops early.
+disables it, while smaller values trade response for more smoothing.
+`--max-linear-speed 0.20` restores the limit used by that successful ACT path;
+the earlier 0.05 m/s adapter limit clipped the learned 10--14 mm steps. Zero
+chunks means run until `Ctrl+C`.
 
 The RTDE servoJ implementation remains an explicit experimental alternative:
 

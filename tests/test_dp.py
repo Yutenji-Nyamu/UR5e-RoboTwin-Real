@@ -91,13 +91,23 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
         current = np.zeros(6, dtype=np.float32)
         desired = np.asarray([0.010, 0, 0, 0, 0, 0], dtype=np.float32)
         smooth_target, smooth_velocity = smoothed_speedl_target(
-            current, desired, None, SocketSpeedLConfig(smoothing_alpha=0.5)
+            current,
+            desired,
+            None,
+            SocketSpeedLConfig(smoothing_alpha=0.5, max_linear_velocity=0.05),
         )
         raw_target, raw_velocity = smoothed_speedl_target(
+            current,
+            desired,
+            None,
+            SocketSpeedLConfig(smoothing_alpha=1.0, max_linear_velocity=0.05),
+        )
+        default_target, _ = smoothed_speedl_target(
             current, desired, None, SocketSpeedLConfig(smoothing_alpha=1.0)
         )
         self.assertAlmostEqual(float(smooth_target[0]), 0.0025, places=6)
         self.assertAlmostEqual(float(raw_target[0]), 0.005, places=6)
+        self.assertAlmostEqual(float(default_target[0]), 0.010, places=6)
         self.assertLessEqual(float(np.linalg.norm(smooth_velocity[:3])), 0.05001)
         self.assertLessEqual(float(np.linalg.norm(raw_velocity[:3])), 0.05001)
 

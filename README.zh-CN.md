@@ -34,7 +34,8 @@ DP真机推理：
 
 ```bash
 ur5e-infer-init
-ur5e-infer 20260905_150221:300 --execute --backend socket
+ur5e-infer 20260905_150221:300 --execute --backend socket \
+  --smooth-alpha 0.7 --max-linear-speed 0.20
 ```
 
 时间戳与epoch共同标识checkpoint，例如 `20260905_150221:300`。第一次调试加

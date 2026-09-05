@@ -38,7 +38,8 @@ Live DP inference:
 
 ```bash
 ur5e-infer-init
-ur5e-infer 20260905_150221:300 --execute --backend socket
+ur5e-infer 20260905_150221:300 --execute --backend socket \
+  --smooth-alpha 0.7 --max-linear-speed 0.20
 ```
 
 The timestamp and epoch identify a checkpoint, for example

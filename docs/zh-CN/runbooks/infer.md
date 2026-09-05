@@ -41,18 +41,20 @@ ur5e-infer-init
 
 ```bash
 ur5e-infer 20260905_150221:300 --execute \
-  --backend socket --smooth-alpha 0.7 --chunks 1 --no-gripper
+  --backend socket --smooth-alpha 0.7 --max-linear-speed 0.20 \
+  --chunks 1 --no-gripper
 ```
 
 确认运动后，完整运行并启用夹爪：
 
 ```bash
 ur5e-infer 20260905_150221:300 --execute \
-  --backend socket --smooth-alpha 0.7
+  --backend socket --smooth-alpha 0.7 --max-linear-speed 0.20 --chunks 0
 ```
 
 `--smooth-alpha 0.7` 复用旧ACT的目标EMA；`1.0`关闭EMA，较小值更平滑但响应更慢。
-默认50个chunk，即RoboTwin原有的300 action上限；可按 `Ctrl+C` 提前停止。
+`--max-linear-speed 0.20` 恢复旧ACT成功链路的速度上限；此前适配层的0.05 m/s会截短
+模型预测的10--14 mm步长。`--chunks 0` 持续运行到按下 `Ctrl+C`。
 
 RTDE servoJ版本保留为明确的并列实验：
 

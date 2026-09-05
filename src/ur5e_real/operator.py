@@ -161,6 +161,12 @@ def infer() -> int:
         default=0.7,
         help="socket target EMA; 1 disables smoothing (default: 0.7)",
     )
+    parser.add_argument(
+        "--max-linear-speed",
+        type=float,
+        default=0.20,
+        help="socket TCP linear speed limit in m/s (default: 0.20)",
+    )
     args = parser.parse_args()
     if args.chunks < 0:
         parser.error("--chunks must be non-negative")
@@ -174,6 +180,7 @@ def infer() -> int:
         enable_gripper=not args.no_gripper,
         backend=args.backend,
         smoothing_alpha=args.smooth_alpha,
+        max_linear_velocity=args.max_linear_speed,
     )
     mode_name = "shadow" if args.shadow else "execute"
     backend = "read-only" if args.shadow else args.backend

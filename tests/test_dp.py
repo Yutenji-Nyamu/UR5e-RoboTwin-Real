@@ -140,6 +140,7 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
 
     def test_dp_inference_step_override_defaults_to_upstream(self):
         self.assertEqual(DPInferenceConfig().diffusion_steps, 100)
+        self.assertFalse(DPInferenceConfig().inter_chunk_hold)
 
     def test_training_command_preserves_upstream_defaults(self):
         with tempfile.TemporaryDirectory() as directory:

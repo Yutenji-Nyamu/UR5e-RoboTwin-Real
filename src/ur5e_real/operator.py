@@ -173,6 +173,11 @@ def infer() -> int:
         default=100,
         help="diffusion denoising steps per chunk (default: 100)",
     )
+    parser.add_argument(
+        "--inter-chunk-hold",
+        action="store_true",
+        help="experimentally track the final pose during inference (default: off)",
+    )
     args = parser.parse_args()
     if args.chunks < 0:
         parser.error("--chunks must be non-negative")
@@ -188,6 +193,7 @@ def infer() -> int:
         smoothing_alpha=args.smooth_alpha,
         max_linear_velocity=args.max_linear_speed,
         diffusion_steps=args.diffusion_steps,
+        inter_chunk_hold=args.inter_chunk_hold,
     )
     mode_name = "shadow" if args.shadow else "execute"
     backend = "read-only" if args.shadow else args.backend

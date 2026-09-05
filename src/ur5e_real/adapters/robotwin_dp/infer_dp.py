@@ -40,6 +40,7 @@ class InferenceConfig:
     smoothing_alpha: float = 0.7
     max_linear_velocity: float = 0.20
     diffusion_steps: int = 100
+    inter_chunk_hold: bool = False
 
 
 def _image_chw(image, image_size: tuple[int, int] = DP_IMAGE_SIZE):
@@ -373,7 +374,7 @@ def _run_execute_socket(
             f"[EXECUTE] socket speedL at {inference.policy_hz:g} Hz; "
             f"target EMA alpha={inference.smoothing_alpha:g}; "
             f"linear limit={inference.max_linear_velocity:g}m/s; "
-            "endpoint hold during inference"
+            f"inter-chunk hold={'on' if inference.inter_chunk_hold else 'off'}"
         )
         while inference.chunks == 0 or chunk_index < inference.chunks:
             state = states.read()
@@ -423,7 +424,7 @@ def _run_execute_socket(
             for tcp, gripper_value, pair in captured_observations:
                 model.update_obs(encoder.encode(tcp, gripper_value, pair.head, pair.wrist))
             chunk_index += 1
-            if previous_target is not None and (
+            if inference.inter_chunk_hold and previous_target is not None and (
                 inference.chunks == 0 or chunk_index < inference.chunks
             ):
                 gap_controller = SocketInferenceGapController(
@@ -494,6 +495,11 @@ def main(argv: list[str] | None = None) -> int:
         default=100,
         help="diffusion denoising steps per chunk (default: 100)",
     )
+    parser.add_argument(
+        "--inter-chunk-hold",
+        action="store_true",
+        help="experimentally track the final pose during inference (default: off)",
+    )
     args = parser.parse_args(argv)
     inference = InferenceConfig(
         chunks=args.chunks,
@@ -503,6 +509,7 @@ def main(argv: list[str] | None = None) -> int:
         smoothing_alpha=args.smooth_alpha,
         max_linear_velocity=args.max_linear_speed,
         diffusion_steps=args.diffusion_steps,
+        inter_chunk_hold=args.inter_chunk_hold,
     )
     robotwin_root = args.robotwin_root.expanduser().resolve()
     checkpoint = args.checkpoint.expanduser().resolve()

@@ -61,9 +61,9 @@ disables it, while smaller values trade response for more smoothing.
 the earlier 0.05 m/s adapter limit clipped the learned 10--14 mm steps. Zero
 chunks means run until `Ctrl+C`.
 
-The socket controller keeps tracking the final pose target during synchronous
-model inference. It therefore approaches the chunk endpoint under the configured
-acceleration instead of braking because a `speedl` command expired.
+Inter-chunk hold is off by default, preserving the historically successful ACT
+execution inside each chunk. Add `--inter-chunk-hold` only to A/B test endpoint
+tracking during synchronous inference without silently changing the baseline.
 
 Optional second experiment: append `--diffusion-steps 10` to reduce the measured
 inference gap from about 790 ms to 80 ms. The upstream baseline remains 100 steps;

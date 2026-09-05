@@ -87,7 +87,8 @@ class ContinuousSocketSpeedLController:
         self.config = config
         self._target: list[float] | None = None
         self._error: Exception | None = None
-        self._lock = threading.Lock()
+        self._condition = threading.Condition()
+        self._target_version = 0
         self._ready = threading.Event()
         self._running = False
         self._thread: threading.Thread | None = None
@@ -111,8 +112,10 @@ class ContinuousSocketSpeedLController:
         if len(values) != 6:
             raise ValueError("TCP target must contain six values")
         self.check()
-        with self._lock:
+        with self._condition:
             self._target = values
+            self._target_version += 1
+            self._condition.notify()
 
     def check(self) -> None:
         if self._error is not None:
@@ -120,12 +123,21 @@ class ContinuousSocketSpeedLController:
 
     def _loop(self) -> None:
         period = 1.0 / self.config.policy_hz
-        deadline = time.monotonic()
+        next_keepalive = time.monotonic()
+        sent_version = -1
         try:
-            while self._running:
-                state = self.read_state()
-                with self._lock:
+            while True:
+                with self._condition:
+                    while self._running and self._target_version == sent_version:
+                        wait = next_keepalive - time.monotonic()
+                        if wait <= 0:
+                            break
+                        self._condition.wait(timeout=wait)
+                    if not self._running:
+                        return
                     target = None if self._target is None else list(self._target)
+                    target_version = self._target_version
+                state = self.read_state()
                 if state is not None and target is not None:
                     velocity = tracking_speedl_velocity(state[1], target, self.config)
                     self.connection.sendall(
@@ -136,19 +148,17 @@ class ContinuousSocketSpeedLController:
                         ).encode("utf-8")
                     )
                     self._ready.set()
-                deadline += period
-                wait = deadline - time.monotonic()
-                if wait > 0:
-                    time.sleep(wait)
-                else:
-                    deadline = time.monotonic()
+                    sent_version = target_version
+                next_keepalive = time.monotonic() + period
         except Exception as exc:
             if self._running:
                 self._error = exc
             self._ready.set()
 
     def stop(self) -> None:
-        self._running = False
+        with self._condition:
+            self._running = False
+            self._condition.notify()
         if self._thread is not None:
             self._thread.join(timeout=2.0)
             self._thread = None

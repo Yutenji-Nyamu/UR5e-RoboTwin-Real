@@ -14,8 +14,8 @@ from ...control.chunk import ChunkStreamConfig, stream_tcp_chunk
 from ...control.gripper_policy import GripperCommandConfig, GripperPolicy
 from ...control.servoj import ServoJController, ServoJStreamConfig
 from ...control.socket_speedl import (
-    ContinuousSocketSpeedLController,
     SocketSpeedLConfig,
+    SocketInferenceGapController,
     smoothed_speedl_target,
 )
 from ...data.schema import nearest_rotation_vector
@@ -23,7 +23,7 @@ from ...hardware.dashboard import require_external_motion_ready
 from ...hardware.gripper import GripperSerial
 from ...hardware.realsense import DualColorCamera, LatestDualColorCamera
 from ...hardware.rtde import LatestRtdeTcpClient, RtdeOutputConfig, RtdeTcpClient
-from ...hardware.urscript import send_urscript
+from ...hardware.urscript import send_urscript, speedl_command, stopl_command
 
 DP_IMAGE_SIZE = (320, 240)  # width, height
 
@@ -358,7 +358,7 @@ def _run_execute_socket(
         max_linear_velocity=inference.max_linear_velocity,
     )
     robot: socket.socket | None = None
-    tracker: ContinuousSocketSpeedLController | None = None
+    gap_controller: SocketInferenceGapController | None = None
     previous_target = None
     chunk_index = 0
     try:
@@ -368,16 +368,12 @@ def _run_execute_socket(
         robot = socket.create_connection(
             (lab.robot.host, lab.robot.script_port), timeout=lab.robot.socket_timeout_s
         )
-        initial_state = states.read()
-        if initial_state is None:
-            raise RuntimeError("RTDE has not produced an initial TCP pose")
-        tracker = ContinuousSocketSpeedLController(robot, states.read, motion)
-        tracker.start(initial_state[1])
         model.reset_obs()
         print(
-            f"[EXECUTE] continuous socket speedL at {inference.policy_hz:g} Hz; "
+            f"[EXECUTE] socket speedL at {inference.policy_hz:g} Hz; "
             f"target EMA alpha={inference.smoothing_alpha:g}; "
-            f"linear limit={inference.max_linear_velocity:g}m/s"
+            f"linear limit={inference.max_linear_velocity:g}m/s; "
+            "endpoint hold during inference"
         )
         while inference.chunks == 0 or chunk_index < inference.chunks:
             state = states.read()
@@ -391,6 +387,10 @@ def _run_execute_socket(
             actions = np.asarray(model.get_action(observation), dtype=np.float32)
             elapsed_ms = (time.perf_counter() - started) * 1000.0
             print(f"[CHUNK {chunk_index}] {len(actions)} actions, inference={elapsed_ms:.1f}ms")
+            if gap_controller is not None:
+                gap_controller.stop()
+                gap_controller.check()
+                gap_controller = None
 
             deadline = time.monotonic()
             captured_observations = []
@@ -399,10 +399,16 @@ def _run_execute_socket(
                 if state is None:
                     continue
                 tcp = state[1]
-                previous_target, _ = smoothed_speedl_target(
+                previous_target, velocity = smoothed_speedl_target(
                     tcp, action[:6], previous_target, motion
                 )
-                tracker.set_target(previous_target)
+                robot.sendall(
+                    speedl_command(
+                        velocity,
+                        acceleration=motion.acceleration,
+                        duration_s=1.0 / motion.policy_hz,
+                    ).encode("utf-8")
+                )
                 if gripper_policy is not None:
                     gripper_policy.step(float(action[13]))
                 deadline += 1.0 / motion.policy_hz
@@ -417,12 +423,23 @@ def _run_execute_socket(
             for tcp, gripper_value, pair in captured_observations:
                 model.update_obs(encoder.encode(tcp, gripper_value, pair.head, pair.wrist))
             chunk_index += 1
+            if previous_target is not None and (
+                inference.chunks == 0 or chunk_index < inference.chunks
+            ):
+                gap_controller = SocketInferenceGapController(
+                    robot, states.read, previous_target, motion
+                )
+                gap_controller.start()
     except KeyboardInterrupt:
         print("\n[STOP] DP execution interrupted")
     finally:
-        if tracker is not None:
-            tracker.stop()
+        if gap_controller is not None:
+            gap_controller.stop()
         if robot is not None:
+            try:
+                robot.sendall(stopl_command().encode("utf-8"))
+            except Exception:
+                pass
             robot.close()
         states.stop()
         cameras.stop()

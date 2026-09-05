@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import threading
-import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Sequence
 
 from ..data.schema import nearest_rotation_vector
-from ..hardware.urscript import speedl_command, stopl_command
+from ..hardware.urscript import speedl_command
 from .chunk import ChunkStreamConfig, limit_tcp_target
 
 
@@ -73,73 +72,50 @@ def tracking_speedl_velocity(
     return velocity.astype(np.float32)
 
 
-class ContinuousSocketSpeedLController:
-    """Keep socket speedL alive while policy inference runs synchronously."""
+class SocketInferenceGapController:
+    """Track one final pose while the next policy chunk is being inferred."""
 
     def __init__(
         self,
         connection: Any,
         read_state: Callable[[], tuple[float, list[float]] | None],
+        target: Sequence[float],
         config: SocketSpeedLConfig,
     ) -> None:
         self.connection = connection
         self.read_state = read_state
         self.config = config
-        self._target: list[float] | None = None
+        self.target = [float(value) for value in target]
+        if len(self.target) != 6:
+            raise ValueError("TCP target must contain six values")
         self._error: Exception | None = None
-        self._condition = threading.Condition()
-        self._target_version = 0
         self._ready = threading.Event()
-        self._running = False
+        self._stop = threading.Event()
         self._thread: threading.Thread | None = None
 
-    def start(self, initial_target: Sequence[float]) -> None:
-        self.set_target(initial_target)
-        self._running = True
+    def start(self) -> None:
         self._thread = threading.Thread(
             target=self._loop,
-            name="ur5e-socket-speedl",
+            name="ur5e-socket-gap-hold",
             daemon=True,
         )
         self._thread.start()
         if not self._ready.wait(timeout=2.0):
             self.stop()
-            raise RuntimeError("timed out starting continuous socket speedL")
+            raise RuntimeError("timed out starting socket inference-gap control")
         self.check()
-
-    def set_target(self, target: Sequence[float]) -> None:
-        values = [float(value) for value in target]
-        if len(values) != 6:
-            raise ValueError("TCP target must contain six values")
-        self.check()
-        with self._condition:
-            self._target = values
-            self._target_version += 1
-            self._condition.notify()
 
     def check(self) -> None:
         if self._error is not None:
-            raise RuntimeError("continuous socket speedL failed") from self._error
+            raise RuntimeError("socket inference-gap control failed") from self._error
 
     def _loop(self) -> None:
         period = 1.0 / self.config.policy_hz
-        next_keepalive = time.monotonic()
-        sent_version = -1
         try:
-            while True:
-                with self._condition:
-                    while self._running and self._target_version == sent_version:
-                        wait = next_keepalive - time.monotonic()
-                        if wait <= 0:
-                            break
-                        self._condition.wait(timeout=wait)
-                    if not self._running:
-                        return
-                    target = None if self._target is None else list(self._target)
-                    target_version = self._target_version
+            while not self._stop.is_set():
                 state = self.read_state()
-                if state is not None and target is not None:
-                    velocity = tracking_speedl_velocity(state[1], target, self.config)
+                if state is not None:
+                    velocity = tracking_speedl_velocity(state[1], self.target, self.config)
                     self.connection.sendall(
                         speedl_command(
                             velocity,
@@ -148,21 +124,14 @@ class ContinuousSocketSpeedLController:
                         ).encode("utf-8")
                     )
                     self._ready.set()
-                    sent_version = target_version
-                next_keepalive = time.monotonic() + period
+                self._stop.wait(period)
         except Exception as exc:
-            if self._running:
+            if not self._stop.is_set():
                 self._error = exc
             self._ready.set()
 
     def stop(self) -> None:
-        with self._condition:
-            self._running = False
-            self._condition.notify()
+        self._stop.set()
         if self._thread is not None:
             self._thread.join(timeout=2.0)
             self._thread = None
-        try:
-            self.connection.sendall(stopl_command().encode("utf-8"))
-        except Exception:
-            pass

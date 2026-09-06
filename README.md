@@ -38,15 +38,14 @@ Live DP inference:
 
 ```bash
 ur5e-infer-init
-ur5e-infer 20260905_150221:300 --execute --backend socket \
-  --smooth-alpha 0.7 --max-linear-speed 0.20
+ur5e-infer 20260905_150221:600 --execute --backend socket \
+  --socket-transition baseline --smooth-alpha 0.7 \
+  --max-linear-speed 0.40 --chunks 0
 ```
 
-The timestamp and epoch identify a checkpoint, for example
-`20260905_150221:300`. Add `--chunks 1 --no-gripper` for the first run. The
-socket backend follows the `speedl` path already proven by the historical ACT
-deployment; RTDE remains an explicit experimental alternative. See
-[DP inference](docs/runbooks/infer.md).
+The timestamp and epoch identify a checkpoint. The socket baseline is the
+proven path; optional final-action stretch and RTDE servoJ variants are listed
+in [DP inference](docs/runbooks/infer.md).
 
 ## Diffusion Policy quick path
 

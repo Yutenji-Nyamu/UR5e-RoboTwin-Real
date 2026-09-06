@@ -6,6 +6,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
 
+SERVOJ_LOOKAHEAD_DECLARATION = "  local servoj_lookahead_time = 0.1"
+SERVOJ_GAIN_DECLARATION = "  local servoj_gain = 300"
+
 
 @dataclass(frozen=True)
 class ServoJStreamConfig:
@@ -16,6 +19,20 @@ class ServoJStreamConfig:
     servoj_mode: int = 2
     connect_retry_s: float = 0.5
     connect_timeout_s: float = 15.0
+
+
+def render_servoj_program(source: str, lookahead_time: float, gain: int) -> str:
+    """Apply command-line servoJ tuning to the tracked robot-side program."""
+    if not 0.03 <= lookahead_time <= 0.2:
+        raise ValueError("servoJ lookahead_time must be in [0.03, 0.2]")
+    if not 100 <= gain <= 2000:
+        raise ValueError("servoJ gain must be in [100, 2000]")
+    if source.count(SERVOJ_LOOKAHEAD_DECLARATION) != 1 or source.count(SERVOJ_GAIN_DECLARATION) != 1:
+        raise ValueError("servoJ program tuning declarations are missing or duplicated")
+    return source.replace(
+        SERVOJ_LOOKAHEAD_DECLARATION,
+        f"  local servoj_lookahead_time = {lookahead_time:.6f}",
+    ).replace(SERVOJ_GAIN_DECLARATION, f"  local servoj_gain = {gain}")
 
 
 def _imports() -> tuple[Any, Any]:

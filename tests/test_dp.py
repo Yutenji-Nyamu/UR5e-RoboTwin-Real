@@ -19,10 +19,11 @@ from ur5e_real.control.chunk import (
     limit_tcp_target,
 )
 from ur5e_real.control.gripper_policy import GripperCommandConfig, GripperPolicy
+from ur5e_real.control.servoj import render_servoj_program
 from ur5e_real.control.socket_speedl import (
     SocketSpeedLConfig,
     smoothed_speedl_target,
-    tracking_speedl_velocity,
+    stretched_speedl_velocity,
 )
 from ur5e_real.operator import resolve_dp_checkpoint
 
@@ -131,16 +132,28 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
         policy.step(0.3, now=1.3)
         self.assertEqual(gripper.commands, ["close", "open"])
 
-    def test_socket_pose_tracker_slows_near_target_and_obeys_limits(self):
-        config = SocketSpeedLConfig(tracking_gain=10.0, max_linear_velocity=0.2)
-        fast = tracking_speedl_velocity(np.zeros(6), [0.1, 0, 0, 0, 0, 0], config)
-        slow = tracking_speedl_velocity(np.zeros(6), [0.005, 0, 0, 0, 0, 0], config)
-        self.assertAlmostEqual(float(fast[0]), 0.2, places=6)
-        self.assertAlmostEqual(float(slow[0]), 0.05, places=6)
+    def test_socket_stretch_spreads_only_the_final_delta_over_the_gap(self):
+        velocity, duration_s = stretched_speedl_velocity(
+            np.zeros(6),
+            [0.02, 0, 0, 0, 0, 0],
+            0.08,
+            SocketSpeedLConfig(policy_hz=10.0),
+        )
+        self.assertAlmostEqual(duration_s, 0.20, places=6)
+        self.assertAlmostEqual(float(velocity[0]), 0.10, places=6)
+
+    def test_servoj_tuning_is_rendered_without_changing_the_template(self):
+        source = Path("robot_programs/servoj_control_loop.script").read_text(encoding="utf-8")
+        configured = render_servoj_program(source, 0.2, 400)
+        self.assertIn("local servoj_lookahead_time = 0.200000", configured)
+        self.assertIn("local servoj_gain = 400", configured)
+        self.assertIn("local servoj_lookahead_time = 0.1", source)
+        self.assertIn("local servoj_gain = 300", source)
 
     def test_dp_inference_step_override_defaults_to_upstream(self):
         self.assertEqual(DPInferenceConfig().diffusion_steps, 100)
-        self.assertFalse(DPInferenceConfig().inter_chunk_hold)
+        self.assertEqual(DPInferenceConfig().socket_transition, "baseline")
+        self.assertEqual(DPInferenceConfig().servoj_gain, 300)
 
     def test_training_command_preserves_upstream_defaults(self):
         with tempfile.TemporaryDirectory() as directory:

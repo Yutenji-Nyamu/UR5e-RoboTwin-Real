@@ -125,7 +125,9 @@ def _parser() -> argparse.ArgumentParser:
     infer_dp.add_argument("--smooth-alpha", type=float, default=0.7)
     infer_dp.add_argument("--max-linear-speed", type=float, default=0.20)
     infer_dp.add_argument("--diffusion-steps", type=int, default=100)
-    infer_dp.add_argument("--inter-chunk-hold", action="store_true")
+    infer_dp.add_argument("--socket-transition", choices=("baseline", "stretch"), default="baseline")
+    infer_dp.add_argument("--servoj-lookahead", type=float, default=0.1)
+    infer_dp.add_argument("--servoj-gain", type=int, default=300)
 
     return parser
 
@@ -292,7 +294,9 @@ def main(argv: list[str] | None = None) -> int:
             smoothing_alpha=args.smooth_alpha,
             max_linear_velocity=args.max_linear_speed,
             diffusion_steps=args.diffusion_steps,
-            inter_chunk_hold=args.inter_chunk_hold,
+            socket_transition=args.socket_transition,
+            servoj_lookahead_time=args.servoj_lookahead,
+            servoj_gain=args.servoj_gain,
         )
         robotwin_root = Path(args.robotwin_root).expanduser().resolve()
         checkpoint = Path(args.checkpoint).expanduser().resolve()

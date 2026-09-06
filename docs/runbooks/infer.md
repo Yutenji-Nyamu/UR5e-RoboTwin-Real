@@ -22,7 +22,7 @@ latency, and label error without connecting hardware.
 ## 2. Live shadow mode
 
 ```bash
-ur5e-infer 20260905_150221:300 --shadow --chunks 10
+ur5e-infer 20260905_150221:600 --shadow --chunks 10
 ```
 
 This connects both cameras and read-only RTDE, prints predictions, and sends no
@@ -38,46 +38,57 @@ home at low speed, and opens the gripper:
 ur5e-infer-init
 ```
 
-After arranging the scene, first test the socket path inherited from the
-historically successful ACT deployment. It reads RTDE feedback and sends
-`speedl` over socket 30001; no PolyScope RTDE program is required:
+After arranging the scene, select one of three independent executors.
+
+### A. Socket baseline (proven smooth within a chunk)
+
+This reads RTDE feedback and sends `speedl` over socket 30001; no manually
+started PolyScope RTDE program is required:
 
 ```bash
-ur5e-infer 20260905_150221:300 --execute \
-  --backend socket --smooth-alpha 0.7 --max-linear-speed 0.20 \
-  --chunks 1 --no-gripper
+ur5e-infer 20260905_150221:600 --execute \
+  --backend socket --socket-transition baseline \
+  --smooth-alpha 0.7 --max-linear-speed 0.40 --chunks 0
 ```
 
-After confirming motion, run the complete episode with the gripper enabled:
+This is the baseline that completed the task. `--smooth-alpha 0.7` is the
+intra-chunk target EMA; `baseline` leaves the inference gap unchanged.
+
+### B. Socket final-action stretch
 
 ```bash
-ur5e-infer 20260905_150221:300 --execute \
-  --backend socket --smooth-alpha 0.7 --max-linear-speed 0.20 --chunks 0
+ur5e-infer 20260905_150221:600 --execute \
+  --backend socket --socket-transition stretch \
+  --smooth-alpha 0.7 --max-linear-speed 0.40 \
+  --diffusion-steps 10 --chunks 0
 ```
 
-`--smooth-alpha 0.7` applies the target EMA used by the old ACT path; `1.0`
-disables it, while smaller values trade response for more smoothing.
-`--max-linear-speed 0.20` restores the limit used by that successful ACT path;
-the earlier 0.05 m/s adapter limit clipped the learned 10--14 mm steps. Zero
-chunks means run until `Ctrl+C`.
+The first five actions are identical to the baseline. Only the final target is
+spread over `100 ms + measured inference time + 20 ms`; the next chunk then
+preempts it. There is no background thread or concurrent writer to port 30001.
+The selected final `speedL` duration is printed for every chunk.
 
-Inter-chunk hold is off by default, preserving the historically successful ACT
-execution inside each chunk. Add `--inter-chunk-hold` only to A/B test endpoint
-tracking during synchronous inference without silently changing the baseline.
+On this workstation, `--diffusion-steps 10` reduced inference from roughly 790
+ms to 80 ms, with nearly unchanged mean error on three offline observations. It
+changes inference sampling only and does not require retraining.
 
-Optional second experiment: append `--diffusion-steps 10` to reduce the measured
-inference gap from about 790 ms to 80 ms. The upstream baseline remains 100 steps;
-three sampled offline observations had nearly unchanged mean error. This changes
-inference sampling only and does not require retraining.
+### C. RTDE servoJ at 500 Hz
 
-The RTDE servoJ implementation remains an explicit experimental alternative:
+The model, cameras, and observations remain unchanged; only execution differs:
 
 ```bash
-ur5e-infer 20260905_150221:300 --execute --backend rtde --chunks 1 --no-gripper
+ur5e-infer 20260905_150221:600 --execute \
+  --backend rtde --max-linear-speed 0.40 --diffusion-steps 10 \
+  --servoj-lookahead 0.1 --servoj-gain 300 --chunks 0
 ```
 
-It injects the robot-side servoJ script and writes RTDE input registers. Script
-runtime has been confirmed, but known-displacement tracking is not yet proven.
-The backends never switch automatically. The gripper uses action element 14;
-`--no-gripper` isolates arm tests. Camera and RTDE state acquisition run in
-background threads so inference does not leave stale samples queued.
+The command injects the robot-side servoJ loop and interpolates the six 10 Hz
+targets into 500 Hz setpoints. It keeps publishing the final setpoint during
+inference, so there is no socket-command-expiry brake, although the robot can
+still pause briefly. `0.1/300` are the official servoJ defaults; explicit valid
+ranges are `lookahead=0.03--0.2` and `gain=100--2000`. This backend is wired but
+still awaits its first verified following test in this repository; change the
+end to `--chunks 1 --no-gripper` for a one-chunk comparison.
+
+The executors never switch automatically. `--chunks 0` runs until `Ctrl+C`; the
+gripper consumes action element 14, and `--no-gripper` isolates arm motion.

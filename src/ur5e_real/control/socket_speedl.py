@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-import threading
-from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Sequence
+from typing import Sequence
 
 from ..data.schema import nearest_rotation_vector
-from ..hardware.urscript import speedl_command
 from .chunk import ChunkStreamConfig, limit_tcp_target
+
+SOCKET_STRETCH_MARGIN_S = 0.02
 
 
 @dataclass(frozen=True)
@@ -17,7 +16,6 @@ class SocketSpeedLConfig:
     acceleration: float = 0.5
     max_linear_velocity: float = 0.20
     max_angular_velocity: float = 0.5
-    tracking_gain: float = 10.0
 
 
 def smoothed_speedl_target(
@@ -48,90 +46,24 @@ def smoothed_speedl_target(
     return smoothed.astype(np.float32), velocity.astype(np.float32)
 
 
-def tracking_speedl_velocity(
-    current: Sequence[float], target: Sequence[float], config: SocketSpeedLConfig
+def stretched_speedl_velocity(
+    current: Sequence[float],
+    target: Sequence[float],
+    inference_s: float,
+    config: SocketSpeedLConfig,
+    *,
+    margin_s: float = SOCKET_STRETCH_MARGIN_S,
 ):
-    """Calculate a bounded Cartesian velocity that converges on a pose target."""
+    """Spread the final action over its period plus the expected inference gap."""
     import numpy as np
 
-    if config.tracking_gain <= 0:
-        raise ValueError("tracking_gain must be positive")
+    if inference_s < 0 or margin_s < 0:
+        raise ValueError("inference_s and margin_s must be non-negative")
     current_array = np.asarray(current, dtype=np.float32)
     target_array = np.asarray(target, dtype=np.float32).copy()
     if current_array.shape != (6,) or target_array.shape != (6,):
         raise ValueError("current and target TCP poses must each contain six values")
     target_array[3:6] = nearest_rotation_vector(target_array[3:6], current_array[3:6])
-    velocity = config.tracking_gain * (target_array - current_array)
-    for component, limit in (
-        (velocity[:3], config.max_linear_velocity),
-        (velocity[3:], config.max_angular_velocity),
-    ):
-        norm = float(np.linalg.norm(component))
-        if norm > limit and norm > 1e-9:
-            component *= limit / norm
-    return velocity.astype(np.float32)
-
-
-class SocketInferenceGapController:
-    """Track one final pose while the next policy chunk is being inferred."""
-
-    def __init__(
-        self,
-        connection: Any,
-        read_state: Callable[[], tuple[float, list[float]] | None],
-        target: Sequence[float],
-        config: SocketSpeedLConfig,
-    ) -> None:
-        self.connection = connection
-        self.read_state = read_state
-        self.config = config
-        self.target = [float(value) for value in target]
-        if len(self.target) != 6:
-            raise ValueError("TCP target must contain six values")
-        self._error: Exception | None = None
-        self._ready = threading.Event()
-        self._stop = threading.Event()
-        self._thread: threading.Thread | None = None
-
-    def start(self) -> None:
-        self._thread = threading.Thread(
-            target=self._loop,
-            name="ur5e-socket-gap-hold",
-            daemon=True,
-        )
-        self._thread.start()
-        if not self._ready.wait(timeout=2.0):
-            self.stop()
-            raise RuntimeError("timed out starting socket inference-gap control")
-        self.check()
-
-    def check(self) -> None:
-        if self._error is not None:
-            raise RuntimeError("socket inference-gap control failed") from self._error
-
-    def _loop(self) -> None:
-        period = 1.0 / self.config.policy_hz
-        try:
-            while not self._stop.is_set():
-                state = self.read_state()
-                if state is not None:
-                    velocity = tracking_speedl_velocity(state[1], self.target, self.config)
-                    self.connection.sendall(
-                        speedl_command(
-                            velocity,
-                            acceleration=self.config.acceleration,
-                            duration_s=period,
-                        ).encode("utf-8")
-                    )
-                    self._ready.set()
-                self._stop.wait(period)
-        except Exception as exc:
-            if not self._stop.is_set():
-                self._error = exc
-            self._ready.set()
-
-    def stop(self) -> None:
-        self._stop.set()
-        if self._thread is not None:
-            self._thread.join(timeout=2.0)
-            self._thread = None
+    duration_s = 1.0 / config.policy_hz + inference_s + margin_s
+    velocity = (target_array - current_array) / duration_s
+    return velocity.astype(np.float32), duration_s

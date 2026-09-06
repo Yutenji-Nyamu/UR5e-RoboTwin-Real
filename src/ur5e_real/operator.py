@@ -165,7 +165,7 @@ def infer() -> int:
         "--max-linear-speed",
         type=float,
         default=0.20,
-        help="socket TCP linear speed limit in m/s (default: 0.20)",
+        help="TCP linear speed limit in m/s for either backend (default: 0.20)",
     )
     parser.add_argument(
         "--diffusion-steps",
@@ -174,10 +174,13 @@ def infer() -> int:
         help="diffusion denoising steps per chunk (default: 100)",
     )
     parser.add_argument(
-        "--inter-chunk-hold",
-        action="store_true",
-        help="experimentally track the final pose during inference (default: off)",
+        "--socket-transition",
+        choices=("baseline", "stretch"),
+        default="baseline",
+        help="socket chunk boundary mode (default: baseline)",
     )
+    parser.add_argument("--servoj-lookahead", type=float, default=0.1)
+    parser.add_argument("--servoj-gain", type=int, default=300)
     args = parser.parse_args()
     if args.chunks < 0:
         parser.error("--chunks must be non-negative")
@@ -193,7 +196,9 @@ def infer() -> int:
         smoothing_alpha=args.smooth_alpha,
         max_linear_velocity=args.max_linear_speed,
         diffusion_steps=args.diffusion_steps,
-        inter_chunk_hold=args.inter_chunk_hold,
+        socket_transition=args.socket_transition,
+        servoj_lookahead_time=args.servoj_lookahead,
+        servoj_gain=args.servoj_gain,
     )
     mode_name = "shadow" if args.shadow else "execute"
     backend = "read-only" if args.shadow else args.backend

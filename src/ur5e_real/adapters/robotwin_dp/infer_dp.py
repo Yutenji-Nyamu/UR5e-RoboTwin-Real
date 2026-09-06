@@ -12,11 +12,12 @@ from typing import Any
 from ...config import LabConfig, load_config
 from ...control.chunk import ChunkStreamConfig, stream_tcp_chunk
 from ...control.gripper_policy import GripperCommandConfig, GripperPolicy
-from ...control.servoj import ServoJController, ServoJStreamConfig
+from ...control.servoj import ServoJController, ServoJStreamConfig, render_servoj_program
 from ...control.socket_speedl import (
+    SOCKET_STRETCH_MARGIN_S,
     SocketSpeedLConfig,
-    SocketInferenceGapController,
     smoothed_speedl_target,
+    stretched_speedl_velocity,
 )
 from ...data.schema import nearest_rotation_vector
 from ...hardware.dashboard import require_external_motion_ready
@@ -40,7 +41,9 @@ class InferenceConfig:
     smoothing_alpha: float = 0.7
     max_linear_velocity: float = 0.20
     diffusion_steps: int = 100
-    inter_chunk_hold: bool = False
+    socket_transition: str = "baseline"
+    servoj_lookahead_time: float = 0.1
+    servoj_gain: int = 300
 
 
 def _image_chw(image, image_size: tuple[int, int] = DP_IMAGE_SIZE):
@@ -205,18 +208,26 @@ def _servo(lab: LabConfig) -> ServoJController:
     )
 
 
-def _start_servoj_program(lab: LabConfig) -> None:
+def _start_servoj_program(lab: LabConfig, inference: InferenceConfig) -> None:
     require_external_motion_ready(lab.robot.host)
     script = lab.servoj.program_script
     if not script.is_file():
         raise FileNotFoundError(script)
-    send_urscript(
+    program = render_servoj_program(
         script.read_text(encoding="utf-8"),
+        inference.servoj_lookahead_time,
+        inference.servoj_gain,
+    )
+    send_urscript(
+        program,
         lab.robot.host,
         lab.robot.script_port,
         lab.robot.socket_timeout_s,
     )
-    print(f"[CONTROL] robot-side servoJ program started: {script.name}")
+    print(
+        f"[CONTROL] robot-side servoJ program started: {script.name}; "
+        f"lookahead={inference.servoj_lookahead_time:g}s gain={inference.servoj_gain}"
+    )
 
 
 def run_shadow(
@@ -288,14 +299,21 @@ def _run_execute_rtde(
         else None
     )
     gripper_policy = GripperPolicy(gripper, GripperCommandConfig()) if gripper is not None else None
-    stream_config = ChunkStreamConfig(policy_hz=inference.policy_hz, servo_hz=lab.servoj.frequency_hz)
+    stream_config = ChunkStreamConfig(
+        policy_hz=inference.policy_hz,
+        servo_hz=lab.servoj.frequency_hz,
+        max_linear_velocity=inference.max_linear_velocity,
+    )
     chunk_index = 0
     try:
         cameras.start()
-        _start_servoj_program(lab)
+        _start_servoj_program(lab, inference)
         controller.connect_and_start()
         model.reset_obs()
-        print("[EXECUTE] continuous 6-action chunks through RTDE servoJ")
+        print(
+            f"[EXECUTE] continuous 6-action chunks through RTDE servoJ; "
+            f"linear limit={inference.max_linear_velocity:g}m/s"
+        )
         while inference.chunks == 0 or chunk_index < inference.chunks:
             tcp = controller.get_latest_tcp()
             pair = cameras.read()
@@ -359,7 +377,6 @@ def _run_execute_socket(
         max_linear_velocity=inference.max_linear_velocity,
     )
     robot: socket.socket | None = None
-    gap_controller: SocketInferenceGapController | None = None
     previous_target = None
     chunk_index = 0
     try:
@@ -374,8 +391,10 @@ def _run_execute_socket(
             f"[EXECUTE] socket speedL at {inference.policy_hz:g} Hz; "
             f"target EMA alpha={inference.smoothing_alpha:g}; "
             f"linear limit={inference.max_linear_velocity:g}m/s; "
-            f"inter-chunk hold={'on' if inference.inter_chunk_hold else 'off'}"
+            f"transition={inference.socket_transition}"
         )
+        if inference.socket_transition not in ("baseline", "stretch"):
+            raise ValueError(f"unsupported socket transition: {inference.socket_transition}")
         while inference.chunks == 0 or chunk_index < inference.chunks:
             state = states.read()
             pair = cameras.read()
@@ -387,15 +406,18 @@ def _run_execute_socket(
             started = time.perf_counter()
             actions = np.asarray(model.get_action(observation), dtype=np.float32)
             elapsed_ms = (time.perf_counter() - started) * 1000.0
-            print(f"[CHUNK {chunk_index}] {len(actions)} actions, inference={elapsed_ms:.1f}ms")
-            if gap_controller is not None:
-                gap_controller.stop()
-                gap_controller.check()
-                gap_controller = None
+            transition_note = ""
+            if inference.socket_transition == "stretch":
+                bridge_ms = 1000.0 / motion.policy_hz + elapsed_ms + 1000.0 * SOCKET_STRETCH_MARGIN_S
+                transition_note = f", final speedL={bridge_ms:.1f}ms"
+            print(
+                f"[CHUNK {chunk_index}] {len(actions)} actions, "
+                f"inference={elapsed_ms:.1f}ms{transition_note}"
+            )
 
             deadline = time.monotonic()
             captured_observations = []
-            for action in actions:
+            for action_index, action in enumerate(actions):
                 state = states.read()
                 if state is None:
                     continue
@@ -403,11 +425,19 @@ def _run_execute_socket(
                 previous_target, velocity = smoothed_speedl_target(
                     tcp, action[:6], previous_target, motion
                 )
+                duration_s = 1.0 / motion.policy_hz
+                if inference.socket_transition == "stretch" and action_index == len(actions) - 1:
+                    velocity, duration_s = stretched_speedl_velocity(
+                        tcp,
+                        previous_target,
+                        elapsed_ms / 1000.0,
+                        motion,
+                    )
                 robot.sendall(
                     speedl_command(
                         velocity,
                         acceleration=motion.acceleration,
-                        duration_s=1.0 / motion.policy_hz,
+                        duration_s=duration_s,
                     ).encode("utf-8")
                 )
                 if gripper_policy is not None:
@@ -424,18 +454,9 @@ def _run_execute_socket(
             for tcp, gripper_value, pair in captured_observations:
                 model.update_obs(encoder.encode(tcp, gripper_value, pair.head, pair.wrist))
             chunk_index += 1
-            if inference.inter_chunk_hold and previous_target is not None and (
-                inference.chunks == 0 or chunk_index < inference.chunks
-            ):
-                gap_controller = SocketInferenceGapController(
-                    robot, states.read, previous_target, motion
-                )
-                gap_controller.start()
     except KeyboardInterrupt:
         print("\n[STOP] DP execution interrupted")
     finally:
-        if gap_controller is not None:
-            gap_controller.stop()
         if robot is not None:
             try:
                 robot.sendall(stopl_command().encode("utf-8"))
@@ -487,7 +508,7 @@ def main(argv: list[str] | None = None) -> int:
         "--max-linear-speed",
         type=float,
         default=0.20,
-        help="socket TCP linear speed limit in m/s (default: 0.20)",
+        help="TCP linear speed limit in m/s for either backend (default: 0.20)",
     )
     parser.add_argument(
         "--diffusion-steps",
@@ -496,10 +517,13 @@ def main(argv: list[str] | None = None) -> int:
         help="diffusion denoising steps per chunk (default: 100)",
     )
     parser.add_argument(
-        "--inter-chunk-hold",
-        action="store_true",
-        help="experimentally track the final pose during inference (default: off)",
+        "--socket-transition",
+        choices=("baseline", "stretch"),
+        default="baseline",
+        help="socket chunk boundary mode (default: baseline)",
     )
+    parser.add_argument("--servoj-lookahead", type=float, default=0.1)
+    parser.add_argument("--servoj-gain", type=int, default=300)
     args = parser.parse_args(argv)
     inference = InferenceConfig(
         chunks=args.chunks,
@@ -509,7 +533,9 @@ def main(argv: list[str] | None = None) -> int:
         smoothing_alpha=args.smooth_alpha,
         max_linear_velocity=args.max_linear_speed,
         diffusion_steps=args.diffusion_steps,
-        inter_chunk_hold=args.inter_chunk_hold,
+        socket_transition=args.socket_transition,
+        servoj_lookahead_time=args.servoj_lookahead,
+        servoj_gain=args.servoj_gain,
     )
     robotwin_root = args.robotwin_root.expanduser().resolve()
     checkpoint = args.checkpoint.expanduser().resolve()

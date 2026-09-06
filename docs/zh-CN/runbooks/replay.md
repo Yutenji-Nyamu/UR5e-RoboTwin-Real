@@ -78,8 +78,9 @@ ur5e-replay latest --backend rtde --execute
 默认配置与当前DP推理执行层一致：记录的10 Hz TCP从第2帧开始作为动作，每6步一组，
 组内由同一个 `stream_tcp_chunk` 插值为500 Hz servoJ设点，线速度上限 `0.40 m/s`、
 `lookahead=0.1`、`gain=300`。每组之后保持最后设点 `0.08 s`，模拟当前10步DP推理的
-典型空档；后台RTDE流不会中断。逐帧 `gripper_state` 也经过推理共用的阈值、连续3帧
-确认与单周期 `GripperPolicy`；旧数据没有该列时才回退到事件表。
+典型空档；后台RTDE流不会中断。记录的按键事件会逐条原样重播，包括连续两次
+`close`；只有旧数据没有事件表时，才用逐帧 `gripper_state` 经过推理共用的
+`GripperPolicy` 兼容。
 
 研究不同chunk边界时可显式覆盖：
 

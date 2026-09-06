@@ -252,6 +252,25 @@ def build_rtde_chunks(
     return chunks[:max_chunks] if max_chunks else chunks
 
 
+def apply_rtde_replay_gripper(
+    action: dict,
+    gripper: GripperSerial | None,
+    gripper_policy: GripperPolicy | None,
+    *,
+    use_recorded_events: bool,
+) -> None:
+    """Replay explicit button presses exactly; use state only for legacy data."""
+    if gripper is None:
+        return
+    if use_recorded_events:
+        for event in action["events"]:
+            gripper.close() if event["event"] == "close" else gripper.open()
+        return
+    gripper_state = action["row"]["gripper_state"]
+    if gripper_state is not None and gripper_policy is not None:
+        gripper_policy.step(float(gripper_state))
+
+
 def _run_socket_replay(cfg: ReplayConfig) -> None:
     if cfg.row_stride < 1:
         raise ValueError("row_stride must be at least one")
@@ -403,15 +422,13 @@ def _run_rtde_replay(cfg: ReplayConfig) -> None:
             print(f"[CHUNK {chunk_index}] {len(chunk)} recorded actions")
 
             def apply_events(action_index: int, _target: list[float]) -> None:
-                if gripper_policy is None:
-                    return
                 action = chunk[action_index]
-                gripper_state = action["row"]["gripper_state"]
-                if gripper_state is not None:
-                    gripper_policy.step(float(gripper_state))
-                    return
-                for event in action["events"]:
-                    gripper.close() if event["event"] == "close" else gripper.open()
+                apply_rtde_replay_gripper(
+                    action,
+                    gripper,
+                    gripper_policy,
+                    use_recorded_events=bool(events),
+                )
 
             stream_tcp_chunk(
                 controller,

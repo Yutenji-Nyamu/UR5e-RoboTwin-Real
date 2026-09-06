@@ -5,6 +5,7 @@ from pathlib import Path
 
 from ur5e_real.replay import (
     ReplayConfig,
+    apply_rtde_replay_gripper,
     build_rtde_chunks,
     build_segment_program,
     build_segments,
@@ -86,6 +87,30 @@ class ReplayTest(unittest.TestCase):
         self.assertEqual(chunks[0][1]["events"][0]["event"], "close")
         self.assertEqual(chunks[1][1]["events"][0]["event"], "open")
         self.assertEqual(len(build_rtde_chunks(rows, events, max_chunks=1)), 1)
+
+    def test_rtde_replay_preserves_repeated_close_button_presses(self):
+        class FakeGripper:
+            def __init__(self):
+                self.commands = []
+
+            def close(self):
+                self.commands.append("close")
+
+            def open(self):
+                self.commands.append("open")
+
+        gripper = FakeGripper()
+        for event in ("close", "close", "open"):
+            apply_rtde_replay_gripper(
+                {
+                    "row": {"gripper_state": 1.0 if event == "close" else 0.0},
+                    "events": [{"event": event}],
+                },
+                gripper,
+                None,
+                use_recorded_events=True,
+            )
+        self.assertEqual(gripper.commands, ["close", "close", "open"])
 
 
 if __name__ == "__main__":

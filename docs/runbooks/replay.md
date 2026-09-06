@@ -89,10 +89,10 @@ the second frame become actions, grouped six at a time. The same
 `stream_tcp_chunk` interpolates each group into a 500 Hz servoJ stream with a
 `0.40 m/s` linear limit, `lookahead=0.1`, and `gain=300`. The controller holds
 the final setpoint for `0.08 s` between groups to imitate the typical current
-ten-step DP inference gap; its background RTDE stream remains active. Per-frame
-`gripper_state` also passes through the same threshold, three-frame confirmation,
-and single-cycle `GripperPolicy` as inference. Old rows without that field fall
-back to the event file.
+ten-step DP inference gap; its background RTDE stream remains active. Recorded
+button events are replayed exactly, including repeated `close` commands. Legacy
+data without an event file falls back to per-frame `gripper_state` through the
+inference `GripperPolicy`.
 
 Override the chunk boundary explicitly for experiments:
 

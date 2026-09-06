@@ -38,12 +38,24 @@ home at low speed, and opens the gripper:
 ur5e-infer-init
 ```
 
-After arranging the scene, select one of three independent executors.
+After arranging the scene, run:
 
-### A. Socket baseline (proven smooth within a chunk)
+```bash
+ur5e-infer 20260905_150221:600 --execute
+```
 
-This reads RTDE feedback and sends `speedl` over socket 30001; no manually
-started PolyScope RTDE program is required:
+The defaults are the configuration verified smooth on the real robot: RTDE
+servoJ with 500 Hz interpolation, `max-linear-speed=0.40`, 10 diffusion steps,
+`lookahead=0.1`, `gain=300`, and continuous execution until `Ctrl+C`. The
+robot-side loop is injected automatically and keeps publishing the final
+setpoint during inference, avoiding socket-command-expiry braking.
+
+The checkpoint may be a full path or `TRAIN_TIMESTAMP:EPOCH`. Add `--chunks N`
+to limit execution or `--no-gripper` to isolate the arm.
+
+## Socket comparison modes
+
+The earlier task-completing baseline with smooth intra-chunk motion remains:
 
 ```bash
 ur5e-infer 20260905_150221:600 --execute \
@@ -51,10 +63,7 @@ ur5e-infer 20260905_150221:600 --execute \
   --smooth-alpha 0.7 --max-linear-speed 0.40 --chunks 0
 ```
 
-This is the baseline that completed the task. `--smooth-alpha 0.7` is the
-intra-chunk target EMA; `baseline` leaves the inference gap unchanged.
-
-### B. Socket final-action stretch
+The final-action-stretch experiment is also retained:
 
 ```bash
 ur5e-infer 20260905_150221:600 --execute \
@@ -63,32 +72,7 @@ ur5e-infer 20260905_150221:600 --execute \
   --diffusion-steps 10 --chunks 0
 ```
 
-The first five actions are identical to the baseline. Only the final target is
-spread over `100 ms + measured inference time + 20 ms`; the next chunk then
-preempts it. There is no background thread or concurrent writer to port 30001.
-The selected final `speedL` duration is printed for every chunk.
-
-On this workstation, `--diffusion-steps 10` reduced inference from roughly 790
-ms to 80 ms, with nearly unchanged mean error on three offline observations. It
-changes inference sampling only and does not require retraining.
-
-### C. RTDE servoJ at 500 Hz
-
-The model, cameras, and observations remain unchanged; only execution differs:
-
-```bash
-ur5e-infer 20260905_150221:600 --execute \
-  --backend rtde --max-linear-speed 0.40 --diffusion-steps 10 \
-  --servoj-lookahead 0.1 --servoj-gain 300 --chunks 0
-```
-
-The command injects the robot-side servoJ loop and interpolates the six 10 Hz
-targets into 500 Hz setpoints. It keeps publishing the final setpoint during
-inference, so there is no socket-command-expiry brake, although the robot can
-still pause briefly. `0.1/300` are the official servoJ defaults; explicit valid
-ranges are `lookahead=0.03--0.2` and `gain=100--2000`. This backend is wired but
-still awaits its first verified following test in this repository; change the
-end to `--chunks 1 --no-gripper` for a one-chunk comparison.
-
-The executors never switch automatically. `--chunks 0` runs until `Ctrl+C`; the
-gripper consumes action element 14, and `--no-gripper` isolates arm motion.
+Live testing showed clear deceleration both within and between chunks, so this
+mode is not recommended. Stretching deliberately slows the final action, and
+the next URScript interrupts that still-running `speedL`. It remains only for
+comparison and does not affect the RTDE default.

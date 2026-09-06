@@ -24,7 +24,7 @@ UR5e_RoboTwin_Real（本仓库跟踪、维护）
 
 第一次确认能够驱动真机的策略链路，是RTDE读取 `actual_TCP_pose`，再通过30001端口
 发送限幅后的 `speedl(..., t=0.1)`；后续版本对目标做了 `alpha=0.7` 的EMA。旧项目也有
-RTDE寄存器/servoJ实验，但本仓库尚未用已知位移证明它确实跟随。
+RTDE寄存器/servoJ实验；当前DP适配层的RTDE servoJ已完成平滑实机任务验证。
 
 模型设置了 `chunk_size=50`，但当前适配器只使用 `prediction[0,0]`；真正的 chunk
 调度尚未实现。
@@ -51,8 +51,8 @@ RTDE寄存器/servoJ实验，但本仓库尚未用已知位移证明它确实跟
 
 | 后端 | 优点 | 局限 | 定位 |
 |---|---|---|---|
-| socket `speedl` | 基于第一次成功ACT执行；无需PolyScope RTDE程序 | 10 Hz命令；慢推理期间会暂停 | DP首次验机默认；目标EMA可调 |
-| RTDE输入 + servoJ | 500 Hz设点和机器人端lookahead | 寄存器写运动仍需已知位移验证 | 明确的实验后端 |
+| socket `speedl` | 基于第一次成功ACT执行；无需PolyScope RTDE程序 | chunk边界有明显刹车 | 保留作对照 |
+| RTDE输入 + servoJ | 500 Hz设点和机器人端lookahead；实机平滑 | 推理期间保持末设点 | DP默认后端 |
 | socket + 批量 `movel` | 已由录制轨迹重播验证 | 开环分段计时 | 仅手动重播 |
 
 DP的6步chunk可通过任一策略后端执行，不改变模型输出。用 `--backend socket` 或

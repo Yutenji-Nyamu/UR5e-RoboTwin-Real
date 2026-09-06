@@ -24,7 +24,7 @@ ur5e-collect pick_place_cube --note "可选的场景备注"
 
 ```bash
 ur5e-replay-init
-ur5e-replay RUN_ID --execute
+ur5e-replay latest --execute
 ```
 
 初始化完成后，先恢复录制时的场景，再执行重播。完整固定流程和检查项见
@@ -34,13 +34,11 @@ DP真机推理：
 
 ```bash
 ur5e-infer-init
-ur5e-infer 20260905_150221:300 --execute --backend socket \
-  --smooth-alpha 0.7 --max-linear-speed 0.20
+ur5e-infer 20260905_150221:600 --execute
 ```
 
-时间戳与epoch共同标识checkpoint，例如 `20260905_150221:300`。第一次调试加
-`--chunks 1 --no-gripper`。`socket` 是旧ACT已经实际运动成功的 `speedl` 链路；
-`rtde` 保留为并列实验后端。完整说明见[《DP推理》](docs/zh-CN/runbooks/infer.md)。
+时间戳与epoch共同标识checkpoint。默认就是本次实机验证平滑的500 Hz RTDE servoJ、
+10步去噪和持续执行配置；socket对照版本见[《DP推理》](docs/zh-CN/runbooks/infer.md)。
 
 ## Diffusion Policy 快速流程
 
@@ -63,7 +61,7 @@ ur5e-real train-dp ZARR_PATH \
 
 # 先离线推理，再接真机shadow
 ur5e-real infer-dp --checkpoint CHECKPOINT --episode HDF5_EPISODE --index 20
-ur5e-infer 20260905_150221:300 --shadow --chunks 10
+ur5e-infer 20260905_150221:600 --shadow --chunks 10
 ```
 
 完整参数见[训练](docs/zh-CN/runbooks/train.md)与[推理](docs/zh-CN/runbooks/infer.md)。
@@ -73,8 +71,8 @@ ur5e-infer 20260905_150221:300 --shadow --chunks 10
 数据统一存放在4TB共享盘的 `/data/robotics/ur5e-real`。架构、硬件调试、数据管理、
 训练和推理文档见 [`docs/zh-CN/README.md`](docs/zh-CN/README.md)。
 
-Diffusion Policy 主链已打通到 HDF5、Zarr、官方训练、checkpoint离线加载和真机
-shadow。真机执行可明确选择已验证基础链路的socket `speedl`或实验性的RTDE servoJ。命令见
+Diffusion Policy 主链已打通到 HDF5、Zarr、官方训练、checkpoint离线加载、真机
+shadow和RTDE servoJ平滑执行。命令见
 [训练](docs/zh-CN/runbooks/train.md)与[推理](docs/zh-CN/runbooks/infer.md)。
 
 每条raw轨迹由 `session_<RUN_ID>.json` 索引，记录任务、起止时间、时长、样本数、

@@ -56,13 +56,13 @@
 
 2. 按录制时的起始位置布置物体，确认整条轨迹空间净空。
 
-3. 重播指定数据：
+3. 重播最新数据：
 
    ```bash
-   ur5e-replay <RUN_ID> --execute
+   ur5e-replay latest --execute
    ```
 
-   示例：
+   指定历史数据时再填写run ID：
 
    ```bash
    ur5e-replay 20260903_182752 --execute

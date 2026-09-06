@@ -27,7 +27,8 @@ The first policy path confirmed to move the real arm used RTDE for
 `actual_TCP_pose`, then sent bounded `speedl(..., t=0.1)` commands over socket
 30001. Its later version applied a target EMA with alpha `0.7`. A separate ACT
 RTDE-register/servoJ experiment also exists, but has not yet passed a known
-displacement test in this repository.
+displacement test in the old ACT path. The current DP RTDE servoJ adapter has
+now completed a smooth live task.
 
 The model has `chunk_size=50`, but the current adapter applies only
 `prediction[0,0]`; true chunk scheduling remains future work.
@@ -58,8 +59,8 @@ and later decisions.
 
 | Backend | Advantage | Limitation | Role |
 |---|---|---|---|
-| socket `speedl` | Based on the first successful ACT execution; no PolyScope RTDE program | 10 Hz command timing and a pause during slow inference | Default first DP commissioning path; target EMA is selectable |
-| RTDE input + servoJ | 500 Hz setpoints and robot-side lookahead | Register-write motion still requires a known-displacement test | Explicit experimental backend |
+| socket `speedl` | Based on the first successful ACT execution; no PolyScope RTDE program | Clear braking at chunk boundaries | Retained for comparison |
+| RTDE input + servoJ | Smooth live motion with 500 Hz setpoints and robot-side lookahead | Holds the final setpoint during inference | Default DP backend |
 | socket + batched `movel` | Proven for recorded trajectories | Open-loop segment timing | Manual replay only |
 
 A six-step DP chunk can use either learned-policy backend without changing the

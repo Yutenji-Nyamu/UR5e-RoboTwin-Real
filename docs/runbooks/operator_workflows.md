@@ -47,11 +47,13 @@ later use; raw products live under `/data/robotics/ur5e-real/raw`.
 2. Restore the objects to their recorded starting positions and clear the whole
    trajectory workspace.
 
-3. Execute the selected session:
+3. Execute the latest session:
 
    ```bash
-   ur5e-replay RUN_ID --execute
+   ur5e-replay latest --execute
    ```
+
+   Pass a run ID instead of `latest` to select an older session.
 
 The command aligns slowly to the recorded start, then executes the complete arm
 path and gripper events. For an unvalidated trajectory, first omit `--execute`

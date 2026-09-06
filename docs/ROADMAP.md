@@ -2,8 +2,9 @@
 
 [简体中文](zh-CN/ROADMAP.md)
 
-Status: 2026-09-04. Devices, capture, replay, the offline DP path, and shadow
-pass; a small servoJ test is next. RoboTwin stays above one narrow policy adapter.
+Status: 2026-09-06. Devices, capture, replay, DP training/shadow, and live RTDE
+servoJ inference pass; servoJ is now the default executor. RoboTwin stays above
+one narrow policy adapter.
 
 ## Fixed principles
 
@@ -42,8 +43,8 @@ current 14-value compatibility layout the initial mapping is
 | Serial gripper | Stable by-id path; open and close tested | Policy gripper decoding |
 | Dual RealSense | Dual capture, 60-frame warmup, and DP shadow tested | Formal data capture |
 | socket replay | Session `20260903_182752` replayed completely | Keep as an independent regression path |
-| RTDE servoJ | ACT client, recipe, and robot program exist | Hold, small step, ramp, watchdog |
-| Diffusion Policy | Zarr, native batch, GPU train, checkpoint load, offline, and shadow pass | One arm-only socket chunk, then gripper; servoJ separately |
+| RTDE servoJ | Smooth live execution of complete 500 Hz DP chunks | Quantify tracking error when useful |
+| Diffusion Policy | Conversion, training, offline, shadow, and live task execution pass | Add consistent data and evaluate success rate |
 
 ## Chunk execution
 
@@ -65,10 +66,10 @@ replanning, or chunk fusion is useful. See
 
 - `SocketMovelReplayBackend`: Remote mode, batched `movel`, open-loop timing;
   manual replay only.
-- `SocketSpeedLPolicyBackend`: RTDE state plus 10 Hz socket `speedl`, with
-  selectable target EMA; first learned-policy commissioning backend.
+- `SocketSpeedLPolicyBackend`: RTDE state plus 10 Hz socket `speedl`, retained
+  for comparison.
 - `RtdeServoJBackend`: robot program started automatically in Remote mode, with
-  500 Hz RTDE setpoints and feedback; explicit experimental backend.
+  500 Hz RTDE setpoints and feedback; the default policy executor.
 
 The backends never switch automatically. See
 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md).
@@ -114,8 +115,7 @@ Status: one complete capture and replay is finished.
 
 ### 4 — policy motion backends
 
-- Confirm socket speedL with one model chunk; separately test servoJ hold,
-  millimetre step, slow ramp, tracking, and stop latency.
+- Compare socket speedL and servoJ tracking and stop behavior.
 
 Exit: configured safety limits and measured rate/latency pass.
 
@@ -132,14 +132,13 @@ the current checkpoint is not a task-quality model.
 ### 6 — Shadow then live
 
 - Shadow: live inputs, predictions logged, no commands.
-- Arm-only conservative chunk; compare socket and RTDE only if useful.
-- Full six-step socket execution first; keep RTDE as an explicit A/B test;
-  enable the debounced gripper last.
+- Execute complete six-action chunks and gripper output through RTDE servoJ.
+- Select socket explicitly only when a comparison is useful.
 
 Exit: repeatable trials with stop reasons and raw/guarded/measured logs.
 
-Status: shadow is complete; socket live execution is next, while servoJ remains
-independently gated.
+Status: shadow and a complete live RTDE servoJ task pass; the next focus is data
+volume and task-success evaluation.
 
 ## Human–automation handoff
 

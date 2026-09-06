@@ -34,13 +34,13 @@ class InferenceConfig:
     n_obs_steps: int = 3
     n_action_steps: int = 6
     policy_hz: float = 10.0
-    chunks: int = 1
+    chunks: int = 0
     gpu: str = "0"
     enable_gripper: bool = True
-    backend: str = "socket"
+    backend: str = "rtde"
     smoothing_alpha: float = 0.7
-    max_linear_velocity: float = 0.20
-    diffusion_steps: int = 100
+    max_linear_velocity: float = 0.40
+    diffusion_steps: int = 10
     socket_transition: str = "baseline"
     servoj_lookahead_time: float = 0.1
     servoj_gain: int = 300
@@ -494,10 +494,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--config", help="lab config required for shadow or execute")
     parser.add_argument("--index", type=int, default=2, help="offline observation index")
     parser.add_argument("--output", type=Path, help="optional offline prediction NPZ")
-    parser.add_argument("--chunks", type=int, default=1, help="live chunks; 0 means until Ctrl+C")
+    parser.add_argument("--chunks", type=int, default=0, help="live chunks; 0 means until Ctrl+C (default)")
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--no-gripper", action="store_true")
-    parser.add_argument("--backend", choices=("socket", "rtde"), default="socket")
+    parser.add_argument("--backend", choices=("socket", "rtde"), default="rtde")
     parser.add_argument(
         "--smooth-alpha",
         type=float,
@@ -507,14 +507,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--max-linear-speed",
         type=float,
-        default=0.20,
-        help="TCP linear speed limit in m/s for either backend (default: 0.20)",
+        default=0.40,
+        help="TCP linear speed limit in m/s for either backend (default: 0.40)",
     )
     parser.add_argument(
         "--diffusion-steps",
         type=int,
-        default=100,
-        help="diffusion denoising steps per chunk (default: 100)",
+        default=10,
+        help="diffusion denoising steps per chunk (default: 10)",
     )
     parser.add_argument(
         "--socket-transition",

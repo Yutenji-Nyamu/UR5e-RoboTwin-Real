@@ -100,13 +100,12 @@ the original RoboTwin configuration.
 Offline prediction/label comparison is saved, and live shadow completed two
 full six-action chunks. This checkpoint validates the pipeline, not task quality.
 
-### 4. policy execution backends (in progress)
+### 4. Policy execution backends (baseline complete)
 
-- First commission DP with the historical RTDE-read/socket-`speedl` path and
-  selectable target EMA (`alpha=0.7` by default).
-- Keep RTDE servoJ as an explicit A/B backend; prove it first with a known
-  millimetre displacement before using it for policy evaluation.
-- Connect DP arm motion, then enable the gripper.
+- Socket `speedl` completes the task but brakes clearly at chunk boundaries and
+  is retained for comparison.
+- RTDE servoJ completes the live task smoothly and is now the default executor.
+- The model still returns the original six-action chunk; training is unchanged.
 
 Formal inference remains in Remote mode. `--backend socket` does not require a
 PolyScope RTDE program; `--backend rtde` injects the servoJ loop. Neither backend
@@ -147,5 +146,5 @@ baseline above. Later decisions are:
 4. Consider early replanning or chunk fusion only if complete six-step execution
    shows a measured problem.
 
-The immediate next step is one arm-only socket chunk with a timestamp-qualified
-checkpoint. After that works, enable the gripper; test RTDE servoJ separately.
+The execution path now passes end to end. The next step is more consistent
+successful trajectories and measured task success rate.

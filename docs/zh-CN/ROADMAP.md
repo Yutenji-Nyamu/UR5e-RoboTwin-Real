@@ -2,8 +2,8 @@
 
 [English](../ROADMAP.md)
 
-状态：2026-09-04。设备、采集、重播、DP离线链路和shadow已通过，下一步是servoJ
-小步验证。RoboTwin 始终位于窄策略适配层之上。
+状态：2026-09-06。设备、采集、重播、DP训练/shadow和RTDE servoJ真机推理均已通过；
+servoJ是当前默认执行后端。RoboTwin 始终位于窄策略适配层之上。
 
 ## 固定原则
 
@@ -38,8 +38,8 @@
 | 串口夹爪 | 稳定by-id路径；打开/闭合均已实测 | 策略夹爪解码 |
 | 双 RealSense | 双路采集、60帧预热和DP shadow已实测 | 正式数据采集 |
 | socket 重播 | session `20260903_182752` 已完整重播成功 | 保持为独立回归链路 |
-| RTDE servoJ | ACT 客户端、recipe、机器人程序均存在 | 保持、小步、斜坡、watchdog |
-| Diffusion Policy | Zarr、原生batch、GPU训练、checkpoint加载、offline和shadow已通过 | 先测一个仅机械臂socket chunk，再接夹爪；servoJ另测 |
+| RTDE servoJ | 500 Hz完整DP推理实机平滑 | 后续按需要量化跟踪误差 |
+| Diffusion Policy | 转换、训练、offline、shadow及真机任务均已通过 | 扩充一致数据并评估成功率 |
 
 ## Chunk 执行
 
@@ -59,10 +59,9 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 - `SocketMovelReplayBackend`：Remote模式、批量 `movel`、开环计时；仅用于手动
   重播。
-- `SocketSpeedLPolicyBackend`：RTDE读状态、10 Hz socket `speedl`写动作，目标EMA
-  可调；学习策略首次验机后端。
+- `SocketSpeedLPolicyBackend`：RTDE读状态、10 Hz socket `speedl`写动作，保留作对照。
 - `RtdeServoJBackend`：Remote模式自动启动机器人程序、500 Hz RTDE设点与反馈；
-  明确的实验后端。
+  当前默认策略执行后端。
 
 两者绝不自动切换，详见 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md)。
 
@@ -103,8 +102,7 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 ### 4 — 策略运动后端
 
-- 先用一个模型chunk确认socket speedL；servoJ另行测试保持、毫米级小步、慢速
-  斜坡、跟踪和停止延迟。
+- 对比socket speedL与servoJ的跟踪和停止行为。
 
 退出条件：安全限制以及实测频率/延迟通过。
 
@@ -120,12 +118,12 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 ### 6 — Shadow再实机
 
 - Shadow：输入真实传感器，只记录预测，不下发。
-- 仅机械臂、保守chunk；仅在有价值时比较socket与RTDE。
-- 先执行完整6步socket；RTDE保持明确A/B；最后启用带去抖的夹爪。
+- RTDE servoJ完整执行6步chunk和夹爪动作。
+- socket只在需要对照时显式选择。
 
 退出条件：试验可复现，并记录停止原因及原始/保护/实测轨迹。
 
-状态：shadow已完成；下一步实测socket策略执行，servoJ保持独立门控。
+状态：shadow和RTDE servoJ完整真机任务均已完成；后续重点转向数据量与成功率评估。
 
 ## 人员与自动化分工
 

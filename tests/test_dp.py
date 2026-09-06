@@ -150,10 +150,14 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
         self.assertIn("local servoj_lookahead_time = 0.1", source)
         self.assertIn("local servoj_gain = 300", source)
 
-    def test_dp_inference_step_override_defaults_to_upstream(self):
-        self.assertEqual(DPInferenceConfig().diffusion_steps, 100)
-        self.assertEqual(DPInferenceConfig().socket_transition, "baseline")
-        self.assertEqual(DPInferenceConfig().servoj_gain, 300)
+    def test_dp_inference_defaults_to_proven_rtde_configuration(self):
+        config = DPInferenceConfig()
+        self.assertEqual(config.backend, "rtde")
+        self.assertEqual(config.chunks, 0)
+        self.assertEqual(config.max_linear_velocity, 0.40)
+        self.assertEqual(config.diffusion_steps, 10)
+        self.assertEqual(config.servoj_lookahead_time, 0.1)
+        self.assertEqual(config.servoj_gain, 300)
 
     def test_training_command_preserves_upstream_defaults(self):
         with tempfile.TemporaryDirectory() as directory:

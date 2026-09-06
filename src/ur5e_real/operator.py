@@ -96,15 +96,24 @@ def collect() -> int:
     return 0
 
 
-def _session_path(value: str) -> Path:
+def resolve_session_reference(value: str, action_dir: Path) -> Path:
     candidate = Path(value).expanduser()
     if candidate.is_absolute() or candidate.parent != Path("."):
         return candidate.resolve()
-    action_dir = load_config(LAB_CONFIG).collection.data_root / "raw" / "action"
+    if value == "latest":
+        sessions = sorted(action_dir.glob("session_[0-9]*.json"))
+        if not sessions:
+            raise FileNotFoundError(f"no sessions under {action_dir}")
+        return sessions[-1].resolve()
     filename = value if value.startswith("session_") else f"session_{value}"
     if not filename.endswith(".json"):
         filename = f"{filename}.json"
     return action_dir / filename
+
+
+def _session_path(value: str) -> Path:
+    action_dir = load_config(LAB_CONFIG).collection.data_root / "raw" / "action"
+    return resolve_session_reference(value, action_dir)
 
 
 def resolve_dp_checkpoint(value: str, data_root: Path) -> Path:
@@ -149,12 +158,12 @@ def infer() -> int:
     parser.add_argument(
         "--chunks",
         type=int,
-        default=50,
-        help="six-action chunks to run (default: 50 = RoboTwin's 300-action episode; 0 until Ctrl+C)",
+        default=0,
+        help="six-action chunks to run (default: 0 = until Ctrl+C)",
     )
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--no-gripper", action="store_true")
-    parser.add_argument("--backend", choices=("socket", "rtde"), default="socket")
+    parser.add_argument("--backend", choices=("socket", "rtde"), default="rtde")
     parser.add_argument(
         "--smooth-alpha",
         type=float,
@@ -164,14 +173,14 @@ def infer() -> int:
     parser.add_argument(
         "--max-linear-speed",
         type=float,
-        default=0.20,
-        help="TCP linear speed limit in m/s for either backend (default: 0.20)",
+        default=0.40,
+        help="TCP linear speed limit in m/s for either backend (default: 0.40)",
     )
     parser.add_argument(
         "--diffusion-steps",
         type=int,
-        default=100,
-        help="diffusion denoising steps per chunk (default: 100)",
+        default=10,
+        help="diffusion denoising steps per chunk (default: 10)",
     )
     parser.add_argument(
         "--socket-transition",
@@ -218,7 +227,7 @@ def replay() -> int:
     from .replay import ReplayConfig, resolve_replay_paths, run_replay
 
     parser = argparse.ArgumentParser(prog="ur5e-replay", description="preview or replay one recorded trajectory")
-    parser.add_argument("session", help="run ID or session JSON path")
+    parser.add_argument("session", help="run ID, session JSON path, or 'latest'")
     parser.add_argument("--max-segments", type=int)
     parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
@@ -226,6 +235,8 @@ def replay() -> int:
     _enter_repository()
     cfg = load_config(LAB_CONFIG)
     session = _session_path(args.session)
+    if args.session == "latest":
+        print(f"[LATEST] {session.stem.removeprefix('session_')}")
     action_csv, events = resolve_replay_paths(session)
     run_replay(
         ReplayConfig(

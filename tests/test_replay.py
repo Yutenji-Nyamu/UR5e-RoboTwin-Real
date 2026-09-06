@@ -12,9 +12,19 @@ from ur5e_real.replay import (
     resolve_replay_paths,
     smooth_rotation_vectors,
 )
+from ur5e_real.operator import resolve_session_reference
 
 
 class ReplayTest(unittest.TestCase):
+    def test_latest_session_uses_newest_run_id(self):
+        with tempfile.TemporaryDirectory() as directory:
+            action_dir = Path(directory)
+            older = action_dir / "session_20260903_120000.json"
+            latest = action_dir / "session_20260905_180000.json"
+            older.touch()
+            latest.touch()
+            self.assertEqual(resolve_session_reference("latest", action_dir), latest.resolve())
+
     def test_load_filter_and_program(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "actions.csv"

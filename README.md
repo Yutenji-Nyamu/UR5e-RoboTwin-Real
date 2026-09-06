@@ -27,7 +27,7 @@ Replay:
 
 ```bash
 ur5e-replay-init
-ur5e-replay RUN_ID --execute
+ur5e-replay latest --execute
 ```
 
 After initialization, restore the recorded scene before executing the replay.
@@ -38,14 +38,13 @@ Live DP inference:
 
 ```bash
 ur5e-infer-init
-ur5e-infer 20260905_150221:600 --execute --backend socket \
-  --socket-transition baseline --smooth-alpha 0.7 \
-  --max-linear-speed 0.40 --chunks 0
+ur5e-infer 20260905_150221:600 --execute
 ```
 
-The timestamp and epoch identify a checkpoint. The socket baseline is the
-proven path; optional final-action stretch and RTDE servoJ variants are listed
-in [DP inference](docs/runbooks/infer.md).
+The timestamp and epoch identify a checkpoint. The default is the smooth
+real-robot configuration: 500 Hz RTDE servoJ, 10 diffusion steps, and continuous
+execution. Socket comparison modes remain available in
+[DP inference](docs/runbooks/infer.md).
 
 ## Diffusion Policy quick path
 
@@ -68,7 +67,7 @@ ur5e-real train-dp ZARR_PATH \
 
 # Offline inference, then live shadow inference
 ur5e-real infer-dp --checkpoint CHECKPOINT --episode HDF5_EPISODE --index 20
-ur5e-infer 20260905_150221:300 --shadow --chunks 10
+ur5e-infer 20260905_150221:600 --shadow --chunks 10
 ```
 
 See [training](docs/runbooks/train.md) and [inference](docs/runbooks/infer.md)
@@ -81,8 +80,7 @@ hardware commissioning, data management, training, and inference documentation
 is indexed in [`docs/README.md`](docs/README.md).
 
 The Diffusion Policy path passes HDF5, Zarr, native training, checkpoint loading,
-and live shadow inference. Execution explicitly selects the historically proven
-socket `speedl` foundation or the experimental RTDE servoJ backend; see
+shadow inference, and smooth RTDE servoJ execution; see
 [training](docs/runbooks/train.md) and [inference](docs/runbooks/infer.md).
 
 Each raw trajectory has one `session_<RUN_ID>.json` index containing task,

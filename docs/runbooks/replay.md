@@ -21,7 +21,15 @@ ur5e-replay-init
 This command selects the environment and repository internally, checks the
 hardware, moves slowly to the shared home pose, and opens the gripper.
 
-Second, replay a named trajectory:
+Second, replay the most recently collected trajectory without remembering its
+timestamp:
+
+```bash
+ur5e-replay latest --execute
+```
+
+The selected run ID is printed first. A historical trajectory can still be
+selected explicitly:
 
 ```bash
 ur5e-replay 20260903_123456 --execute

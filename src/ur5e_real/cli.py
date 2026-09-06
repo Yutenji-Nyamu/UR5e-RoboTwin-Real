@@ -62,7 +62,14 @@ def _parser() -> argparse.ArgumentParser:
     replay.add_argument("source", help="session JSON, or an action CSV for legacy data")
     replay.add_argument("--gripper-events")
     replay.add_argument("--row-stride", type=int, default=5)
+    replay.add_argument("--backend", choices=("socket", "rtde"), default="socket")
     replay.add_argument("--max-segments", type=int)
+    replay.add_argument("--chunks", type=int, default=0, help="RTDE chunks; 0 means the complete recording")
+    replay.add_argument("--chunk-size", type=int, default=6)
+    replay.add_argument("--chunk-gap", type=float, default=0.08)
+    replay.add_argument("--max-linear-speed", type=float, default=0.40)
+    replay.add_argument("--servoj-lookahead", type=float, default=0.1)
+    replay.add_argument("--servoj-gain", type=int, default=300)
     replay.add_argument("--execute", action="store_true", help="actually move the robot")
 
     process_act = sub.add_parser("process-act", help="convert real HDF5 episodes to RoboTwin ACT format")
@@ -216,6 +223,20 @@ def main(argv: list[str] | None = None) -> int:
             row_stride=args.row_stride,
             max_segments=args.max_segments,
             execute=args.execute,
+            backend=args.backend,
+            rtde_port=cfg.robot.rtde_port,
+            policy_hz=cfg.robot.rtde_frequency_hz,
+            chunk_size=args.chunk_size,
+            chunk_gap_s=args.chunk_gap,
+            max_chunks=args.chunks,
+            servoj_frequency_hz=cfg.servoj.frequency_hz,
+            servoj_config_xml=cfg.servoj.config_xml,
+            servoj_program_script=cfg.servoj.program_script,
+            servoj_mode=cfg.servoj.mode,
+            servoj_connect_timeout_s=cfg.servoj.connect_timeout_s,
+            servoj_lookahead_time=args.servoj_lookahead,
+            servoj_gain=args.servoj_gain,
+            rtde_max_linear_velocity=args.max_linear_speed,
         )
         run_replay(replay_cfg)
         return 0

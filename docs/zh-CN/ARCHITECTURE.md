@@ -42,6 +42,8 @@ ActionChunk(tcp targets[N,6], gripper[N], dt)
           |
           v
 TCP限幅 -> 明确选择socket speedL或RTDE servoJ后端 -> 串口夹爪
+
+记录的TCP/夹爪行 -> ActionChunk -> 同一个RTDE servoJ后端（仅显式对照）
 ```
 
 只有适配层可以把单臂7维状态编码为上游兼容向量。当前14维布局为

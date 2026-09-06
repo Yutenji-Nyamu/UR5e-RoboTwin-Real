@@ -48,6 +48,8 @@ ActionChunk(tcp targets[N,6], gripper[N], dt)
           |
           v
 TCP limits -> explicit socket speedL or RTDE servoJ backend -> serial gripper
+
+recorded TCP/gripper rows -> ActionChunk -> the same RTDE servoJ backend (explicit comparison only)
 ```
 
 Only an adapter may encode the single-arm seven-value state into an upstream

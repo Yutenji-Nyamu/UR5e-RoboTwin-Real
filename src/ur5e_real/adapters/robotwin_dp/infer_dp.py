@@ -12,7 +12,7 @@ from typing import Any
 from ...config import LabConfig, load_config
 from ...control.chunk import ChunkStreamConfig, stream_tcp_chunk
 from ...control.gripper_policy import GripperCommandConfig, GripperPolicy
-from ...control.servoj import ServoJController, ServoJStreamConfig, render_servoj_program
+from ...control.servoj import ServoJController, ServoJStreamConfig, start_servoj_program
 from ...control.socket_speedl import (
     SOCKET_STRETCH_MARGIN_S,
     SocketSpeedLConfig,
@@ -24,7 +24,7 @@ from ...hardware.dashboard import require_external_motion_ready
 from ...hardware.gripper import GripperSerial
 from ...hardware.realsense import DualColorCamera, LatestDualColorCamera
 from ...hardware.rtde import LatestRtdeTcpClient, RtdeOutputConfig, RtdeTcpClient
-from ...hardware.urscript import send_urscript, speedl_command, stopl_command
+from ...hardware.urscript import speedl_command, stopl_command
 
 DP_IMAGE_SIZE = (320, 240)  # width, height
 
@@ -209,24 +209,13 @@ def _servo(lab: LabConfig) -> ServoJController:
 
 
 def _start_servoj_program(lab: LabConfig, inference: InferenceConfig) -> None:
-    require_external_motion_ready(lab.robot.host)
-    script = lab.servoj.program_script
-    if not script.is_file():
-        raise FileNotFoundError(script)
-    program = render_servoj_program(
-        script.read_text(encoding="utf-8"),
-        inference.servoj_lookahead_time,
-        inference.servoj_gain,
-    )
-    send_urscript(
-        program,
-        lab.robot.host,
-        lab.robot.script_port,
-        lab.robot.socket_timeout_s,
-    )
-    print(
-        f"[CONTROL] robot-side servoJ program started: {script.name}; "
-        f"lookahead={inference.servoj_lookahead_time:g}s gain={inference.servoj_gain}"
+    start_servoj_program(
+        robot_host=lab.robot.host,
+        robot_port=lab.robot.script_port,
+        socket_timeout_s=lab.robot.socket_timeout_s,
+        program_script=lab.servoj.program_script,
+        lookahead_time=inference.servoj_lookahead_time,
+        gain=inference.servoj_gain,
     )
 
 

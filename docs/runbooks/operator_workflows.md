@@ -59,8 +59,14 @@ The command aligns slowly to the recorded start, then executes the complete arm
 path and gripper events. For an unvalidated trajectory, first omit `--execute`
 to inspect its summary; see the [replay runbook](replay.md) for segmented testing.
 
+For a comparison through the same RTDE servoJ executor as DP inference, run
+`ur5e-replay latest --backend rtde --execute` explicitly. Socket remains the
+default. The [replay runbook](replay.md) gives the one-chunk first test and
+timing overrides.
+
 ## Boundary
 
-Collection and manual replay form an independent commissioning loop. Replay
-uses socket `movel`; future RoboTwin training and Diffusion Policy deployment
-use the separate RTDE `servoJ` policy-execution path.
+Collection and manual replay form an independent commissioning loop. Routine
+replay defaults to socket `movel`. RTDE comparison replay and Diffusion Policy
+inference share the same servoJ action executor; one receives recorded actions
+and the other receives model actions.

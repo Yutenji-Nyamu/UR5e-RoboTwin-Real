@@ -6,6 +6,9 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Sequence
 
+from ..hardware.dashboard import require_external_motion_ready
+from ..hardware.urscript import send_urscript
+
 SERVOJ_LOOKAHEAD_DECLARATION = "  local servoj_lookahead_time = 0.1"
 SERVOJ_GAIN_DECLARATION = "  local servoj_gain = 300"
 
@@ -33,6 +36,31 @@ def render_servoj_program(source: str, lookahead_time: float, gain: int) -> str:
         SERVOJ_LOOKAHEAD_DECLARATION,
         f"  local servoj_lookahead_time = {lookahead_time:.6f}",
     ).replace(SERVOJ_GAIN_DECLARATION, f"  local servoj_gain = {gain}")
+
+
+def start_servoj_program(
+    *,
+    robot_host: str,
+    robot_port: int,
+    socket_timeout_s: float,
+    program_script: Path,
+    lookahead_time: float,
+    gain: int,
+) -> None:
+    """Start the tracked robot-side loop used by every RTDE chunk executor."""
+    require_external_motion_ready(robot_host)
+    if not program_script.is_file():
+        raise FileNotFoundError(program_script)
+    program = render_servoj_program(
+        program_script.read_text(encoding="utf-8"),
+        lookahead_time,
+        gain,
+    )
+    send_urscript(program, robot_host, robot_port, socket_timeout_s)
+    print(
+        f"[CONTROL] robot-side servoJ program started: {program_script.name}; "
+        f"lookahead={lookahead_time:g}s gain={gain}"
+    )
 
 
 def _imports() -> tuple[Any, Any]:

@@ -26,6 +26,7 @@ from ur5e_real.control.socket_speedl import (
     stretched_speedl_velocity,
 )
 from ur5e_real.operator import resolve_dp_checkpoint
+from ur5e_real.replay import ReplayConfig
 
 
 class FakeGripper:
@@ -158,6 +159,15 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
         self.assertEqual(config.diffusion_steps, 10)
         self.assertEqual(config.servoj_lookahead_time, 0.1)
         self.assertEqual(config.servoj_gain, 300)
+
+    def test_rtde_replay_defaults_match_dp_action_executor(self):
+        inference = DPInferenceConfig()
+        replay = ReplayConfig(Path("actions.csv"), None, "robot.local")
+        self.assertEqual(replay.chunk_size, inference.n_action_steps)
+        self.assertEqual(replay.policy_hz, inference.policy_hz)
+        self.assertEqual(replay.rtde_max_linear_velocity, inference.max_linear_velocity)
+        self.assertEqual(replay.servoj_lookahead_time, inference.servoj_lookahead_time)
+        self.assertEqual(replay.servoj_gain, inference.servoj_gain)
 
     def test_training_command_preserves_upstream_defaults(self):
         with tempfile.TemporaryDirectory() as directory:

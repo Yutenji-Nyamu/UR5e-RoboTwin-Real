@@ -5,6 +5,7 @@ from pathlib import Path
 
 from ur5e_real.replay import (
     ReplayConfig,
+    build_rtde_chunks,
     build_segment_program,
     build_segments,
     filter_waypoints,
@@ -16,6 +17,10 @@ from ur5e_real.operator import resolve_session_reference
 
 
 class ReplayTest(unittest.TestCase):
+    def test_socket_remains_the_default_backend(self):
+        cfg = ReplayConfig(Path("actions.csv"), None, "robot.local")
+        self.assertEqual(cfg.backend, "socket")
+
     def test_latest_session_uses_newest_run_id(self):
         with tempfile.TemporaryDirectory() as directory:
             action_dir = Path(directory)
@@ -36,6 +41,7 @@ class ReplayTest(unittest.TestCase):
                 encoding="utf-8",
             )
             rows = load_action_rows(path)
+            self.assertIsNone(rows[0]["gripper_state"])
             self.assertEqual(smooth_rotation_vectors(rows), 0)
             filtered = filter_waypoints(rows, [], 0.003, 0.03)
             self.assertEqual(len(filtered), 2)
@@ -65,6 +71,21 @@ class ReplayTest(unittest.TestCase):
             action, events = resolve_replay_paths(manifest)
             self.assertEqual(action, root / "rtde.csv")
             self.assertEqual(events, root / "events.csv")
+
+    def test_rtde_replay_groups_six_actions_and_maps_events_to_waypoints(self):
+        rows = [
+            {"row_index": index, "controller_time_s": index / 10, "pose": [index, 0, 0, 0, 0, 0]}
+            for index in range(14)
+        ]
+        events = [
+            {"controller_time_s": 0.15, "event": "close"},
+            {"controller_time_s": 0.75, "event": "open"},
+        ]
+        chunks = build_rtde_chunks(rows, events)
+        self.assertEqual([len(chunk) for chunk in chunks], [6, 6, 1])
+        self.assertEqual(chunks[0][1]["events"][0]["event"], "close")
+        self.assertEqual(chunks[1][1]["events"][0]["event"], "open")
+        self.assertEqual(len(build_rtde_chunks(rows, events, max_chunks=1)), 1)
 
 
 if __name__ == "__main__":

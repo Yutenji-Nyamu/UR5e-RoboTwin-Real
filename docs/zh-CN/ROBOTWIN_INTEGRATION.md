@@ -52,8 +52,9 @@ RTDE寄存器/servoJ实验；当前DP适配层的RTDE servoJ已完成平滑实�
 | 后端 | 优点 | 局限 | 定位 |
 |---|---|---|---|
 | socket `speedl` | 基于第一次成功ACT执行；无需PolyScope RTDE程序 | chunk边界有明显刹车 | 保留作对照 |
-| RTDE输入 + servoJ | 500 Hz设点和机器人端lookahead；实机平滑 | 推理期间保持末设点 | DP默认后端 |
-| socket + 批量 `movel` | 已由录制轨迹重播验证 | 开环分段计时 | 仅手动重播 |
+| RTDE输入 + servoJ | 500 Hz设点和机器人端lookahead；实机平滑 | 推理/模拟空档期间保持末设点 | DP默认后端和显式记录动作对照 |
+| socket + 批量 `movel` | 已由录制轨迹重播验证 | 开环分段计时 | 默认手动重播 |
 
 DP的6步chunk可通过任一策略后端执行，不改变模型输出。用 `--backend socket` 或
-`--backend rtde` 明确选择；两者不自动切换。
+`--backend rtde` 明确选择；两者不自动切换。`ur5e-replay --backend rtde` 从策略边界
+下方进入同一个 `stream_tcp_chunk`，只是改为使用记录动作。

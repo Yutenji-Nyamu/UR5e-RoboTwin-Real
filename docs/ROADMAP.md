@@ -12,7 +12,8 @@ one narrow policy adapter.
 2. RoboTwin owns model/training semantics. The pinned DP baseline (`8` horizon,
    `3` observations, `6` actions, `10 Hz`) is unchanged unless measurements and
    an explicit decision justify a deviation.
-3. Manual record/replay and learned-policy execution are separate motion paths.
+3. Socket replay remains an independent regression path; an explicit RTDE
+   replay mode may enter the shared action executor for controlled comparison.
 4. No first physical output is combined with another device test; any movement
    requires a human at the workcell.
 
@@ -43,6 +44,7 @@ current 14-value compatibility layout the initial mapping is
 | Serial gripper | Stable by-id path; open and close tested | Policy gripper decoding |
 | Dual RealSense | Dual capture, 60-frame warmup, and DP shadow tested | Formal data capture |
 | socket replay | Session `20260903_182752` replayed completely | Keep as an independent regression path |
+| RTDE chunk replay | Recorded-action parsing and real-session dry-run pass | Execute one bounded chunk, then the complete session |
 | RTDE servoJ | Smooth live execution of complete 500 Hz DP chunks | Quantify tracking error when useful |
 | Diffusion Policy | Conversion, training, offline, shadow, and live task execution pass | Add consistent data and evaluate success rate |
 
@@ -65,11 +67,12 @@ replanning, or chunk fusion is useful. See
 ## Motion backends
 
 - `SocketMovelReplayBackend`: Remote mode, batched `movel`, open-loop timing;
-  manual replay only.
+  the default manual replay.
 - `SocketSpeedLPolicyBackend`: RTDE state plus 10 Hz socket `speedl`, retained
   for comparison.
 - `RtdeServoJBackend`: robot program started automatically in Remote mode, with
-  500 Hz RTDE setpoints and feedback; the default policy executor.
+  500 Hz RTDE setpoints and feedback; the default policy executor and explicit
+  recorded-action comparison backend.
 
 The backends never switch automatically. See
 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md).
@@ -111,7 +114,8 @@ Status: complete.
 Exit: no pose discontinuity and bounded tracking/timing error. This gate remains
 independent of ML.
 
-Status: one complete capture and replay is finished.
+Status: one complete capture/socket replay is finished. RTDE recorded-action
+replay passes parsing and dry-run; its first physical chunk remains to test.
 
 ### 4 — policy motion backends
 

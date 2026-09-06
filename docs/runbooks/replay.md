@@ -2,9 +2,10 @@
 
 [简体中文](../zh-CN/runbooks/replay.md)
 
-This is an independent commissioning and physical-regression path: the arm uses
-grouped socket `movel` programs and the gripper executes recorded events at
-segment boundaries. It is not the policy training or inference backend.
+This is an independent commissioning and physical-regression path. The verified
+grouped socket `movel` route remains the default. An explicit RTDE branch can
+feed the same recording as six-action chunks into the exact servoJ execution
+layer used by DP inference.
 
 ## Routine workflow
 
@@ -57,9 +58,58 @@ ur5e-replay 20260903_123456 --max-segments 1 --execute
 Use the routine full replay only after confirming no pose jump, wrong rotation
 branch, collision risk, or unexpected gripper event.
 
+## RTDE chunk comparison replay
+
+The existing socket replay is unchanged. Only `--backend rtde` selects the new
+branch. Preview its plan first:
+
+```bash
+ur5e-replay latest --backend rtde
+```
+
+Execute one chunk for the first live check:
+
+```bash
+ur5e-replay-init
+ur5e-replay latest --backend rtde --chunks 1 --execute
+```
+
+Then run the complete recording:
+
+```bash
+ur5e-replay latest --backend rtde --execute
+```
+
+As in default replay, a low-speed socket `moveL` aligns the first recorded frame
+before trajectory execution. The shared RTDE executor begins with the second
+frame target.
+
+Defaults match the current DP executor. Recorded 10 Hz TCP rows beginning at
+the second frame become actions, grouped six at a time. The same
+`stream_tcp_chunk` interpolates each group into a 500 Hz servoJ stream with a
+`0.40 m/s` linear limit, `lookahead=0.1`, and `gain=300`. The controller holds
+the final setpoint for `0.08 s` between groups to imitate the typical current
+ten-step DP inference gap; its background RTDE stream remains active. Per-frame
+`gripper_state` also passes through the same threshold, three-frame confirmation,
+and single-cycle `GripperPolicy` as inference. Old rows without that field fall
+back to the event file.
+
+Override the chunk boundary explicitly for experiments:
+
+```bash
+ur5e-replay latest --backend rtde \
+  --chunk-size 6 --chunk-gap 0.08 --max-linear-speed 0.40 --execute
+```
+
+For example, `--chunk-gap 0` joins recorded actions continuously, while
+`--chunk-gap 0.8` imitates slower inference. Apart from the start alignment,
+this branch loads neither model nor cameras. Below the action boundary, its
+difference from online inference is whether actions come from the recording or
+the model.
+
 ## Boundary
 
-Replay validates RTDE recording, socket motion, rotation-vector continuity, and
-gripper events. It is open loop and does not validate a policy model, RTDE
-input-register servoJ, chunk blending, or closed-loop safety. Learned policies
-keep the independent servoJ execution path.
+Default replay validates RTDE recording, socket motion, rotation-vector
+continuity, and gripper events. The RTDE comparison branch additionally checks
+the policy-shared servoJ executor and chunk timing, but it does not load or
+evaluate a policy model.

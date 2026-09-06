@@ -2,8 +2,8 @@
 
 [English](../../runbooks/replay.md)
 
-这是独立的验机/物理回归链路：机械臂使用socket批量 `movel`，夹爪按记录事件分段
-执行。它不是策略训练或推理后端。
+这是独立的验机/物理回归链路。默认仍使用已经验证的socket批量 `movel`；新增的
+RTDE分支可把同一条记录作为6步chunk，送入DP推理完全相同的servoJ执行层。
 
 ## 日常固定流程
 
@@ -51,8 +51,48 @@ ur5e-replay 20260903_123456 --max-segments 1 --execute
 确认没有位姿跳变、错误旋转分支、碰撞风险或意外夹爪事件后，该轨迹以后才使用上面
 的日常完整重播命令。
 
+## RTDE chunk对照重播
+
+现有socket重播没有变化；只有显式传入 `--backend rtde` 才进入新分支。先看摘要：
+
+```bash
+ur5e-replay latest --backend rtde
+```
+
+第一次只执行1个chunk：
+
+```bash
+ur5e-replay-init
+ur5e-replay latest --backend rtde --chunks 1 --execute
+```
+
+确认后完整执行：
+
+```bash
+ur5e-replay latest --backend rtde --execute
+```
+
+与默认重播一样，正式进入记录动作前仍用低速socket `moveL`对齐第一帧；从第2帧目标
+开始才进入共用RTDE执行层。
+
+默认配置与当前DP推理执行层一致：记录的10 Hz TCP从第2帧开始作为动作，每6步一组，
+组内由同一个 `stream_tcp_chunk` 插值为500 Hz servoJ设点，线速度上限 `0.40 m/s`、
+`lookahead=0.1`、`gain=300`。每组之后保持最后设点 `0.08 s`，模拟当前10步DP推理的
+典型空档；后台RTDE流不会中断。逐帧 `gripper_state` 也经过推理共用的阈值、连续3帧
+确认与单周期 `GripperPolicy`；旧数据没有该列时才回退到事件表。
+
+研究不同chunk边界时可显式覆盖：
+
+```bash
+ur5e-replay latest --backend rtde \
+  --chunk-size 6 --chunk-gap 0.08 --max-linear-speed 0.40 --execute
+```
+
+例如 `--chunk-gap 0` 表示记录动作连续衔接、不模拟推理；`--chunk-gap 0.8` 可模拟较慢
+推理。除上述起点对齐外，该分支不加载模型或相机；在动作执行边界下，它与在线推理
+的区别就是“动作来自记录还是模型”。
+
 ## 边界
 
-重播验证RTDE录制、socket运动、旋转向量连续性和夹爪事件。它是开环链路，不证明
-策略模型、RTDE输入寄存器servoJ、chunk融合或闭环安全；学习策略保持独立servoJ
-执行链路。
+默认重播验证RTDE录制、socket运动、旋转向量连续性和夹爪事件。RTDE对照分支另外
+验证与策略共用的servoJ执行层及chunk时序，但不加载或评价策略模型。

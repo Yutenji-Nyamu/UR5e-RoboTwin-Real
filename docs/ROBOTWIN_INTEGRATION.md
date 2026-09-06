@@ -59,9 +59,10 @@ and later decisions.
 | Backend | Advantage | Limitation | Role |
 |---|---|---|---|
 | socket `speedl` | Based on the first successful ACT execution; no PolyScope RTDE program | Clear braking at chunk boundaries | Retained for comparison |
-| RTDE input + servoJ | Smooth live motion with 500 Hz setpoints and robot-side lookahead | Holds the final setpoint during inference | Default DP backend |
-| socket + batched `movel` | Proven for recorded trajectories | Open-loop segment timing | Manual replay only |
+| RTDE input + servoJ | Smooth live motion with 500 Hz setpoints and robot-side lookahead | Holds the final setpoint during inference/gap | Default DP backend and explicit recorded-action comparison |
+| socket + batched `movel` | Proven for recorded trajectories | Open-loop segment timing | Default manual replay |
 
 A six-step DP chunk can use either learned-policy backend without changing the
 policy output. Select `--backend socket` or `--backend rtde`; the executor never
-switches automatically.
+switches automatically. `ur5e-replay --backend rtde` enters the same
+`stream_tcp_chunk` executor below the policy boundary with recorded actions.

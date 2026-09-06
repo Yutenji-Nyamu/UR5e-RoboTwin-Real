@@ -10,7 +10,7 @@ servoJ是当前默认执行后端。RoboTwin 始终位于窄策略适配层之�
 1. 硬件、时间戳、安全和执行归本仓库负责。
 2. RoboTwin 负责模型与训练语义。固定版本 DP 基线（horizon `8`、观测 `3` 步、
    动作 `6` 步、`10 Hz`）默认不改；只有实测证据和明确决策才能改变。
-3. 手动录制/重播与学习策略执行是两条独立运动链路。
+3. socket重播保持独立回归链路；只有显式RTDE重播才进入共用动作执行器做可控对照。
 4. 首次物理输出不能与其他设备测试合并；任何运动都需要人员在现场。
 
 ## 边界
@@ -38,6 +38,7 @@ servoJ是当前默认执行后端。RoboTwin 始终位于窄策略适配层之�
 | 串口夹爪 | 稳定by-id路径；打开/闭合均已实测 | 策略夹爪解码 |
 | 双 RealSense | 双路采集、60帧预热和DP shadow已实测 | 正式数据采集 |
 | socket 重播 | session `20260903_182752` 已完整重播成功 | 保持为独立回归链路 |
+| RTDE chunk重播 | 记录动作解析与真实session dry-run已通过 | 先执行1个有界chunk，再执行完整session |
 | RTDE servoJ | 500 Hz完整DP推理实机平滑 | 后续按需要量化跟踪误差 |
 | Diffusion Policy | 转换、训练、offline、shadow及真机任务均已通过 | 扩充一致数据并评估成功率 |
 
@@ -57,11 +58,10 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 ## 运动后端
 
-- `SocketMovelReplayBackend`：Remote模式、批量 `movel`、开环计时；仅用于手动
-  重播。
+- `SocketMovelReplayBackend`：Remote模式、批量 `movel`、开环计时；默认手动重播。
 - `SocketSpeedLPolicyBackend`：RTDE读状态、10 Hz socket `speedl`写动作，保留作对照。
 - `RtdeServoJBackend`：Remote模式自动启动机器人程序、500 Hz RTDE设点与反馈；
-  当前默认策略执行后端。
+  当前默认策略执行后端，也供显式记录动作对照重播复用。
 
 两者绝不自动切换，详见 [`ROBOTWIN_INTEGRATION.md`](ROBOTWIN_INTEGRATION.md)。
 
@@ -98,7 +98,8 @@ RoboTwin DP 输出6步动作。第一版按上游顺序完整执行6步，再进
 
 退出条件：无位姿跳变，跟踪/时间误差有界；此门与ML独立。
 
-状态：已完成一次完整采集和重播。
+状态：已完成一次完整采集/socket重播；RTDE记录动作重播已通过解析和dry-run，待首次
+执行1个物理chunk。
 
 ### 4 — 策略运动后端
 

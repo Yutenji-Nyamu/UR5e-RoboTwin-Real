@@ -9,10 +9,10 @@ Python把目标写入RTDE输入寄存器，同时机器人控制器上必须有U
 `servoJ`。本项目会自动发送该脚本，无需手动加载URP。
 
 ```text
-ur5e-infer
-├─ 相机 + DP模型：产生6步TCP动作
-├─ 30001：发送 robot_programs/servoj_control_loop.script
-└─ 30004：UrRtde客户端以500 Hz写输入寄存器
+相机 + DP模型 ────────┐
+                     ├─ 6步TCP动作 ─ stream_tcp_chunk
+记录的10 Hz TCP轨迹 ─┘                    ├─ 30001：发送servoJ脚本
+                                         └─ 30004：500 Hz写输入寄存器
                   ↓
      控制器URScript读取目标、逆解并调用servoJ
                   ↓
@@ -30,6 +30,8 @@ ur5e-infer
 
 当前链路不依赖ROS、External Control URCap或示教器中手动播放的URP。旧项目中
 `translation_sample_servoj.urp` 的Local模式流程是历史实验，不是当前DP前置条件。
+`ur5e-infer` 与 `ur5e-replay --backend rtde` 共用图中动作执行部分；区别仅在6步动作
+来自模型还是记录。重播可用 `--chunk-gap` 模拟模型推理期间的末设点保持。
 
 ## PolyScope与网络要求
 

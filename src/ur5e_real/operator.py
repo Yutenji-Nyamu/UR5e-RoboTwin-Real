@@ -228,7 +228,19 @@ def replay() -> int:
 
     parser = argparse.ArgumentParser(prog="ur5e-replay", description="preview or replay one recorded trajectory")
     parser.add_argument("session", help="run ID, session JSON path, or 'latest'")
+    parser.add_argument("--backend", choices=("socket", "rtde"), default="socket")
     parser.add_argument("--max-segments", type=int)
+    parser.add_argument("--chunks", type=int, default=0, help="RTDE chunks to run; 0 means the complete recording")
+    parser.add_argument("--chunk-size", type=int, default=6)
+    parser.add_argument(
+        "--chunk-gap",
+        type=float,
+        default=0.08,
+        help="RTDE hold between chunks, simulating DP inference time in seconds (default: 0.08)",
+    )
+    parser.add_argument("--max-linear-speed", type=float, default=0.40)
+    parser.add_argument("--servoj-lookahead", type=float, default=0.1)
+    parser.add_argument("--servoj-gain", type=int, default=300)
     parser.add_argument("--execute", action="store_true")
     args = parser.parse_args()
 
@@ -250,6 +262,20 @@ def replay() -> int:
             serial_timeout_s=cfg.gripper.timeout_s,
             max_segments=args.max_segments,
             execute=args.execute,
+            backend=args.backend,
+            rtde_port=cfg.robot.rtde_port,
+            policy_hz=cfg.robot.rtde_frequency_hz,
+            chunk_size=args.chunk_size,
+            chunk_gap_s=args.chunk_gap,
+            max_chunks=args.chunks,
+            servoj_frequency_hz=cfg.servoj.frequency_hz,
+            servoj_config_xml=cfg.servoj.config_xml,
+            servoj_program_script=cfg.servoj.program_script,
+            servoj_mode=cfg.servoj.mode,
+            servoj_connect_timeout_s=cfg.servoj.connect_timeout_s,
+            servoj_lookahead_time=args.servoj_lookahead,
+            servoj_gain=args.servoj_gain,
+            rtde_max_linear_velocity=args.max_linear_speed,
         )
     )
     return 0

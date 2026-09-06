@@ -11,10 +11,10 @@ calls `servoJ`. This project sends that program automatically; no manually
 loaded URP is required.
 
 ```text
-ur5e-infer
-├─ cameras + DP model: produce a six-action TCP chunk
-├─ port 30001: send robot_programs/servoj_control_loop.script
-└─ port 30004: UrRtde client writes input registers at 500 Hz
+cameras + DP model ───────┐
+                          ├─ six TCP actions ─ stream_tcp_chunk
+recorded 10 Hz TCP rows ──┘                       ├─ port 30001: send servoJ script
+                                                  └─ port 30004: write registers at 500 Hz
                          ↓
        controller URScript reads targets, solves IK, calls servoJ
                          ↓
@@ -33,6 +33,9 @@ ur5e-infer
 The current path needs neither ROS, the External Control URCap, nor a URP
 manually started on the pendant. The old project's Local-mode
 `translation_sample_servoj.urp` flow is historical, not a current DP dependency.
+`ur5e-infer` and `ur5e-replay --backend rtde` share the action-execution portion
+of this diagram; only the source of each six-action chunk differs. Replay uses
+`--chunk-gap` to imitate final-setpoint holding during model inference.
 
 ## PolyScope and network requirements
 

@@ -40,7 +40,7 @@ RTDE寄存器/servoJ实验；当前DP适配层的RTDE servoJ已完成平滑实�
 - 14维双臂兼容向量。
 
 这些上游模型语义保持不改。适配层完整执行6步，下层明确选择历史socket speedL
-执行器或实验性的500 Hz RTDE servoJ执行器。
+执行器或已实机验证的500 Hz RTDE servoJ执行器。
 
 当前转换器已生成 `/joint_action/vector` 和经过原生Dataset验证的DP Zarr。兼容映射为
 `[tcp(6), dummy_gripper, tcp(6), physical_gripper]`，保证采集、训练、推理含义一致。

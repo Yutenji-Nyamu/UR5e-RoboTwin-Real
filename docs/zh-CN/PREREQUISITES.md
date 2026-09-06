@@ -16,8 +16,25 @@
 | 数据盘 | 4 TB Seagate NTFS3，自动挂载到 `/data` | raw、转换数据、checkpoint和日志 |
 | RoboTwin | `.third_party/RoboTwin`，固定提交 `21072034...` | 上游模型与训练代码 |
 
-2026-09-04 已修复NTFS的MFT镜像与dirty标记，systemd自动挂载恢复正常；当前剩余
-约3.0 TiB。该故障来自卷未干净卸载，不是权限检查或按需挂载设计造成的。
+2026-09-06 已用 `ur5e-storage-repair` 修复NTFS的MFT镜像与dirty标记，systemd自动
+挂载以 `rw` 恢复；当前剩余约3.0 TiB。该故障来自卷未干净卸载，不是权限检查或
+按需挂载设计造成的。
+
+新工作站优先使用 Ubuntu 24.04 LTS。RealSense官方二进制安装说明目前覆盖Ubuntu
+20/22/24 LTS；本机25.04是已经工作的现场快照，不应当作为最省事的重装基线。系统层
+至少需要Git、Conda、NVIDIA驱动、RealSense运行库/udev规则、串口组权限，以及使用
+NTFS数据盘时的 `ntfsfix`：
+
+```bash
+sudo apt install git ntfs-3g librealsense2-dkms librealsense2-utils \
+  librealsense2-dev librealsense2-udev-rules
+sudo usermod -aG dialout "$USER"
+```
+
+RealSense apt源的添加步骤以
+[librealsense官方Linux安装文档](https://github.com/realsenseai/librealsense/blob/master/doc/distribution_linux.md)
+为准；不要从旧仓库复制过期的发行版源或内核补丁。NVIDIA驱动先用 `nvidia-smi`
+确认，再创建Python环境。
 
 ## 真机一次性准备
 
@@ -35,6 +52,7 @@
 当前仓库保留并直接使用
 `robot_programs/servoj_control_loop.script` 和 RTDE XML。旧项目的
 `translation_sample_servoj.urp` 仅作为历史参考，不再是日常运行前置条件。
+完整的端口、寄存器、脚本和Python依赖关系见[RTDE读写链路](RTDE_STACK.md)。
 
 ### 夹爪
 
@@ -101,3 +119,8 @@ librealsense udev规则已经识别CH340与两台相机，无需再编译旧CH34
 | DP在线 | 见[推理手册](runbooks/infer.md) | shadow与RTDE实机推理均通过 |
 
 当前默认推理配置已经固定为本次通过的RTDE servoJ组合。
+
+旧项目README的价值在于逐设备实验记录，但其中也混有重复SDK、手编译驱动和已替换的
+URP流程。当前仓库把可复现信息按用途拆成：本文负责“装什么”，
+[环境部署](runbooks/setup.md)负责“怎样装”，[硬件逐项调试](runbooks/hardware_commissioning.md)
+负责“怎样逐层验”，[RTDE读写链路](RTDE_STACK.md)负责机器人读写边界。

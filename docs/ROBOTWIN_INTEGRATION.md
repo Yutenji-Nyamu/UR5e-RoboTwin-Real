@@ -26,9 +26,8 @@ artifacts and are not committed.
 The first policy path confirmed to move the real arm used RTDE for
 `actual_TCP_pose`, then sent bounded `speedl(..., t=0.1)` commands over socket
 30001. Its later version applied a target EMA with alpha `0.7`. A separate ACT
-RTDE-register/servoJ experiment also exists, but has not yet passed a known
-displacement test in the old ACT path. The current DP RTDE servoJ adapter has
-now completed a smooth live task.
+RTDE-register/servoJ experiment also exists in the old ACT path. The current DP
+RTDE servoJ adapter has completed a smooth live task.
 
 The model has `chunk_size=50`, but the current adapter applies only
 `prediction[0,0]`; true chunk scheduling remains future work.
@@ -45,7 +44,7 @@ The pinned RoboTwin DP baseline defines:
 
 These upstream model semantics remain unchanged. The adapter executes all six
 steps, then explicitly selects either the historical socket speedL executor or
-the experimental 500 Hz RTDE servoJ executor below the model boundary.
+the verified 500 Hz RTDE servoJ executor below the model boundary.
 
 The converter now produces upstream `/joint_action/vector` and a DP Zarr tested
 with the native Dataset. The compatibility mapping is

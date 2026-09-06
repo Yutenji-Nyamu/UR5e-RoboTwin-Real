@@ -2,7 +2,7 @@
 
 [简体中文](zh-CN/STORAGE.md)
 
-Inventory updated: 2026-09-04.
+Inventory updated: 2026-09-06.
 
 ## Active layout
 
@@ -12,8 +12,9 @@ Inventory updated: 2026-09-04.
 | 4 TB Seagate HDD | NTFS3 | mounted at `/data`, 712 GiB used, 3.0 TiB available | datasets, recordings, checkpoints, archives |
 
 The HDD is persistently configured by UUID in `/etc/fstab` with `nofail` and a
-systemd automount. On 2026-09-04 `ntfsfix` repaired the MFT mirror and cleared
-the dirty flag; automount passed again. Accounts `zhangw`, `ur5`, and `wlf` belong to `robotdata`;
+systemd automount. On 2026-09-06 the repository's `ur5e-storage-repair`
+repaired the MFT mirror, cleared the dirty flag, and verified a fresh `rw`
+mount. Accounts `zhangw`, `ur5`, and `wlf` belong to `robotdata`;
 `/data/robotics` is setgid group-writable. A pre-change fstab backup is retained
 at `/etc/fstab.codex-backup-20260901`.
 
@@ -53,3 +54,22 @@ bottleneck, then move it back after the run.
 The local `configs/lab.yaml` uses `/data/robotics/ur5e-real` as
 `collection.data_root`. See [`DATA_MANAGEMENT.md`](DATA_MANAGEMENT.md) for
 dataset identity, retention, and verified migration rules.
+
+## One-command read-only mount repair
+
+An unclean NTFS volume may cause Linux to mount `/data` read-only. First leave
+shells whose working directory is under `/data` and stop collection or training
+that uses the disk, then run:
+
+```bash
+ur5e-storage-repair
+```
+
+The command derives the device UUID and systemd units from `/etc/fstab`, stops
+the mount normally, runs `ntfsfix --clear-dirty`, restores the automount, and verifies that
+the underlying NTFS mount is `rw`. It requests system privileges once through
+`sudo`, does not rewrite fstab, and never uses forced or lazy unmounting. If the
+disk is busy, use `fuser -vm /data`, exit the listed programs normally, and
+retry. If `ntfsfix` reports Windows hibernation or explicitly requires
+`chkdsk`, boot Windows, check the volume, and shut it down fully instead of
+forcing the Linux mount.

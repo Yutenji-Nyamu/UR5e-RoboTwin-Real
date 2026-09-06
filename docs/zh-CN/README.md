@@ -6,6 +6,7 @@
 
 - [架构](ARCHITECTURE.md)
 - [RoboTwin 集成边界](ROBOTWIN_INTEGRATION.md)
+- [RTDE读写链路](RTDE_STACK.md)
 - [Diffusion Policy 真机实施上下文](DIFFUSION_POLICY_PLAN.md)
 - [真机路线图](ROADMAP.md)
 - [迁移记录](MIGRATION.md)

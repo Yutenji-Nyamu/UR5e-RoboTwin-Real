@@ -2,9 +2,9 @@
 
 [简体中文](zh-CN/DIFFUSION_POLICY_PLAN.md)
 
-Status: 2026-09-04. Data conversion, native training, offline inference, and
-live shadow pass; servoJ execution is next. Commands are in the training and
-inference runbooks.
+Status: 2026-09-06. Data conversion, native training, offline inference, live
+shadow, socket execution, and smooth RTDE servoJ execution all pass. Commands
+are in the training and inference runbooks.
 
 ## Goal and boundary
 
@@ -30,10 +30,10 @@ semantics. It lives at `.third_party/RoboTwin` at commit
 | Capture | 10 Hz UR5e RTDE, gripper, and two-D435i capture works on hardware |
 | Data | Session `20260903_182752` was recorded, reviewed, and saved successfully |
 | Replay | All three socket `movel` segments and both gripper events replayed successfully |
-| Historical ACT | Proves real image input, model loading, RTDE read/write, and 500 Hz servoJ integration; it consumed only the first ACT chunk action |
+| Historical ACT | Proves real image input, model loading, RTDE state receive, and socket speedL execution; it consumed only the first ACT chunk action |
 | RoboTwin DP | HDF5 `joint_action/vector` to Zarr, Hydra training, checkpoint, and six-action prediction ran end to end |
-| Shadow | Two chunks passed with both cameras and read-only RTDE; steady inference was about 0.84 seconds and sent no command |
-| servoJ | Client, RTDE recipe, and robot script are migrated; hold/small-step/continuous-path tests remain on the new stack |
+| Shadow | Live cameras and read-only RTDE pass without sending robot commands |
+| servoJ | Client, RTDE recipe, injected robot script, and continuous 500 Hz execution completed a smooth live task |
 
 One episode is enough to test conversion, batching, forward passes, checkpoint
 loading, and one-episode overfitting. It cannot measure generalization or task

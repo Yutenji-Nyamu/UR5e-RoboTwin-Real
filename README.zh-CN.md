@@ -8,7 +8,8 @@ RoboTwin 策略适配的一站式流程。本仓库负责真机与数据，RoboT
 
 ## 日常操作
 
-以下命令会自动选择本仓库和 `RoboTwinSimReal` 环境，无需手动 `cd` 或激活 Conda。
+完成一次[命令安装](docs/zh-CN/runbooks/setup.md)后，以下命令会自动选择本仓库和
+`RoboTwinSimReal` 环境，无需手动 `cd` 或激活 Conda。
 
 采集：
 
@@ -70,6 +71,10 @@ ur5e-infer 20260905_150221:600 --shadow --chunks 10
 
 数据统一存放在4TB共享盘的 `/data/robotics/ur5e-real`。架构、硬件调试、数据管理、
 训练和推理文档见 [`docs/zh-CN/README.md`](docs/zh-CN/README.md)。
+
+新机器部署从[环境部署](docs/zh-CN/runbooks/setup.md)、
+[软硬件前置条件](docs/zh-CN/PREREQUISITES.md)和
+[RTDE读写链路](docs/zh-CN/RTDE_STACK.md)开始。
 
 Diffusion Policy 主链已打通到 HDF5、Zarr、官方训练、checkpoint离线加载、真机
 shadow和RTDE servoJ平滑执行。命令见

@@ -52,6 +52,7 @@ ur5e-replay = "ur5e_real.operator:replay"
 ur5e-policy-init = "ur5e_real.operator:policy_init"
 ur5e-infer-init = "ur5e_real.operator:infer_init"
 ur5e-infer = "ur5e_real.operator:infer"
+ur5e-storage-repair = "ur5e_real.storage:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

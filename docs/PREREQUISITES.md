@@ -17,9 +17,29 @@ point.
 | Data disk | 4 TB Seagate NTFS3, automounted at `/data` | Raw data, conversions, checkpoints, and logs |
 | RoboTwin | `.third_party/RoboTwin` at pinned commit `21072034...` | Upstream model and training code |
 
-On 2026-09-04 the NTFS MFT mirror and dirty flag were repaired and systemd
-automount was restored; about 3.0 TiB remains available. The failure came from
-an unclean volume state, not permission checks or the automount design.
+On 2026-09-06 `ur5e-storage-repair` repaired the NTFS MFT mirror and dirty flag,
+and restored the systemd automount as `rw`; about 3.0 TiB remains available.
+The failure came from an unclean volume state, not permission checks or the
+automount design.
+
+Prefer Ubuntu 24.04 LTS for a clean workstation. Official RealSense binary
+installation instructions currently cover Ubuntu 20/22/24 LTS. This machine's
+working 25.04 installation is a verified site snapshot, not the easiest rebuild
+baseline. The system layer needs at least Git, Conda, an NVIDIA driver,
+RealSense runtime/udev rules, serial-group access, and `ntfsfix` when using the
+NTFS data disk:
+
+```bash
+sudo apt install git ntfs-3g librealsense2-dkms librealsense2-utils \
+  librealsense2-dev librealsense2-udev-rules
+sudo usermod -aG dialout "$USER"
+```
+
+Follow the
+[official librealsense Linux installation guide](https://github.com/realsenseai/librealsense/blob/master/doc/distribution_linux.md)
+to configure its apt repository. Do not copy stale distribution sources or
+kernel patches from the old repository. Confirm the NVIDIA driver with
+`nvidia-smi` before creating the Python environment.
 
 ## One-time real-hardware setup
 
@@ -39,6 +59,8 @@ an unclean volume state, not permission checks or the automount design.
 The repository directly uses the tracked `robot_programs/servoj_control_loop.script`
 and RTDE XML. The historical `translation_sample_servoj.urp` remains reference
 material and is no longer a daily runtime prerequisite.
+See the [RTDE read/write stack](RTDE_STACK.md) for the complete port, register,
+robot-script, and Python dependency chain.
 
 ### Gripper
 
@@ -110,3 +132,10 @@ both cameras, so the old copied CH341 driver is unnecessary.
 | Online DP | See the [inference guide](runbooks/infer.md) | Both shadow and live RTDE inference pass |
 
 The default inference configuration is now the verified RTDE servoJ combination.
+
+The old README remains useful as a record of individual device experiments,
+but it also mixes duplicate SDKs, hand-built drivers, and a superseded URP
+workflow. This repository separates reproducibility by purpose: this page says
+what to install, [setup](runbooks/setup.md) says how to deploy it,
+[hardware commissioning](runbooks/hardware_commissioning.md) verifies each
+layer, and the [RTDE stack](RTDE_STACK.md) defines the robot I/O boundary.

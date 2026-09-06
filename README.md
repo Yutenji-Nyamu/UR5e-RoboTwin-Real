@@ -9,8 +9,9 @@ RoboTwin remains a pinned upstream policy framework.
 
 ## Daily operation
 
-The installed commands select the repository and `RoboTwinSimReal` environment
-automatically; no manual `cd` or Conda activation is required.
+After the one-time [command installation](docs/runbooks/setup.md), these commands
+select the repository and `RoboTwinSimReal` environment automatically; no manual
+`cd` or Conda activation is required.
 
 Collection:
 
@@ -78,6 +79,10 @@ for all options.
 Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architecture,
 hardware commissioning, data management, training, and inference documentation
 is indexed in [`docs/README.md`](docs/README.md).
+
+For a clean-machine deployment, start with [setup](docs/runbooks/setup.md),
+[prerequisites](docs/PREREQUISITES.md), and the complete
+[RTDE read/write stack](docs/RTDE_STACK.md).
 
 The Diffusion Policy path passes HDF5, Zarr, native training, checkpoint loading,
 shadow inference, and smooth RTDE servoJ execution; see

@@ -63,6 +63,23 @@ checkpoints are written under `/data/robotics/ur5e-real/checkpoints/dp/`.
 The default saves every 300 epochs, at epochs 300 and 600. Per-epoch train and
 validation losses are written to `logs.json.txt` in the run directory.
 
+### Batch size and measured A6000 use
+
+A larger batch usually reduces batches per epoch, but each batch costs more
+compute, so elapsed time does not scale inversely with batch size. The current
+17-episode, 1,562-transition dataset automatically selects `batch=72`, giving
+about 20 optimizer steps per epoch and 12,000 over 600 epochs. It measured about
+7.2 seconds per epoch.
+
+On this workstation's 48 GB RTX A6000, a `batch=128` trial peaked near 25 GB of
+VRAM and reached 99% GPU compute use. Its steady epochs took about six seconds
+with 11 training batches, only a roughly 15--20% speedup. The pinned RoboTwin
+validation loader drops a remainder smaller than one full batch. The current
+held-out episode has 74 frames, so batch 128 produces zero validation batches.
+The default therefore remains the automatic 72 for meaningful validation loss.
+Pass `--batch-size 128` only for a speed experiment where validation is not
+needed.
+
 The first full run on 2026-09-04 included six successful episodes (869
 transitions), held out the last episode for validation, and trained on the
 other five. All 600 epochs finished in about 15.6 minutes; both `300.ckpt` and

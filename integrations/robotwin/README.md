@@ -6,13 +6,14 @@
 version in `robotwin.lock` and cloned into `.third_party/RoboTwin` by
 `scripts/bootstrap_robotwin.sh`.
 
-Our current code is kept in `src/ur5e_real/adapters/robotwin_act`; the planned
-DP integration will live beside it in `adapters/robotwin_dp`. The ACT adapter adds:
+Our adapters live in `src/ur5e_real/adapters/robotwin_act` and
+`src/ur5e_real/adapters/robotwin_dp`. They add:
 
-- real HDF5 to ACT preprocessing;
-- real dual-camera/TCP/gripper inference;
+- real HDF5 conversion to ACT and DP formats;
+- real camera/TCP/gripper observation and execution adapters;
+- native RoboTwin DP training and checkpoint loading;
 - the task configuration written during preprocessing;
-- one narrow, documented compatibility patch.
+- one narrow, documented ACT compatibility patch.
 
 Do not commit `.third_party/RoboTwin`, trained checkpoints, or generated
 `SIM_TASK_CONFIGS.json`. If upstream is upgraded, update the lock and revalidate

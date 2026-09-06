@@ -2,8 +2,8 @@
 
 [English](../DIFFUSION_POLICY_PLAN.md)
 
-状态：2026-09-04。数据转换、官方训练、离线推理和真机shadow已通过；servoJ实机
-执行是下一阶段。具体命令见训练与推理runbook。
+状态：2026-09-06。数据转换、官方训练、离线推理、真机shadow、socket执行和RTDE
+servoJ平滑实机执行均已通过。具体命令见训练与推理runbook。
 
 ## 目标与边界
 
@@ -28,10 +28,10 @@
 | 采集 | UR5e RTDE、夹爪和双 D435i 的10 Hz同步采集已实机通过 |
 | 数据 | session `20260903_182752` 已成功记录、复核和保存 |
 | 重播 | 同一 session 的三段 socket `movel` 与两次夹爪事件已完整重播成功 |
-| 旧 ACT | 已证明真实双相机观测、模型加载、RTDE读写和500 Hz servoJ的接法；旧实现每次只取ACT chunk第1步 |
+| 旧 ACT | 已证明真实图像观测、模型加载、RTDE状态读取和socket speedL执行；旧实现每次只取ACT chunk第1步 |
 | RoboTwin DP | HDF5 `joint_action/vector` -> Zarr -> Hydra训练 -> checkpoint -> 6步预测已实跑 |
-| shadow | 双相机和只读RTDE已连续完成2个chunk；稳态推理约0.84秒，未发送命令 |
-| servoJ | 客户端、RTDE recipe和机器人端脚本已迁入；新仓库内尚未重新做保持/小步/连续轨迹实测 |
+| shadow | 真机相机和只读RTDE已通过，未发送机器人命令 |
+| servoJ | 客户端、RTDE recipe、自动注入机器人脚本和500 Hz连续执行已完成平滑实机任务 |
 
 一条数据足以验证转换、batch、前向、checkpoint加载和单episode过拟合；它不能用来
 判断策略泛化或真实任务成功率。

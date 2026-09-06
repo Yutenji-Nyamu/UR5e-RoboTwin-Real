@@ -6,6 +6,7 @@
 
 - [Architecture](ARCHITECTURE.md)
 - [RoboTwin integration boundary](ROBOTWIN_INTEGRATION.md)
+- [RTDE read/write stack](RTDE_STACK.md)
 - [Diffusion Policy real-robot implementation context](DIFFUSION_POLICY_PLAN.md)
 - [Real-robot roadmap](ROADMAP.md)
 - [Migration record](MIGRATION.md)

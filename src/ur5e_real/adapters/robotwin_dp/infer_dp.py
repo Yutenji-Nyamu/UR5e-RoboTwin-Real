@@ -296,8 +296,9 @@ def _run_execute_rtde(
     chunk_index = 0
     try:
         cameras.start()
+        controller.connect_and_prime()
         _start_servoj_program(lab, inference)
-        controller.connect_and_start()
+        controller.activate()
         model.reset_obs()
         print(
             f"[EXECUTE] continuous 6-action chunks through RTDE servoJ; "

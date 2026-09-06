@@ -22,6 +22,7 @@ class ServoJStreamConfig:
     servoj_mode: int = 2
     connect_retry_s: float = 0.5
     connect_timeout_s: float = 15.0
+    program_start_timeout_s: float = 2.0
 
 
 def render_servoj_program(source: str, lookahead_time: float, gain: int) -> str:
@@ -87,8 +88,11 @@ class ServoJController:
         self._running = False
         self._thread: threading.Thread | None = None
 
-    def connect_and_start(self) -> None:
+    def connect_and_prime(self) -> None:
+        """Connect RTDE and clear the persistent watchdog before script start."""
         cfg = self.config
+        if self._connection is not None:
+            raise RuntimeError("RTDE controller is already connected")
         if not cfg.config_xml_path.is_file():
             raise FileNotFoundError(cfg.config_xml_path)
         rtde, rtde_config = _imports()
@@ -136,14 +140,49 @@ class ServoJController:
         for index, value in enumerate(self._latest_tcp):
             setattr(setpoint, f"input_double_register_{index}", float(value))
         connection.send(setpoint)
-        watchdog.input_int_register_0 = cfg.servoj_mode
+        # RTDE input registers persist between programs.  A previous stop leaves
+        # mode=3 behind, so explicitly clear it before starting the URScript.
+        watchdog.input_int_register_0 = 0
         connection.send(watchdog)
         self._connection = connection
         self._setpoint = setpoint
         self._watchdog = watchdog
+        print("[CONTROL] RTDE registers primed: mode=0")
+
+    def activate(self) -> None:
+        """Enable servoJ after the robot-side program has been submitted."""
+        if self._connection is None or self._watchdog is None:
+            raise RuntimeError("RTDE controller must be primed before activation")
+        if self._running:
+            raise RuntimeError("RTDE controller is already active")
+
+        self._watchdog.input_int_register_0 = self.config.servoj_mode
+        self._connection.send(self._watchdog)
         self._running = True
         self._thread = threading.Thread(target=self._loop, name="ur5e-servoj", daemon=True)
         self._thread.start()
+
+        deadline = time.monotonic() + self.config.program_start_timeout_s
+        while time.monotonic() < deadline:
+            if self._latest_runtime_state == 2:
+                print(
+                    f"[CONTROL] RTDE servoJ running: mode={self.config.servoj_mode} "
+                    f"runtime_state={self._latest_runtime_state}"
+                )
+                return
+            time.sleep(0.01)
+
+        runtime_state = self._latest_runtime_state
+        self.stop()
+        raise RuntimeError(
+            "robot-side servoJ program did not enter the running state "
+            f"(runtime_state={runtime_state})"
+        )
+
+    def connect_and_start(self) -> None:
+        """Compatibility helper for a robot-side program that is already running."""
+        self.connect_and_prime()
+        self.activate()
 
     def _loop(self) -> None:
         while self._running and self._connection is not None:
@@ -152,7 +191,7 @@ class ServoJController:
                 continue
             self._latest_tcp = list(state.actual_TCP_pose)
             self._latest_runtime_state = int(state.runtime_state)
-            if self._latest_runtime_state <= 1:
+            if self._latest_runtime_state != 2:
                 continue
             with self._lock:
                 target = None if self._target_tcp is None else list(self._target_tcp)
@@ -164,6 +203,11 @@ class ServoJController:
     def set_target_tcp(self, pose: Sequence[float]) -> None:
         if len(pose) != 6:
             raise ValueError("pose must contain six values")
+        if self._running and self._latest_runtime_state != 2:
+            raise RuntimeError(
+                "robot-side servoJ program stopped during execution "
+                f"(runtime_state={self._latest_runtime_state})"
+            )
         with self._lock:
             self._target_tcp = [float(value) for value in pose]
 

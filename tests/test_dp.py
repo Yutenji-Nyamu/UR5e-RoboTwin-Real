@@ -1,6 +1,7 @@
 import tempfile
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest import mock
 
 import numpy as np
@@ -19,7 +20,7 @@ from ur5e_real.control.chunk import (
     limit_tcp_target,
 )
 from ur5e_real.control.gripper_policy import GripperCommandConfig, GripperPolicy
-from ur5e_real.control.servoj import render_servoj_program
+from ur5e_real.control.servoj import ServoJController, ServoJStreamConfig, render_servoj_program
 from ur5e_real.control.socket_speedl import (
     SocketSpeedLConfig,
     smoothed_speedl_target,
@@ -150,6 +151,72 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
         self.assertIn("local servoj_gain = 400", configured)
         self.assertIn("local servoj_lookahead_time = 0.1", source)
         self.assertIn("local servoj_gain = 300", source)
+
+    def test_servoj_primes_persistent_watchdog_before_activation(self):
+        watchdog_modes = []
+
+        class FakeConnection:
+            def __init__(self, _host, _port):
+                self.receive_count = 0
+
+            def connect(self):
+                pass
+
+            def get_controller_version(self):
+                pass
+
+            def send_output_setup(self, _names, _types, _frequency):
+                pass
+
+            def send_input_setup(self, names, _types):
+                if names == ["watchdog"]:
+                    return SimpleNamespace(input_int_register_0=3)
+                return SimpleNamespace(**{f"input_double_register_{index}": 0.0 for index in range(6)})
+
+            def send_start(self):
+                return True
+
+            def receive(self):
+                self.receive_count += 1
+                runtime_state = 1 if self.receive_count == 1 else 2
+                return SimpleNamespace(actual_TCP_pose=[0.0] * 6, runtime_state=runtime_state)
+
+            def send(self, recipe):
+                if hasattr(recipe, "input_int_register_0"):
+                    watchdog_modes.append(recipe.input_int_register_0)
+
+            def send_pause(self):
+                pass
+
+            def disconnect(self):
+                pass
+
+        class FakeConfigFile:
+            def __init__(self, _path):
+                pass
+
+            def get_recipe(self, name):
+                return ([name], ["DOUBLE"])
+
+        with tempfile.TemporaryDirectory() as directory:
+            config_xml = Path(directory) / "rtde.xml"
+            config_xml.touch()
+            controller = ServoJController(ServoJStreamConfig("robot.local", config_xml))
+            with mock.patch(
+                "ur5e_real.control.servoj._imports",
+                return_value=(
+                    SimpleNamespace(RTDE=FakeConnection),
+                    SimpleNamespace(ConfigFile=FakeConfigFile),
+                ),
+            ):
+                controller.connect_and_prime()
+            self.assertEqual(watchdog_modes, [0])
+            self.assertFalse(controller._running)
+            controller.activate()
+            self.assertEqual(watchdog_modes, [0, 2])
+            self.assertTrue(controller._running)
+            controller.stop()
+            self.assertEqual(watchdog_modes, [0, 2, 3])
 
     def test_dp_inference_defaults_to_proven_rtde_configuration(self):
         config = DPInferenceConfig()

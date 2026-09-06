@@ -383,6 +383,7 @@ def _run_rtde_replay(cfg: ReplayConfig) -> None:
     )
     gripper_policy = GripperPolicy(gripper, GripperCommandConfig()) if gripper is not None else None
     try:
+        controller.connect_and_prime()
         start_servoj_program(
             robot_host=cfg.robot_host,
             robot_port=cfg.robot_port,
@@ -391,7 +392,7 @@ def _run_rtde_replay(cfg: ReplayConfig) -> None:
             lookahead_time=cfg.servoj_lookahead_time,
             gain=cfg.servoj_gain,
         )
-        controller.connect_and_start()
+        controller.activate()
         print(
             f"[EXECUTE] recorded actions through the DP RTDE servoJ path; "
             f"linear limit={cfg.rtde_max_linear_velocity:g}m/s"

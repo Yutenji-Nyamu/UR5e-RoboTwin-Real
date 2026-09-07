@@ -8,6 +8,8 @@
 - [RoboTwin integration boundary](ROBOTWIN_INTEGRATION.md)
 - [RTDE read/write stack](RTDE_STACK.md)
 - [Diffusion Policy real-robot implementation context](DIFFUSION_POLICY_PLAN.md)
+- [Native RoboTwin π0.5 joint-space real-robot plan (current, Chinese)](plans/pi05/README.md)
+- [π0.5 and RLT initial research (deferred scope, Chinese)](plans/pi05-rlt/README.md)
 - [Real-robot roadmap](ROADMAP.md)
 - [Migration record](MIGRATION.md)
 

@@ -1,0 +1,821 @@
+{
+  "audit_date": "2026-09-07",
+  "implementation_commit": "aeadb3eb7cada7abaa6509ac2f4a6c719113bd0f",
+  "purpose": "Historical TCP-only cube audit; not the dataset for the newly selected joint-space first demo",
+  "raw_files_modified": false,
+  "method": {
+    "original_bounds": "existing motion_bounds, 2 mm / 1 degree, 3 lead / 3 tail frames",
+    "new_tail_proposal": "retain at least until final open timestamp plus 1.0 seconds, inclusive",
+    "visual_review": "all 11 consecutive-session keyframes, plus release-tail comparison for 4 sessions; not full video review"
+  },
+  "sessions": [
+    {
+      "run_id": "20260903_182752",
+      "outcome": "success",
+      "candidate": false,
+      "duration_s": 23.764,
+      "aligned_frames": 228,
+      "trim_start": 67,
+      "trim_stop_exclusive": 214,
+      "trim_head": 67,
+      "trim_tail": 14,
+      "transitions": 146,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        109,
+        179
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.3,
+      "sync_gaps_gt_150ms": 2,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.977,
+      "active_step_mm_p95": 18.7,
+      "active_step_mm_max": 22.2,
+      "rotvec_step_max_rad": 0.0771,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 214,
+      "release_guard_transitions": 146,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260903_182752.json": "46cbfaa009bb98383226ec0af84a154424896fe199835e03dc258016dbc4beaf",
+        "rtde_tcp_gripper_20260903_182752.csv": "33ae9409c7d2ea47c817e238ff2a8639e025f67487ba963564e260cca2aef820",
+        "sync_action_cam_20260903_182752.csv": "ad6660edba6e51f8d200039b4e50b45c07c15d2d53af12a7581265823a2956c6",
+        "gripper_events_20260903_182752.csv": "4e4daa98f023e6a6eed3b8c07b09ca1c174974e414d8915270481009c5586b87"
+      }
+    },
+    {
+      "run_id": "20260904_154957",
+      "outcome": "aborted",
+      "candidate": false,
+      "duration_s": 23.863,
+      "aligned_frames": 234,
+      "trim_start": 25,
+      "trim_stop_exclusive": 160,
+      "trim_head": 25,
+      "trim_tail": 74,
+      "transitions": 134,
+      "events": [
+        "close",
+        "close",
+        "open",
+        "open",
+        "open",
+        "open"
+      ],
+      "event_indices": [
+        79,
+        100,
+        157,
+        184,
+        202,
+        208
+      ],
+      "events_inside_crop": false,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.664,
+      "active_step_mm_p95": 15.33,
+      "active_step_mm_max": 24.22,
+      "rotvec_step_max_rad": 0.0674,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 219,
+      "release_guard_transitions": 193,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_154957.json": "4078464a74080e33f085c76e1763df415840b5bc1a6cb12371549ea4e1e460d3",
+        "rtde_tcp_gripper_20260904_154957.csv": "121ba05f00cd8b7a55927f0cc6001bfece50f9cc460503d8f4296d849fa79d00",
+        "sync_action_cam_20260904_154957.csv": "2fd173ba1b748ec861ab52d714425aa291cd88aa9be2385a00b3cfe6036d196d",
+        "gripper_events_20260904_154957.csv": "1260e12c977cb836bc53f58e261b40c82309506c3b7ddd70705625dd56a8d530"
+      }
+    },
+    {
+      "run_id": "20260904_155414",
+      "outcome": "success",
+      "candidate": false,
+      "duration_s": 16.63,
+      "aligned_frames": 158,
+      "trim_start": 17,
+      "trim_stop_exclusive": 150,
+      "trim_head": 17,
+      "trim_tail": 8,
+      "transitions": 132,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        66,
+        115
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.774,
+      "active_step_mm_p95": 17.13,
+      "active_step_mm_max": 25.74,
+      "rotvec_step_max_rad": 0.0832,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 150,
+      "release_guard_transitions": 132,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_155414.json": "e64c1288006b18efbe6b9e25b036f30b1bcee5c51bc5b0c34c7a4cbddb2d9c8c",
+        "rtde_tcp_gripper_20260904_155414.csv": "d2bdfac3a2f69a624cce00a3160624a37ee47b085204a4a3db03177b424d8ee3",
+        "sync_action_cam_20260904_155414.csv": "93de723e4ce04f15a2b94c95a29526adf6737bf31e6eb88dfa0129c3f3f8b73b",
+        "gripper_events_20260904_155414.csv": "6bd7eea40ac57898c5bfabcd09cdf67da81bb11d85b51f6380b053e92e77b25b"
+      }
+    },
+    {
+      "run_id": "20260904_155521",
+      "outcome": "aborted",
+      "candidate": false,
+      "duration_s": 11.93,
+      "aligned_frames": 107,
+      "trim_start": 15,
+      "trim_stop_exclusive": 63,
+      "trim_head": 15,
+      "trim_tail": 44,
+      "transitions": 47,
+      "events": [
+        "close"
+      ],
+      "event_indices": [
+        60
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.202,
+      "active_step_mm_p95": 12.47,
+      "active_step_mm_max": 16.07,
+      "rotvec_step_max_rad": 0.0472,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 63,
+      "release_guard_transitions": 47,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_155521.json": "821a0d278dfaf9eb5826d32eb3f12f052be5f86bc3ad7eb294bd8cd128db40f1",
+        "rtde_tcp_gripper_20260904_155521.csv": "02ee95dd8c5c77be7c6d7c72ba5f1140ef11fc34f6a85ee59505e3d1605268e5",
+        "sync_action_cam_20260904_155521.csv": "22263e67154012d5488eeb6e2b0eb61ccf6f6bbb9fe8ba2bc5bf0305db393579",
+        "gripper_events_20260904_155521.csv": "0aebc26037ea32e160f0cd1817ae334d14509fc18767b3c623324e5df54b829f"
+      }
+    },
+    {
+      "run_id": "20260904_155618",
+      "outcome": "success",
+      "candidate": false,
+      "duration_s": 13.428,
+      "aligned_frames": 125,
+      "trim_start": 12,
+      "trim_stop_exclusive": 111,
+      "trim_head": 12,
+      "trim_tail": 14,
+      "transitions": 98,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        62,
+        108
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.509,
+      "active_step_mm_p95": 14.29,
+      "active_step_mm_max": 20.31,
+      "rotvec_step_max_rad": 0.0692,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 119,
+      "release_guard_transitions": 106,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_155618.json": "787e0d6ef96334b0bd8c23345c7fe4a4bea9aec0dddbd661e0550df8c3f93ed1",
+        "rtde_tcp_gripper_20260904_155618.csv": "58a0c97f70e2f609c09924049329d3f695f6aa5c484fbbf202be4eecd5361106",
+        "sync_action_cam_20260904_155618.csv": "63b4254479f1794345116ff839bf3c2bea90ae9f0a2eb78a0e755162806ff39f",
+        "gripper_events_20260904_155618.csv": "2dc845cdad4cbbfdd1cef4eacbac5de4555373fcd917b9d8d2d1d9058c0688f0"
+      }
+    },
+    {
+      "run_id": "20260904_155707",
+      "outcome": "success",
+      "candidate": false,
+      "duration_s": 13.419,
+      "aligned_frames": 125,
+      "trim_start": 12,
+      "trim_stop_exclusive": 109,
+      "trim_head": 12,
+      "trim_tail": 16,
+      "transitions": 96,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        62,
+        106
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.528,
+      "active_step_mm_p95": 17.7,
+      "active_step_mm_max": 25.3,
+      "rotvec_step_max_rad": 0.0775,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 117,
+      "release_guard_transitions": 104,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_155707.json": "b22b61b6cd356bda0dfe86e48cc8f375fb1dbbf1f879aa38675760dcf474dfdf",
+        "rtde_tcp_gripper_20260904_155707.csv": "a37d9a3aead3596e1cd4590cdb82387e8707b3912d1e7e107a75007cda537a97",
+        "sync_action_cam_20260904_155707.csv": "77a638fc047092831d43cc57b4b9e83477e22dd7dad17b6bb6e2901ab78aa41e",
+        "gripper_events_20260904_155707.csv": "1231e791efb3814fd25f75262b196a2ab143deca96edce2a3063ddee2f39212b"
+      }
+    },
+    {
+      "run_id": "20260904_155751",
+      "outcome": "success",
+      "candidate": false,
+      "duration_s": 11.53,
+      "aligned_frames": 112,
+      "trim_start": 10,
+      "trim_stop_exclusive": 94,
+      "trim_head": 10,
+      "trim_tail": 18,
+      "transitions": 83,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        47,
+        91
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.504,
+      "active_step_mm_p95": 18.41,
+      "active_step_mm_max": 23.93,
+      "rotvec_step_max_rad": 0.0959,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 102,
+      "release_guard_transitions": 91,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_155751.json": "4eb80df0bcb0eafca1d9967d139bd4f37cf0f443aff5451d1d2339d4ce6b7c3a",
+        "rtde_tcp_gripper_20260904_155751.csv": "f816e923a03f31fb2aaaf743bfed2edf2c4e6a86a43022acde63819c43b7056c",
+        "sync_action_cam_20260904_155751.csv": "2cb8fcc9bd900bd3b43a75bc50de210235381557e2e83495329b92bf56ec55d4",
+        "gripper_events_20260904_155751.csv": "32c286f594bc882971b24ac59f859000aab82def6e148d15c95b61586aabc56b"
+      }
+    },
+    {
+      "run_id": "20260904_155835",
+      "outcome": "success",
+      "candidate": false,
+      "duration_s": 13.501,
+      "aligned_frames": 127,
+      "trim_start": 10,
+      "trim_stop_exclusive": 108,
+      "trim_head": 10,
+      "trim_tail": 19,
+      "transitions": 97,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        56,
+        105
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.553,
+      "active_step_mm_p95": 16.35,
+      "active_step_mm_max": 24.31,
+      "rotvec_step_max_rad": 0.0843,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 116,
+      "release_guard_transitions": 105,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_155835.json": "d2c7e922954eb1f018ab75201c6fdf56d2acfa8382add5a92c269c11eb2c8d2f",
+        "rtde_tcp_gripper_20260904_155835.csv": "7cbd9ba1cca40a333b35ba51d396e08db1f945ed35dcf959e630f0e8828c6f34",
+        "sync_action_cam_20260904_155835.csv": "7ec89bd51f0696f9e607fe2c75df9e57c26802299553f2c1ca2f952ecbb2d72b",
+        "gripper_events_20260904_155835.csv": "3ea1210b6716d37d01a2ad07421b53cc1e247bda79da0821ef8d7cb5ab45fdab"
+      }
+    },
+    {
+      "run_id": "20260904_164924",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 10.839,
+      "aligned_frames": 103,
+      "trim_start": 11,
+      "trim_stop_exclusive": 87,
+      "trim_head": 11,
+      "trim_tail": 16,
+      "transitions": 75,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        43,
+        84
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.526,
+      "active_step_mm_p95": 18.87,
+      "active_step_mm_max": 23.03,
+      "rotvec_step_max_rad": 0.0852,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 95,
+      "release_guard_transitions": 83,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_164924.json": "ffec1202eaaa88b7f95e3ef060b4d312f3cdcac5b3ff743ecc4d9880c81452b6",
+        "rtde_tcp_gripper_20260904_164924.csv": "814f5c9f432001cc5c731674ec67e9c04abc8ffcb478ced9cc7000439bca3e3b",
+        "sync_action_cam_20260904_164924.csv": "b209fd4b25f56d1142c00bfeea478e5da9758fc2f43cc09db698e486eaeb5f98",
+        "gripper_events_20260904_164924.csv": "0111b0990c1bd15b7c359b02b124d15d651d0613ce94cdc744f446e4e6b9766b"
+      }
+    },
+    {
+      "run_id": "20260904_164957",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 11.485,
+      "aligned_frames": 103,
+      "trim_start": 8,
+      "trim_stop_exclusive": 89,
+      "trim_head": 8,
+      "trim_tail": 14,
+      "transitions": 80,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        42,
+        86
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.546,
+      "active_step_mm_p95": 19.16,
+      "active_step_mm_max": 24.67,
+      "rotvec_step_max_rad": 0.0697,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 97,
+      "release_guard_transitions": 88,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_164957.json": "c172dcff0494499a0d5f8f2d71cf40878d20c07a3d958be2af89fac75dc5c82a",
+        "rtde_tcp_gripper_20260904_164957.csv": "7e339f893385b1207a010b4f3e786b4700597c0d7fc9d8bd534408dd58b6fb07",
+        "sync_action_cam_20260904_164957.csv": "76b9286e651c868f098ed7bb3d58bfada1613fe8ed22cedf771fe1b48fb115b2",
+        "gripper_events_20260904_164957.csv": "e3e60cd73efe72c45d7a9ff5f945f583e06aa00b4e7b3530586b7456466c20e6"
+      }
+    },
+    {
+      "run_id": "20260904_165034",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 12.572,
+      "aligned_frames": 117,
+      "trim_start": 9,
+      "trim_stop_exclusive": 97,
+      "trim_head": 9,
+      "trim_tail": 20,
+      "transitions": 87,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        48,
+        94
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.538,
+      "active_step_mm_p95": 16.9,
+      "active_step_mm_max": 24.61,
+      "rotvec_step_max_rad": 0.0917,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 105,
+      "release_guard_transitions": 95,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_165034.json": "7bfe427388acf460462b3f38607d6e9249c72996fc0c088f2934d0cd772d9c58",
+        "rtde_tcp_gripper_20260904_165034.csv": "dba0d5a22e419abc0d61f0896eb8dd08103bec7bf2fde9165be2f1b42292722a",
+        "sync_action_cam_20260904_165034.csv": "5f130169f445a97b069c06c13ef0996759816224e46646b1825fe42210247e16",
+        "gripper_events_20260904_165034.csv": "20b0f0ab4f44bd3645c7d5cf75de132faf5df1e2eb300beb7a511ffc6e16c766"
+      }
+    },
+    {
+      "run_id": "20260904_165110",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 14.515,
+      "aligned_frames": 133,
+      "trim_start": 9,
+      "trim_stop_exclusive": 107,
+      "trim_head": 9,
+      "trim_tail": 26,
+      "transitions": 97,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        55,
+        104
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.566,
+      "active_step_mm_p95": 16.58,
+      "active_step_mm_max": 23.53,
+      "rotvec_step_max_rad": 0.1025,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 115,
+      "release_guard_transitions": 105,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_165110.json": "f8a6ffaf731cbd53fc96e3f6ab1fed10f11d2de40a2ba498bc30cd588b061a93",
+        "rtde_tcp_gripper_20260904_165110.csv": "bc4a320df3c7d467fb135405d92f45b50e88512b03cf07a1dde4543f2d859361",
+        "sync_action_cam_20260904_165110.csv": "2faebd01f303403c499460a9e2975f584d158a0e420b05c6af2743734958f510",
+        "gripper_events_20260904_165110.csv": "b4d24575f1565dcc87cb9e14642cc51b761b9d49e42c7d0beef510ad4fc76309"
+      }
+    },
+    {
+      "run_id": "20260904_165301",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 12.476,
+      "aligned_frames": 116,
+      "trim_start": 10,
+      "trim_stop_exclusive": 98,
+      "trim_head": 10,
+      "trim_tail": 18,
+      "transitions": 87,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        55,
+        95
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.55,
+      "active_step_mm_p95": 19.39,
+      "active_step_mm_max": 23.76,
+      "rotvec_step_max_rad": 0.065,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 106,
+      "release_guard_transitions": 95,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_165301.json": "092916f8663affeb19d5fb21f89d4cdc0e98703ef16224eea7cea88473439ecb",
+        "rtde_tcp_gripper_20260904_165301.csv": "55ed4b99408db27b9306fa7bd2c5c3d95252e5be2306d61496dc8ae9c7410d56",
+        "sync_action_cam_20260904_165301.csv": "9cddc183f2d03d6c0aa8cbf74dadacfb68dca8a03284134ac2e46ceecb93a260",
+        "gripper_events_20260904_165301.csv": "466fe4ca1cda8195098c06129ae4dcf63babd3fbdf3380baf6c632bacd883a64"
+      }
+    },
+    {
+      "run_id": "20260904_165336",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 13.613,
+      "aligned_frames": 131,
+      "trim_start": 16,
+      "trim_stop_exclusive": 109,
+      "trim_head": 16,
+      "trim_tail": 22,
+      "transitions": 92,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        55,
+        106
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.507,
+      "active_step_mm_p95": 16.16,
+      "active_step_mm_max": 17.18,
+      "rotvec_step_max_rad": 0.0741,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 117,
+      "release_guard_transitions": 100,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_165336.json": "5729d9fd9deab006ef385acff0a12ff5038322c59b50627aaca9e0c08a2296bc",
+        "rtde_tcp_gripper_20260904_165336.csv": "f08689aa4dd82f466f0d06fe07759f4d90095a9a91379eade4608fa934fbe72e",
+        "sync_action_cam_20260904_165336.csv": "79ec2fb261a1c82bd400a51c5ec9c64cc16fcad764385922c6a595898341e7c8",
+        "gripper_events_20260904_165336.csv": "e0fedd3ecff9afabae77a37bd2bce0420e89777c3245e7de94d617e4b7b757d2"
+      }
+    },
+    {
+      "run_id": "20260904_165418",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 13.327,
+      "aligned_frames": 121,
+      "trim_start": 10,
+      "trim_stop_exclusive": 102,
+      "trim_head": 10,
+      "trim_tail": 19,
+      "transitions": 91,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        48,
+        99
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.406,
+      "active_step_mm_p95": 13.07,
+      "active_step_mm_max": 15.75,
+      "rotvec_step_max_rad": 0.0432,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 110,
+      "release_guard_transitions": 99,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_165418.json": "5c9f1b38bcf71ec871ba2145e53c03dba22a4a3ba9f20cc0bdaebf15d8a3469a",
+        "rtde_tcp_gripper_20260904_165418.csv": "7cf734ae900f3654d104b518a8b9bae647fd69f57d88dae44d2440f724bce819",
+        "sync_action_cam_20260904_165418.csv": "088fb4ae1555651c8fd6a5782161d8235421df1c16b15b5d59c8714eea607f28",
+        "gripper_events_20260904_165418.csv": "a95c69b7905843ca904b66505a8664e5008e10d703bc725690e23b9f1c1e3c22"
+      }
+    },
+    {
+      "run_id": "20260904_165453",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 11.579,
+      "aligned_frames": 111,
+      "trim_start": 13,
+      "trim_stop_exclusive": 95,
+      "trim_head": 13,
+      "trim_tail": 16,
+      "transitions": 81,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        47,
+        92
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.415,
+      "active_step_mm_p95": 17.3,
+      "active_step_mm_max": 20.21,
+      "rotvec_step_max_rad": 0.0551,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 103,
+      "release_guard_transitions": 89,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_165453.json": "253255f784030fae482167bc28c5cca2aabe8417ae1e38f2a8c34c41cb311829",
+        "rtde_tcp_gripper_20260904_165453.csv": "2ccfbda28687d02468bb95d5eeebd08d12f2f30852aad62d2e6d5f681c5d6677",
+        "sync_action_cam_20260904_165453.csv": "41bbb9389fb5fb872d6f2c5f7f1661ed3d5b52f1690c509dd375392c2b5d9d43",
+        "gripper_events_20260904_165453.csv": "c87ba52f631d6f8967cdeb921ca8433ac5075ca0b638f5597acc474da012fc25"
+      }
+    },
+    {
+      "run_id": "20260904_165840",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 11.323,
+      "aligned_frames": 102,
+      "trim_start": 11,
+      "trim_stop_exclusive": 86,
+      "trim_head": 11,
+      "trim_tail": 16,
+      "transitions": 74,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        45,
+        83
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.3,
+      "sync_gaps_gt_150ms": 2,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.41,
+      "active_step_mm_p95": 19.65,
+      "active_step_mm_max": 20.92,
+      "rotvec_step_max_rad": 0.057,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 94,
+      "release_guard_transitions": 82,
+      "active_gap_indices": [
+        58
+      ],
+      "source_sha256": {
+        "session_20260904_165840.json": "088fefde5dc6d95a190f643575eac18e92b0ffdfdabb8a43d6df348a8cfa2b86",
+        "rtde_tcp_gripper_20260904_165840.csv": "1945b53c053b7698632121947fcf24cd4715debecdf4d1bb638c63d785c30b8b",
+        "sync_action_cam_20260904_165840.csv": "89c0712334c52ba242042d16b74de9a4ada8f28e19f559ff0aa81f87a7266d40",
+        "gripper_events_20260904_165840.csv": "e1c6dd1ad00613e74041f647fc7c5d2e5d00526cf4c0326f6408118cc20c57dc"
+      }
+    },
+    {
+      "run_id": "20260904_165924",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 11.565,
+      "aligned_frames": 108,
+      "trim_start": 19,
+      "trim_stop_exclusive": 92,
+      "trim_head": 19,
+      "trim_tail": 16,
+      "transitions": 72,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        50,
+        89
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.462,
+      "active_step_mm_p95": 20.07,
+      "active_step_mm_max": 23.65,
+      "rotvec_step_max_rad": 0.0561,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 100,
+      "release_guard_transitions": 80,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_165924.json": "a640f67dd9dba1a1c3e2ad741dc699376bba7c9e2c0e7edb7014389c361c87ce",
+        "rtde_tcp_gripper_20260904_165924.csv": "2a81da0034b615c42e774340f3ad2b488e02a07c09608bb33fb235dc7b2ad488",
+        "sync_action_cam_20260904_165924.csv": "3ae4f7e5578a2c8144dccbaf06b52813763ddb397a96613c94dd2035a2d16c89",
+        "gripper_events_20260904_165924.csv": "4e62ee378b9c1cff52bcf07aa9d75477aaeb45b01ffc15aab41550d6578c0bb5"
+      }
+    },
+    {
+      "run_id": "20260904_170000",
+      "outcome": "success",
+      "candidate": true,
+      "duration_s": 11.572,
+      "aligned_frames": 106,
+      "trim_start": 13,
+      "trim_stop_exclusive": 88,
+      "trim_head": 13,
+      "trim_tail": 18,
+      "transitions": 74,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        45,
+        85
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.453,
+      "active_step_mm_p95": 18.49,
+      "active_step_mm_max": 22.31,
+      "rotvec_step_max_rad": 0.061,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 96,
+      "release_guard_transitions": 82,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260904_170000.json": "a1b0210aeeda52d0f75ee850ca8ebd7df80fe5c1b5efdaa8f0a8d854fe374d7c",
+        "rtde_tcp_gripper_20260904_170000.csv": "598ded9ca63c00ffdf615f0a422cca4fc0e358e93f2d1619c67e13ba27925a1b",
+        "sync_action_cam_20260904_170000.csv": "da6348204c71354e507e86a913deed6329fd6a553ec18ffd12cc002bf47912c5",
+        "gripper_events_20260904_170000.csv": "07c883bcef6e3429fe8f7b257836b808ee54406fc7af2e982b60d9264d0c388f"
+      }
+    },
+    {
+      "run_id": "20260906_163150",
+      "outcome": "success",
+      "candidate": false,
+      "duration_s": 14.425,
+      "aligned_frames": 135,
+      "trim_start": 18,
+      "trim_stop_exclusive": 117,
+      "trim_head": 18,
+      "trim_tail": 18,
+      "transitions": 98,
+      "events": [
+        "close",
+        "open"
+      ],
+      "event_indices": [
+        59,
+        114
+      ],
+      "events_inside_crop": true,
+      "sync_dt_median_s": 0.1,
+      "sync_dt_max_s": 0.2,
+      "sync_gaps_gt_150ms": 1,
+      "nearest_sync_error_ms": 0,
+      "missing_frame_pairs": 0,
+      "active_tcp_path_m": 0.477,
+      "active_step_mm_p95": 13.25,
+      "active_step_mm_max": 16.55,
+      "rotvec_step_max_rad": 0.0662,
+      "has_actual_q": false,
+      "release_guard_stop_exclusive": 125,
+      "release_guard_transitions": 106,
+      "active_gap_indices": [],
+      "source_sha256": {
+        "session_20260906_163150.json": "0089559dcf70431264fe2b3af7e70188a134f039d5cb9fba06ac8a471c375e87",
+        "rtde_tcp_gripper_20260906_163150.csv": "e7a0cc9fb83394585d021467f792f6a16ce57205fdfcc4dadbb86e703860d256",
+        "sync_action_cam_20260906_163150.csv": "5f74e17c6de28017972ead0220a6d8788ebe5e48da6cda47f59c79511c143f8b",
+        "gripper_events_20260906_163150.csv": "c09548fac145b1d8881d5ea7c5efd535189630dcba88e73b3f564e040cffb189"
+      }
+    }
+  ]
+}

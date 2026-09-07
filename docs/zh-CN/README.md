@@ -8,6 +8,8 @@
 - [RoboTwin 集成边界](ROBOTWIN_INTEGRATION.md)
 - [RTDE读写链路](RTDE_STACK.md)
 - [Diffusion Policy 真机实施上下文](DIFFUSION_POLICY_PLAN.md)
+- [RoboTwin 原生 π0.5 关节空间真机规划（当前主线）](../plans/pi05/README.md)
+- [π0.5 → RLT 第一轮调研（后续范围暂缓）](../plans/pi05-rlt/README.md)
 - [真机路线图](ROADMAP.md)
 - [迁移记录](MIGRATION.md)
 

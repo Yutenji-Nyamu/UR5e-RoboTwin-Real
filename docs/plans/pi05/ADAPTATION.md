@@ -2,6 +2,9 @@
 
 2026-09-07；实现基线：本仓库 `aeadb3eb7cada7abaa6509ac2f4a6c719113bd0f`，RoboTwin `210720340637cb4619283b295dde4cdd807c9e66`。源码检查不是运行验证。
 
+后续进展：09-08 已开发采集 q/TCP 双记录，见 [采集交付](COLLECTION_IMPLEMENTATION.md)。
+下表是升级前审查快照，不能继续当作当前 collector 不支持 q 的证据；joint 执行与 π0.5 接入仍待开发。
+
 当前决策是 **native π0.5 + joint-space + 先补采双记录**。不在此展开 RLT。总体方案见 [README](README.md)。
 
 ## 1. “参考 DP”具体复用到哪里

@@ -41,6 +41,24 @@ rename or mutate raw files.
 
 ## One trajectory, one index
 
+### Recording format change: 2026-09-08
+
+- The updated collector writes **raw schema v3: measured joint + TCP**, with
+  `actual_q_0..5`, `actual_qd_0..5`, host receive time, and explicit manifest
+  semantics/initial state. See the [collection contract](runbooks/collect.md).
+- All 29 pre-update raw action CSVs inspected on this date lack measured joint
+  columns; the latest is `20260907_174521`. Old data is TCP-only, not joint data
+  despite the downstream RoboTwin name `joint_action`.
+- Identify the boundary by schema **and actual fields**, not by date alone.
+  No old recording is relabeled, synthesized with IK, or overwritten. The first
+  real v3 run ID is still pending; development tests are synthetic.
+- The same cutover note is appended to the data disk's `DATA_LOG.md`. This
+  version-controlled note preserves the boundary even without that disk.
+- Raw dual recording enables later representation-specific exports/checkpoints;
+  existing TCP HDF5 schema v2, DP/ACT conversion, and replay stay unchanged.
+
+### Session index
+
 Each recorded trajectory has one canonical `session_<run_id>.json`. Keep it
 small: it points to products instead of repeating per-frame records already held
 by the sync CSV. The collector finalizes these fields when recording stops:

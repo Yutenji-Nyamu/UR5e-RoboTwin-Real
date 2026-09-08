@@ -43,6 +43,18 @@ def review_session(path: Path, result: str, note: str | None = None) -> dict[str
     return review
 
 
+def recorded_state_label(manifest: dict[str, Any]) -> str:
+    """Describe recorded raw state, not the policy output or converted schema."""
+    if (manifest.get("counts") or {}).get("rtde_samples") == 0:
+        return "none"
+    recording = manifest.get("state_recording") or {}
+    if recording.get("joint_source") == "actual_q" and recording.get("tcp_source") == "actual_TCP_pose":
+        return "joint+tcp"
+    if manifest.get("schema_version") in (1, 2):
+        return "tcp"
+    return "unknown"
+
+
 def session_summaries(action_dir: Path, limit: int = 20) -> list[dict[str, Any]]:
     paths = sorted(action_dir.glob("session_*.json"), reverse=True)
     if limit > 0:
@@ -62,6 +74,8 @@ def session_summaries(action_dir: Path, limit: int = 20) -> list[dict[str, Any]]
                 "outcome": str(manifest.get("outcome") or "unreviewed"),
                 "rtde_samples": counts.get("rtde_samples", "-"),
                 "frame_pairs": counts.get("frame_pairs", "-"),
+                "schema_version": manifest.get("schema_version", "-"),
+                "recorded_state": recorded_state_label(manifest),
                 "manifest": path,
             }
         )
@@ -73,7 +87,7 @@ def print_session_summaries(action_dir: Path, limit: int = 20) -> None:
     if not rows:
         print(f"No sessions found in {action_dir}")
         return
-    print("RUN_ID                   TASK                 DURATION  RESULT       RTDE   FRAMES")
+    print("RUN_ID                   TASK                 DURATION  RESULT       RTDE   FRAMES SCHEMA STATE")
     for row in rows:
         duration = "-" if row["duration_s"] is None else f"{float(row['duration_s']):.1f}s"
         print(
@@ -82,5 +96,7 @@ def print_session_summaries(action_dir: Path, limit: int = 20) -> None:
             f"{duration:>8}  "
             f"{row['outcome']:<11} "
             f"{str(row['rtde_samples']):>6} "
-            f"{str(row['frame_pairs']):>8}"
+            f"{str(row['frame_pairs']):>8} "
+            f"{str(row['schema_version']):>6} "
+            f"{row['recorded_state']}"
         )

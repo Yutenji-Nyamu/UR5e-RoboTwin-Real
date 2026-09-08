@@ -31,6 +31,12 @@ class AlignmentTest(unittest.TestCase):
             align_nearest(np.asarray([]), np.asarray([0.0]))
 
     def test_raw_to_robotwin_act_pipeline(self):
+        self._check_raw_to_robotwin_pipeline(include_joints=False)
+
+    def test_v3_joint_columns_do_not_change_legacy_tcp_act_dp_outputs(self):
+        self._check_raw_to_robotwin_pipeline(include_joints=True)
+
+    def _check_raw_to_robotwin_pipeline(self, *, include_joints):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             action_dir = root / "raw" / "action"
@@ -53,10 +59,23 @@ class AlignmentTest(unittest.TestCase):
                         "tcp_rz",
                         "gripper_state",
                     ]
+                    + (
+                        ["gripper_event_counter"]
+                        + [f"actual_q_{i}" for i in range(6)]
+                        + [f"actual_qd_{i}" for i in range(6)]
+                        + ["host_receive_time_s"]
+                        if include_joints
+                        else []
+                    )
                 )
-                writer.writerow([0.0, 0, 0, 0, 0, 0, 0, 0])
-                writer.writerow([1.0, 1, 2, 3, 0.4, 0.5, 0.6, 1])
-                writer.writerow([2.0, 2, 3, 4, 0.5, 0.6, 0.7, 0])
+                for row in (
+                    [0.0, 0, 0, 0, 0, 0, 0, 0],
+                    [1.0, 1, 2, 3, 0.4, 0.5, 0.6, 1],
+                    [2.0, 2, 3, 4, 0.5, 0.6, 0.7, 0],
+                ):
+                    # Distinct joints must never be silently selected by old TCP converters.
+                    extra = [0, -3.5, -1.2, 1.4, -1.7, -1.6, 3.8, *([0.0] * 6), 1000.0 + row[0]]
+                    writer.writerow(row + (extra if include_joints else []))
 
             with (action_dir / "sync_action_cam_test.csv").open("w", newline="", encoding="utf-8") as handle:
                 writer = csv.writer(handle)
@@ -69,7 +88,14 @@ class AlignmentTest(unittest.TestCase):
                     writer.writerow([timestamp, index, name, name])
 
             (action_dir / "session_test.json").write_text(
-                json.dumps({"run_id": "test", "task": "task", "outcome": "success"}),
+                json.dumps(
+                    {
+                        "run_id": "test",
+                        "task": "task",
+                        "outcome": "success",
+                        "schema_version": 3 if include_joints else 2,
+                    }
+                ),
                 encoding="utf-8",
             )
 

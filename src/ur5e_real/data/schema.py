@@ -4,7 +4,9 @@ import math
 from typing import Sequence
 
 
+# Converted RoboTwin TCP episodes retain v2; raw dual-state recording is v3.
 SCHEMA_VERSION = 2
+RAW_SCHEMA_VERSION = 3
 ROBOTWIN_ACTION_DIM = 14
 
 ACTION_COLUMNS = [
@@ -36,8 +38,7 @@ def nearest_rotation_vector(rotation: Sequence[float], reference: Sequence[float
     if norm > 1e-9:
         unit = [value / norm for value in values]
         candidates.extend(
-            [values[index] + turn * 2.0 * math.pi * unit[index] for index in range(3)]
-            for turn in (-1.0, 1.0)
+            [values[index] + turn * 2.0 * math.pi * unit[index] for index in range(3)] for turn in (-1.0, 1.0)
         )
     return min(candidates, key=lambda item: sum((item[index] - reference[index]) ** 2 for index in range(3)))
 

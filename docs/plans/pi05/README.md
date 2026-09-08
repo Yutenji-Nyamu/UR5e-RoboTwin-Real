@@ -1,17 +1,20 @@
 # RoboTwin 原生 π0.5 → UR5e：joint-space 最小真机 demo
 
-更新：2026-09-08。状态：采集端 joint＋TCP 双记录已开发并通过模拟/回归测试；
-见 [采集开发交付](COLLECTION_IMPLEMENTATION.md)。未运行现场采集、joint 执行或模型训练。
+更新：2026-09-08。采集双记录已交付，用户已补采5条 v3 成功示教。
+本轮继续实现 joint 执行、原生训练及推理接入；实际进度/验证边界以
+[实施记录](IMPLEMENTATION.md) 为准，采集历史见 [采集交付](COLLECTION_IMPLEMENTATION.md)。
 
 本目录是当前 π0.5 的独立上下文，优先于旧 [π0.5/RLT 联合规划](../pi05-rlt/README.md)。继续工作先读 [决策与实施顺序](DECISIONS.md)，原生源码逐项对照见 [适配审查](ADAPTATION.md)，旧方块数据见 [数据审计](DATA_AUDIT.md)。
+
+已开发入口与命令见 [操作说明](USAGE.md)，新5条实测joint数据见 [新数据审计](JOINT5_DATA_AUDIT.json)。
 
 ## 1. 当前用户决策
 
 - 只先做 `pick_place_cube` 的 π0.5 真机最小跑通；charger、RLT、泛化评估均不进入当前验收。
 - 明确选择 **RoboTwin 原生 `policy/pi05`**，参考已经工作的 DP“原生模型 + 本地适配 + 真机执行器”结构。
 - 用户已确认：**首版采用关节动作，接受先补采数据**。新采集同时记录实际关节角与 TCP，保留以后选择表示的能力。
-- 09-07 完成深入审查与规划；09-08 用户进一步收窄本轮为采集开发、测试、日志和 Git 推送，
-  不在本轮安排补采或推进 π0.5/RLT。下文保留整体方案，当前完成范围以采集交付记录为准。
+- 09-08 先完成采集开发；用户补采后，最新请求授权继续开发 π0.5 joint 训推和执行器、检查并推送。
+  当前只做开发与冒烟验证，不自动运动、不启动正式长训，不涉及 RLT。
 
 上一轮把 ALOHA 接口需要适配作为优先转向 RLinf/LeRobot 后端的理由，不符合当前最小目标。接口适配和训练配置调整正是本仓库 DP 已采用的方式；本轮已撤回该后端建议。
 
@@ -54,7 +57,8 @@
 - 建议一并保存 `actual_qd`；保存本机接收时间用于排查延迟。相机已有时间戳能力应尽量落盘，但不伪称 RTDE 和两相机硬件严格同步；
 - episode manifest 写 schema、字段/单位、关节顺序、工具/TCP 配置、起始 q/TCP、采集频率、结果与代码版本。
 
-当前 collector 只订阅 pose/time；另一方面，执行器的 XML 已订阅 `actual_q` 等字段，只是 Python 控制类没有提供/保存完整状态。因此双记录是明确的字段与接口改造，不是机器人不支持。[UR 官方 RTDE 字段](https://docs.universal-robots.com/tutorials/communication-protocol-tutorials/rtde-guide.html)
+历史 collector 只订阅 pose/time；`a3e5427` 起已改为同包 joint＋TCP 双记录，新5条实测字段齐全。
+旧 TCP reader API 保持兼容。[UR 官方 RTDE 字段](https://docs.universal-robots.com/tutorials/communication-protocol-tutorials/rtde-guide.html)
 
 ### 3.2 模型表示选择发生在数据导出和训练配置
 
@@ -96,7 +100,9 @@
 
 单独模型进程使用 Python 3.11+/原生依赖，硬件侧保留现有 Python 3.10 环境。借用原生 WebSocket policy 服务做同机 IPC，不要求安装/运行 RoboTwin 仿真来执行真机。
 
-建议新增 `adapters/robotwin_pi05/{config,process_data,train,serve,infer}.py`、joint 执行适配与相应测试；路径是设计，尚未实现。注册配置和入口放本仓库，优先调用原生函数；确需修 vendor 时将最小补丁托管并纳入 bootstrap，不只手改 ignored 的 `.third_party`。
+已按该边界新增 `adapters/robotwin_pi05/` 和独立 joint 执行器；入口为 `ur5e-pi05` 或
+`python -m ur5e_real.adapters.robotwin_pi05`。训练复用原生模型、init/step、checkpoint 和变换，
+本地只做编排、接口与检查；具体联调结果见实施记录。
 
 ## 6. 参数初值：不需要再逐个问用户
 
@@ -107,10 +113,10 @@
 | EMA | `None` | 避免首版为完整模型额外持有 EMA 副本 |
 | 训练预算 | 先 10-step plumbing；再 1000 steps，按拟合结果决定续到 2000 | 这是试跑预算，不是保证在指定步数成功 |
 | 学习率 | peak `2.5e-5`，warmup 100；原生 AdamW | 首版无需算法调参搜索；decay horizon 与实际训练预算匹配 |
-| 保存 | 每 250 steps + final，保留独立版本/配置/数据清单 | 能重载、可比较；不开覆盖旧结果 |
+| 保存 | 每 500 steps + final，保留独立版本/配置/数据清单 | 能重载、可比较；不开覆盖旧结果 |
 | worker/log | data workers 0 起步，W&B disabled/offline | 减少多进程/GPU初始化和外部服务依赖 |
 | 推理 | H=50、K=6、denoise steps=10；先热身再计端到端 p50/p95 | 需要缩短盲区时才调 K/steps；先不做 RTC |
-| 关节软速度 | 每关节 0.5 rad/s **候选初值**；最大步进 0.05 rad/0.1s | 不是机器人硬件上限；以慢速新示教和受控执行核定 |
+| 关节软速度 | 默认上限0.6 rad/s，可调低；必要时保端点重定时，超过2倍则整段拒绝 | 新示教峰值约0.526 rad/s；这是软件上限，不是硬件/碰撞保证 |
 | servoJ | 500 Hz，lookahead 0.1，gain 300 | 沿用已用参数，不同时改变控制调优 |
 | 首尾 | 起始运动前保留 3 帧；末尾至少覆盖最后 open 后 1 秒 | 旧图像显示 pose 静止不代表夹爪已释放 |
 

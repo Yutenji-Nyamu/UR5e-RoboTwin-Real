@@ -13,6 +13,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+pi05-client = [
+  "websockets>=14,<16",
+  "msgpack>=1.0.5,<2",
+]
 hardware = [
   "numpy==1.26.4",
   "opencv-python==4.11.0.86",
@@ -44,6 +48,7 @@ dev = [
 ]
 
 [project.scripts]
+ur5e-pi05 = "ur5e_real.adapters.robotwin_pi05.__main__:main"
 ur5e-real = "ur5e_real.cli:main"
 ur5e-collect-init = "ur5e_real.operator:collect_init"
 ur5e-collect = "ur5e_real.operator:collect"

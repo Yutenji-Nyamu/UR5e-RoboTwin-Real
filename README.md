@@ -76,6 +76,11 @@ for all options.
 
 ## Data and documentation
 
+The new [native pi05 joint-space adapter](docs/plans/pi05/IMPLEMENTATION.md)
+has an isolated model environment, a five-demo dataset, and tested data/training
+plumbing. Full base-model SFT and physical joint execution are still pending;
+the existing TCP DP path is unchanged. See the [pi05 commands](docs/plans/pi05/USAGE.md).
+
 Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architecture,
 hardware commissioning, data management, training, and inference documentation
 is indexed in [`docs/README.md`](docs/README.md).

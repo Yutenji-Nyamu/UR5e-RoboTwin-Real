@@ -1,0 +1,56 @@
+{
+  "date": "2026-09-08",
+  "experiment": "dummy_plumbing_04",
+  "scope": "random native dummy-model plumbing ONLY, not pi05_base training or robot validation",
+  "full_architecture_parameter_counts": {
+    "trainable": 430098464,
+    "frozen": 2923335408
+  },
+  "dummy_backward_optimizer_checkpoint_reload_inference": "passed",
+  "actions_shape": [
+    50,
+    14
+  ],
+  "verification": {
+    "step": 1,
+    "metrics": {
+      "grad_norm": 1.711130142211914,
+      "loss": 2.271819829940796,
+      "param_norm": 477.8026123046875
+    },
+    "before": {
+      "frozen": {
+        "elements": 429146480,
+        "leaves": 32,
+        "sha256": "fe66d59baf529dd37e417e044a85ab8c7256f260d24d066f57512fc37a21d596"
+      },
+      "trainable": {
+        "elements": 296864,
+        "leaves": 19,
+        "sha256": "25f8a2de002ffd339772e2f7bc76e2baa400c45bc0567dc0cda4b8d6953891c0"
+      }
+    },
+    "after": {
+      "frozen": {
+        "elements": 429146480,
+        "leaves": 32,
+        "sha256": "fe66d59baf529dd37e417e044a85ab8c7256f260d24d066f57512fc37a21d596"
+      },
+      "trainable": {
+        "elements": 296864,
+        "leaves": 19,
+        "sha256": "2ba622fb61da98f86fc9271b09edc6cc0ec205e895bee5846edbe779126b05ce"
+      }
+    },
+    "frozen_unchanged": true,
+    "trainable_changed": true,
+    "checkpoint_reload": true,
+    "optimizer_reload": true,
+    "optimizer_sha256": "84491362d7a8da94ecddbc88cc7d4791b2d1702626b8870e3f1dd642ee7043dc",
+    "elapsed_s": 20.820096808000017,
+    "status": "development_smoke_only"
+  },
+  "full_base_weights_loaded": false,
+  "full_base_sft_verified": false,
+  "physical_execution": false
+}

@@ -1,0 +1,24 @@
+# UR5E_ACTION_SPACE: joint_position
+def ur5e_real_joint_servoj_loop():
+  local mode = 0
+  local joints = get_actual_joint_positions()
+  local servoj_lookahead_time = 0.1
+  local servoj_gain = 300
+  # Fresh nonce prevents a stale persistent output register from passing startup.
+  write_output_integer_register(0, 10505)
+  write_output_integer_register(2, read_input_integer_register(2))
+  rtde_set_watchdog("input_int_register_1", 10, "stop")
+  while (mode < 3):
+    mode = read_input_integer_register(0)
+    write_output_integer_register(1, mode)
+    if (mode == 2):
+      joints = [read_input_float_register(0), read_input_float_register(1), read_input_float_register(2), read_input_float_register(3), read_input_float_register(4), read_input_float_register(5)]
+      servoj(joints, 0, 0, 0.002, servoj_lookahead_time, servoj_gain)
+    else:
+      sync()
+    end
+  end
+  stopj(2.0)
+end
+
+ur5e_real_joint_servoj_loop()

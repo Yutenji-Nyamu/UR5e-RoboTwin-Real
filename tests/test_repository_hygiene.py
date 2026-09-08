@@ -1,7 +1,20 @@
 import re
+import subprocess
 import unittest
 from pathlib import Path
 from urllib.parse import unquote
+
+
+def repository_files(root: Path):
+    """Inspect source candidates, not ignored model/data/runtime caches after local training."""
+    result = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return [root / name for name in result.stdout.split("\0") if name]
 
 
 class RepositoryHygieneTest(unittest.TestCase):
@@ -18,6 +31,7 @@ class RepositoryHygieneTest(unittest.TestCase):
             ".lock",
             ".xml",
             ".script",
+            ".patch",
         }
         forbidden = [
             re.compile(r"/home/[A-Za-z0-9_.-]+/"),
@@ -26,7 +40,7 @@ class RepositoryHygieneTest(unittest.TestCase):
         ]
         ignored_parts = {".git", ".third_party", ".venv", "__pycache__", ".pytest_cache", ".ruff_cache"}
         violations = []
-        for path in root.rglob("*"):
+        for path in repository_files(root):
             if not path.is_file() or ignored_parts.intersection(path.parts):
                 continue
             if path.stat().st_size > 1_000_000:
@@ -42,10 +56,7 @@ class RepositoryHygieneTest(unittest.TestCase):
     def test_all_markdown_documents_have_chinese_mirrors(self):
         root = Path(__file__).resolve().parents[1]
         pairs = [(root / "README.md", root / "README.zh-CN.md")]
-        pairs.extend(
-            (path, root / "docs" / "zh-CN" / path.name)
-            for path in (root / "docs").glob("*.md")
-        )
+        pairs.extend((path, root / "docs" / "zh-CN" / path.name) for path in (root / "docs").glob("*.md"))
         pairs.extend(
             (path, root / "docs" / "zh-CN" / "runbooks" / path.name)
             for path in (root / "docs" / "runbooks").glob("*.md")
@@ -57,16 +68,16 @@ class RepositoryHygieneTest(unittest.TestCase):
             )
         )
         missing = [
-            str(chinese.relative_to(root))
-            for english, chinese in pairs
-            if english.is_file() and not chinese.is_file()
+            str(chinese.relative_to(root)) for english, chinese in pairs if english.is_file() and not chinese.is_file()
         ]
         self.assertEqual(missing, [])
 
     def test_local_markdown_links_resolve(self):
         root = Path(__file__).resolve().parents[1]
         missing = []
-        for markdown in root.rglob("*.md"):
+        for markdown in repository_files(root):
+            if markdown.suffix != ".md" or not markdown.is_file():
+                continue
             if {".git", ".third_party", ".venv"}.intersection(markdown.parts):
                 continue
             content = markdown.read_text(encoding="utf-8")

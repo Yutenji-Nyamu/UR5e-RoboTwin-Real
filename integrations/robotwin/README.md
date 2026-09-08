@@ -15,6 +15,11 @@ Our adapters live in `src/ur5e_real/adapters/robotwin_act` and
 - the task configuration written during preprocessing;
 - one narrow, documented ACT compatibility patch.
 
+The independent `robotwin_pi05` adapter adds joint-space UR data, native JAX
+training/serving, and a separate joint servoJ driver. Its small vendor patches fix
+config import, the pinned Orbax asset callback, and download error propagation;
+the model/loss remain native. See [pi05 implementation](../../docs/plans/pi05/IMPLEMENTATION.md).
+
 Do not commit `.third_party/RoboTwin`, trained checkpoints, or generated
 `SIM_TASK_CONFIGS.json`. If upstream is upgraded, update the lock and revalidate
 the patch and the complete hardware runbook separately.

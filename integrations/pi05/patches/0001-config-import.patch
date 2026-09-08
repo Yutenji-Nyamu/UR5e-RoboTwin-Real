@@ -1,0 +1,28 @@
+diff --git a/policy/pi05/src/openpi/training/config.py b/policy/pi05/src/openpi/training/config.py
+index 75293d4..f2d8834 100644
+--- a/policy/pi05/src/openpi/training/config.py
++++ b/policy/pi05/src/openpi/training/config.py
+@@ -599,7 +599,6 @@ _CONFIGS = [
+                 })
+             ]),
+             base_config=DataConfig(
+-                local_files_only=True,  # Set to True for local-only datasets.
+                 prompt_from_task=True,  # Set to True for prompt by task_name
+             ),
+         ),
+@@ -630,7 +629,6 @@ _CONFIGS = [
+                 })
+             ]),
+             base_config=DataConfig(
+-                local_files_only=True,  # Set to True for local-only datasets.
+                 prompt_from_task=True,
+             ),
+         ),
+@@ -662,7 +660,6 @@ _CONFIGS = [
+                 })
+             ]),
+             base_config=DataConfig(
+-                local_files_only=True,  # Set to True for local-only datasets.
+                 prompt_from_task=True,  # Set to True for prompt by task_name
+             ),
+         ),

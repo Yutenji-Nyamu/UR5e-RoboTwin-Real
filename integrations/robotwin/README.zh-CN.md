@@ -14,6 +14,10 @@
 - 预处理期间写入的任务配置；
 - 一个窄且有记录的ACT兼容补丁。
 
+独立的 `robotwin_pi05` 适配器新增UR关节数据、原生JAX训练/服务和专用joint servoJ执行器。
+小型vendor补丁修复配置导入、锁定Orbax的asset回调和下载异常传播；模型和loss仍是原生实现。
+当前进度和验证边界见 [π0.5实施记录](../../docs/plans/pi05/IMPLEMENTATION.md)。
+
 不要提交 `.third_party/RoboTwin`、训练checkpoint或生成的
 `SIM_TASK_CONFIGS.json`。升级上游时，应分别更新lock并重新验证补丁和完整真机
 runbook。

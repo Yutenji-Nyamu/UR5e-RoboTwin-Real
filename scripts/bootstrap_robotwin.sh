@@ -8,6 +8,9 @@ source "${PROJECT_ROOT}/robotwin.lock"
 VENDOR_ROOT="${PROJECT_ROOT}/.third_party"
 ROBOTWIN_ROOT="${VENDOR_ROOT}/RoboTwin"
 PATCH_FILE="${PROJECT_ROOT}/integrations/robotwin/patches/0001-act-normalize-num-queries.patch"
+PI05_PATCH_FILE="${PROJECT_ROOT}/integrations/pi05/patches/0001-config-import.patch"
+PI05_IO_PATCH_FILE="${PROJECT_ROOT}/integrations/pi05/patches/0002-orbax-callback.patch"
+PI05_DOWNLOAD_PATCH_FILE="${PROJECT_ROOT}/integrations/pi05/patches/0003-propagate-download-errors.patch"
 
 mkdir -p "${VENDOR_ROOT}"
 fresh_clone=false
@@ -29,6 +32,14 @@ git -C "${ROBOTWIN_ROOT}" checkout --detach "${ROBOTWIN_COMMIT}"
 if git -C "${ROBOTWIN_ROOT}" apply --check "${PATCH_FILE}" >/dev/null 2>&1; then
   git -C "${ROBOTWIN_ROOT}" apply "${PATCH_FILE}"
 fi
+for pi05_patch in "${PI05_PATCH_FILE}" "${PI05_IO_PATCH_FILE}" "${PI05_DOWNLOAD_PATCH_FILE}"; do
+  if git -C "${ROBOTWIN_ROOT}" apply --check "${pi05_patch}" >/dev/null 2>&1; then
+    git -C "${ROBOTWIN_ROOT}" apply "${pi05_patch}"
+  elif ! git -C "${ROBOTWIN_ROOT}" apply --reverse --check "${pi05_patch}" >/dev/null 2>&1; then
+    echo "pi05 compatibility patch conflicts; preserve local changes and inspect the checkout." >&2
+    exit 1
+  fi
+done
 
 actual_commit="$(git -C "${ROBOTWIN_ROOT}" rev-parse HEAD)"
 if [[ "${actual_commit}" != "${ROBOTWIN_COMMIT}" ]]; then

@@ -1,0 +1,22 @@
+{
+  "task": "pick_place_cube",
+  "repo_id": "ur5e/pick_place_cube_joint_5_v20260908",
+  "run_ids": [
+    "20260908_153254",
+    "20260908_153339",
+    "20260908_153413",
+    "20260908_153445",
+    "20260908_153525"
+  ],
+  "prompt": "Pick up the cube and place it back on the table.",
+  "fps": 10,
+  "action_horizon": 50,
+  "motion_threshold_rad": 0.005,
+  "lead_in_steps": 3,
+  "tail_steps": 3,
+  "release_tail_s": 1.0,
+  "max_source_gap_s": 0.21,
+  "max_image_offset_s": 0.11,
+  "joint_margin_rad": 0.15,
+  "tcp_margin_m": 0.05
+}

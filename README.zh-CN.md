@@ -69,6 +69,10 @@ ur5e-infer 20260905_150221:600 --shadow --chunks 10
 
 ## 数据与文档
 
+新增 [原生π0.5关节适配](docs/plans/pi05/IMPLEMENTATION.md)：已建立隔离模型环境、5条新数据集，
+并验证数据和训练编排；完整基础权重SFT与新关节链真机测试仍待执行。原TCP DP链不变，
+入口见 [π0.5操作说明](docs/plans/pi05/USAGE.md)。
+
 数据统一存放在4TB共享盘的 `/data/robotics/ur5e-real`。架构、硬件调试、数据管理、
 训练和推理文档见 [`docs/zh-CN/README.md`](docs/zh-CN/README.md)。
 

@@ -1,0 +1,241 @@
+{
+  "experiment": "joint5_sft_20260909_01",
+  "training_code_commit": "c7e95a791fcb98b5f5be6c15f27b51bc4dba9dbb",
+  "state": "completed_and_verified_not_physical_validation",
+  "service": {
+    "unit": "ur5e-pi05-joint5-sft-20260909-01.service",
+    "started": "2026-09-09T16:57:31+08:00",
+    "exited": "2026-09-09T17:28:41+08:00",
+    "wall_seconds": 1870,
+    "exit_status": 0,
+    "main_pid": 0,
+    "result": "success"
+  },
+  "monitoring": {
+    "automation_id": "0-5",
+    "status": "PAUSED",
+    "no_automatic_extension": true
+  },
+  "training": {
+    "step": 1000,
+    "metrics": {
+      "grad_norm": 0.15011030435562134,
+      "loss": 0.02574772760272026,
+      "param_norm": 1802.4378662109375
+    },
+    "before": {
+      "frozen": {
+        "elements": 2923335408,
+        "leaves": 32,
+        "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+      },
+      "trainable": {
+        "elements": 430098464,
+        "leaves": 19,
+        "sha256": "408c5bbfd4d3066167aeefa6e6ada38d997f7ae71154251fd3521d1de53b4951"
+      }
+    },
+    "after": {
+      "frozen": {
+        "elements": 2923335408,
+        "leaves": 32,
+        "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+      },
+      "trainable": {
+        "elements": 430098464,
+        "leaves": 19,
+        "sha256": "e2083535b9762d1de7f15439bd63153ac284939e07bad585795445463ac8d87d"
+      }
+    },
+    "frozen_unchanged": true,
+    "trainable_changed": true,
+    "checkpoint_reload": true,
+    "optimizer_reload": true,
+    "optimizer_sha256": "0ea87b68de1692a51fb5c04d884afb698cd04d118332ee9c7f8f24a847d84604",
+    "elapsed_s": 1858.8093566650005,
+    "status": "SFT_not_physical_validation",
+    "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z",
+    "batch_size": 8,
+    "physical_execution": false,
+    "measured_warm_steps": 999,
+    "first_step_compile_and_compute_s": 27.29578104600023,
+    "warm_step_median_s": 1.6210580309998477,
+    "warm_samples_per_s": 4.9193490871843,
+    "measurement_scope": "training_invocation",
+    "checkpoint": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_sft_20260909_01/1000"
+  },
+  "resources": {
+    "samples": 895,
+    "gpus": {
+      "GPU-fc2b57b6-ffd1-1ab3-6ea4-0292c178e5c4": {
+        "memory_used_mib": 17402,
+        "memory_free_mib": 31131
+      }
+    },
+    "host": {
+      "available_bytes": 90679771136,
+      "process_rss_bytes": 33451900928,
+      "children_rss_sum_bytes": 2110820352,
+      "swap_used_bytes": 786432
+    },
+    "errors": [],
+    "jax_peak_bytes": 15451844864,
+    "sampled_peaks_only": true,
+    "interval_s": 2,
+    "elapsed_s": 1862.215697996,
+    "status": "completed"
+  },
+  "evaluations": [
+    {
+      "step": 500,
+      "scope": "teacher_forced_training_set_only",
+      "physical_execution": false,
+      "samples": 15,
+      "valid_targets": 464,
+      "padded_targets_excluded": 286,
+      "joint_mae_rad": 0.013879145392314047,
+      "gripper_mae": 0.08325220236090106,
+      "gripper_accuracy": 0.9288793103448276,
+      "prefix_joint_mae_rad": 0.007136921855441983,
+      "prefix_gripper_accuracy": 1,
+      "elapsed_s": 9.062675701000444
+    },
+    {
+      "step": 1000,
+      "scope": "teacher_forced_training_set_only",
+      "physical_execution": false,
+      "samples": 15,
+      "valid_targets": 464,
+      "padded_targets_excluded": 286,
+      "joint_mae_rad": 0.009410941217522457,
+      "gripper_mae": 0.07771146438601464,
+      "gripper_accuracy": 0.9267241379310345,
+      "prefix_joint_mae_rad": 0.003975892713862212,
+      "prefix_gripper_accuracy": 1,
+      "elapsed_s": 2.8146730450007453
+    }
+  ],
+  "loss": {
+    "scope": "training_flow_matching_loss_including_native_padding",
+    "metrics": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z/metrics.jsonl",
+    "step": 1000,
+    "snapshot_time_utc": "2026-09-09T09:26:41.297171+00:00",
+    "window": 50,
+    "first_window_mean": 0.16301361575722695,
+    "last_window_mean": 0.0239977858774364,
+    "relative_loss_drop_pct": 85.27866168358854,
+    "nonoverlapping_windows": [
+      {
+        "from_step": 1,
+        "to_step": 50,
+        "mean_loss": 0.16301361575722695
+      },
+      {
+        "from_step": 51,
+        "to_step": 100,
+        "mean_loss": 0.07524517320096492
+      },
+      {
+        "from_step": 101,
+        "to_step": 150,
+        "mean_loss": 0.050335243344306946
+      },
+      {
+        "from_step": 151,
+        "to_step": 200,
+        "mean_loss": 0.0417211652174592
+      },
+      {
+        "from_step": 201,
+        "to_step": 250,
+        "mean_loss": 0.035462691932916644
+      },
+      {
+        "from_step": 251,
+        "to_step": 300,
+        "mean_loss": 0.03452136132866144
+      },
+      {
+        "from_step": 301,
+        "to_step": 350,
+        "mean_loss": 0.029387487396597863
+      },
+      {
+        "from_step": 351,
+        "to_step": 400,
+        "mean_loss": 0.03102137928828597
+      },
+      {
+        "from_step": 401,
+        "to_step": 450,
+        "mean_loss": 0.030560336150228976
+      },
+      {
+        "from_step": 451,
+        "to_step": 500,
+        "mean_loss": 0.026792164612561464
+      },
+      {
+        "from_step": 501,
+        "to_step": 550,
+        "mean_loss": 0.026492366176098583
+      },
+      {
+        "from_step": 551,
+        "to_step": 600,
+        "mean_loss": 0.02637187745422125
+      },
+      {
+        "from_step": 601,
+        "to_step": 650,
+        "mean_loss": 0.026360555589199065
+      },
+      {
+        "from_step": 651,
+        "to_step": 700,
+        "mean_loss": 0.024749026112258436
+      },
+      {
+        "from_step": 701,
+        "to_step": 750,
+        "mean_loss": 0.02525573059916496
+      },
+      {
+        "from_step": 751,
+        "to_step": 800,
+        "mean_loss": 0.02389039196074009
+      },
+      {
+        "from_step": 801,
+        "to_step": 850,
+        "mean_loss": 0.02297718157991767
+      },
+      {
+        "from_step": 851,
+        "to_step": 900,
+        "mean_loss": 0.024515002202242613
+      },
+      {
+        "from_step": 901,
+        "to_step": 950,
+        "mean_loss": 0.022416915148496627
+      },
+      {
+        "from_step": 951,
+        "to_step": 1000,
+        "mean_loss": 0.0239977858774364
+      }
+    ]
+  },
+  "comparison_500_to_1000": {
+    "joint_mae_reduction_pct": 32.193654929690254,
+    "prefix_joint_mae_reduction_pct": 44.29121133180757,
+    "gripper_accuracy_change_percentage_points": -0.21551724137931494
+  },
+  "boundaries": [
+    "15 fixed training observations; not whole-trajectory or held-out evaluation",
+    "native training loss includes terminal padding and compatibility dimensions",
+    "500 checkpoint intermediate-only; 1000 checkpoint audited for parameter and optimizer reload",
+    "no hardware connection or motion; no additional training launched"
+  ]
+}

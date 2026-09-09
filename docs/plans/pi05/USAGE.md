@@ -1,7 +1,7 @@
 # π0.5 joint 接入操作入口
 
 2026-09-09 开训工具与短测记录见 [训练准备](TRAINING_PREPARATION.md)。
-随后已授权并启动1000步正式训练；当前实验名、后台服务与监控入口见 [运行记录](TRAINING_RUN_20260909.md)，不要重复启动。
+随后授权的1000步正式训练与最终审计已完成；实验名、checkpoint与结果见 [运行记录](TRAINING_RUN_20260909.md)，不要重复覆盖。
 
 本页列操作命令，实际跑过哪些检查以 [实施记录](IMPLEMENTATION.md) 为准。
 模型运行在独立 Python3.11/JAX 环境；硬件环境保留现有 DP/PyTorch，二者只用 localhost WebSocket 通信。
@@ -64,7 +64,7 @@ PI05_DATA=/data/robotics/ur5e-real/pi05/lerobot/ur5e/pick_place_cube_joint_5_v20
   --dataset "$PI05_DATA" --exp-name joint5_smoke_01 \
   --steps 1 --batch-size 1 --warmup-steps 0
 
-# 正式拟合示例；运行前选新实验名。当前已运行的实验见上方运行记录，不要重复启动。
+# 正式拟合示例；运行前选新实验名。已完成的首轮实验见上方运行记录，不要重复覆盖。
 .venv/pi05/bin/python -m ur5e_real.adapters.robotwin_pi05 train \
   --dataset "$PI05_DATA" --exp-name joint5_sft_01 \
   --steps 1000 --schedule-steps 3000 --batch-size 8 --num-workers 2 --warmup-steps 100 \
@@ -116,7 +116,7 @@ batch/学习率/增强/数据等必须与原实验一致；旧recipe v1不自动
 ## 4. 服务与离线
 
 ```bash
-PI05_CKPT=checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_sft_01/1000
+PI05_CKPT=checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_sft_20260909_01/1000
 .venv/pi05/bin/python -m ur5e_real.adapters.robotwin_pi05 serve \
   --dataset "$PI05_DATA" --checkpoint "$PI05_CKPT" --port 8005
 ```

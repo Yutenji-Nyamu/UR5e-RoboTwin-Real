@@ -19,29 +19,37 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--dataset", type=Path, required=True)
     parser.add_argument("--exp-name", default="dummy_plumbing_01")
+    parser.add_argument("--steps", type=int, default=1)
+    parser.add_argument("--resume", action="store_true")
     args = parser.parse_args()
     options = SimpleNamespace(
         dataset=args.dataset,
         exp_name=args.exp_name,
-        steps=1,
+        steps=args.steps,
         batch_size=1,
         warmup_steps=0,
         learning_rate=2.5e-5,
-        resume=False,
+        resume=args.resume,
         checkpoint_base=Path(".venv/pi05-smoke"),
         params="TEST_RANDOM_NO_BASE_WEIGHTS",
+        schedule_steps=10,
+        save_interval=2,
+        eval_interval=2,
+        eval_points=1,
     )
     full_config = make_config(
         args.dataset,
         exp_name=args.exp_name,
-        steps=1,
+        steps=args.steps,
         batch_size=1,
         warmup_steps=0,
         checkpoint_base=options.checkpoint_base,
+        schedule_steps=10,
+        save_interval=2,
     )
     from flax import nnx, traverse_util
     import jax
-    from openpi.models.pi0_config import Pi0Config
+    from ur5e_real.adapters.robotwin_pi05.training_model import Pi05TrainingConfig
     from openpi.training.weight_loaders import NoOpWeightLoader
 
     # Count the actual full-sized architecture without allocating/restoring its full weights.
@@ -58,12 +66,12 @@ def main():
     tiny = replace(
         full_config,
         name="pi05_NATIVE_DUMMY_TEST_ONLY",
-        model=Pi0Config(pi05=True, paligemma_variant="dummy", action_expert_variant="dummy"),
+        model=Pi05TrainingConfig(pi05=True, paligemma_variant="dummy", action_expert_variant="dummy"),
         weight_loader=NoOpWeightLoader(),
     )
     with patch.object(train, "make_config", return_value=tiny):
         train.run_training(options)
-    checkpoint = tiny.checkpoint_dir / "1"
+    checkpoint = tiny.checkpoint_dir / str(args.steps)
     with patch.object(serve, "make_config", return_value=tiny):
         policy, _, _ = serve.load_policy(args.dataset, checkpoint, diffusion_steps=2)
     observation, _ = offline_observation(args.dataset)

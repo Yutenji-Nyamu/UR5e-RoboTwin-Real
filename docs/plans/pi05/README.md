@@ -1,6 +1,8 @@
 # RoboTwin 原生 π0.5 → UR5e：joint-space 最小真机 demo
 
-更新：2026-09-08。采集双记录已交付，用户已补采5条 v3 成功示教。
+更新：2026-09-09。最新授权：开训工具＋每档仅3步的batch测试；见 [训练准备与实测](TRAINING_PREPARATION.md)。
+下文保留总体适配规划；旧batch=2初值已开放为可测配置，不代表显卡上限。
+采集双记录已交付，用户已补采5条 v3 成功示教。
 本轮继续实现 joint 执行、原生训练及推理接入；实际进度/验证边界以
 [实施记录](IMPLEMENTATION.md) 为准，采集历史见 [采集交付](COLLECTION_IMPLEMENTATION.md)。
 

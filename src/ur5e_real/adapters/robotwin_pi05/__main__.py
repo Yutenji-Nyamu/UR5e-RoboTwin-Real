@@ -8,7 +8,7 @@ import sys
 
 def main():
     parser = argparse.ArgumentParser(description="Native RoboTwin pi05 / real UR5e joint adapter")
-    parser.add_argument("command", choices=("data", "train", "serve", "infer", "prepare"))
+    parser.add_argument("command", choices=("data", "train", "serve", "infer", "prepare", "evaluate"))
     args = parser.parse_args(sys.argv[1:2])
     rest = sys.argv[2:]
     if args.command == "prepare":

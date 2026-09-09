@@ -1,4 +1,4 @@
-"""UR embodiment configuration using the locked, unmodified native pi05 model."""
+"""UR configuration for locked native pi05, with an explicit training augmentation switch."""
 
 from __future__ import annotations
 
@@ -36,16 +36,25 @@ def make_config(
     learning_rate=2.5e-5,
     warmup_steps=100,
     resume=False,
+    schedule_steps=None,
+    num_workers=0,
+    save_interval=500,
+    image_augmentation=False,
 ):
     if not re.fullmatch(r"[A-Za-z0-9_-]+", exp_name):
         raise ValueError("experiment name must be a simple unique identifier")
-    if steps < 1 or batch_size not in (1, 2) or not 0 <= warmup_steps < max(steps, 2):
-        raise ValueError("require steps>=1, batch size 1 or 2, and warmup below decay length")
+    schedule_steps = max(steps, 2) if schedule_steps is None else schedule_steps
+    if steps < 1 or not 1 <= batch_size <= 128 or schedule_steps < max(steps, 2):
+        raise ValueError("require steps>=1, batch size 1..128, and schedule_steps>=max(steps, 2)")
+    if not 0 <= warmup_steps < schedule_steps or not 0 <= num_workers <= 8 or save_interval < 1:
+        raise ValueError("require warmup below schedule length, workers 0..8, and save_interval>=1")
     if not 0 < learning_rate <= 1e-3:
         raise ValueError("learning rate must be in (0, 1e-3]")
-    contract, _ = validate_dataset(dataset)
+    contract, ready = validate_dataset(dataset)
+    if batch_size > ready["transitions"]:
+        raise ValueError("batch exceeds the dataset; native drop_last would produce no training batches")
     add_native_paths()
-    from openpi.models.pi0_config import Pi0Config
+    from .training_model import Pi05TrainingConfig
     from openpi.training.config import AssetsConfig, LeRobotAlohaDataConfig, TrainConfig
     from openpi.training.optimizer import CosineDecaySchedule
     from openpi.training.weight_loaders import CheckpointWeightLoader
@@ -55,7 +64,7 @@ def make_config(
         name=NAME,
         project_name="ur5e-pi05",
         exp_name=exp_name,
-        model=Pi0Config(pi05=True),
+        model=Pi05TrainingConfig(pi05=True, image_augmentation=image_augmentation),
         weight_loader=CheckpointWeightLoader(str(params)),
         freeze_filter=freeze_backbones,
         data=LeRobotAlohaDataConfig(
@@ -80,16 +89,16 @@ def make_config(
             ),
         ),
         lr_schedule=CosineDecaySchedule(
-            warmup_steps=warmup_steps, peak_lr=learning_rate, decay_steps=max(steps, 2), decay_lr=learning_rate / 10
+            warmup_steps=warmup_steps, peak_lr=learning_rate, decay_steps=schedule_steps, decay_lr=learning_rate / 10
         ),
         checkpoint_base_dir=str(checkpoint_base.resolve()),
         ema_decay=None,
         batch_size=batch_size,
-        num_workers=0,
+        num_workers=num_workers,
         num_train_steps=steps,
         log_interval=10,
-        save_interval=500,
-        keep_period=500,
+        save_interval=save_interval,
+        keep_period=save_interval,
         resume=resume,
         overwrite=False,
         wandb_enabled=False,

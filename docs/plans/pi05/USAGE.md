@@ -1,6 +1,7 @@
 # π0.5 joint 接入操作入口
 
 2026-09-09 开训工具与短测记录见 [训练准备](TRAINING_PREPARATION.md)。
+随后已授权并启动1000步正式训练；当前实验名、后台服务与监控入口见 [运行记录](TRAINING_RUN_20260909.md)，不要重复启动。
 
 本页列操作命令，实际跑过哪些检查以 [实施记录](IMPLEMENTATION.md) 为准。
 模型运行在独立 Python3.11/JAX 环境；硬件环境保留现有 DP/PyTorch，二者只用 localhost WebSocket 通信。
@@ -63,7 +64,7 @@ PI05_DATA=/data/robotics/ur5e-real/pi05/lerobot/ur5e/pick_place_cube_joint_5_v20
   --dataset "$PI05_DATA" --exp-name joint5_smoke_01 \
   --steps 1 --batch-size 1 --warmup-steps 0
 
-# 正式拟合示例（不是本轮已启动的任务）；采用短测建议batch8/workers2。
+# 正式拟合示例；运行前选新实验名。当前已运行的实验见上方运行记录，不要重复启动。
 .venv/pi05/bin/python -m ur5e_real.adapters.robotwin_pi05 train \
   --dataset "$PI05_DATA" --exp-name joint5_sft_01 \
   --steps 1000 --schedule-steps 3000 --batch-size 8 --num-workers 2 --warmup-steps 100 \

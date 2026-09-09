@@ -75,7 +75,32 @@ systemctl --user stop ur5e-pi05-joint5-sft-20260909-01.service
 - 16:59:08首个optimizer step完成（首步编译＋计算27.30秒）；17:01:03已到72步，loss与梯度均有限，
   训练＋取数约1.6秒/步，显存约16.9GiB。loss从首步0.203降到第72步0.044，但单步loss有噪声，未据此宣称拟合成功。
 - 17:01驱动检查：GPU 87°C，当次SW/HW Thermal Slowdown均Not Active，功耗上限300W；继续观察温度。
-- 尚无500步checkpoint、完整拟合或真机成功证据；完整保存/重载结果必须等结束审计。
+- 17:13：第500步checkpoint保存和离线评估完成，之后自动继续本次1000步预算。
+  评估15个固定训练观测、464个有效目标，排除286个末尾padding目标；并非全数据或闭环评估。
+  有效q6 MAE **0.013879rad（0.795°）**，前6步q6 MAE **0.007137rad（0.409°）**；
+  夹爪准确率92.89%，前6步在这些抽样点上100%。后者不能代替开合切换时刻或真机释放验证。
+  评估耗时9.06秒；manifest状态`intermediate_offline_only`，尚未进行最终冻结和重载审计。
+- 17:15:33 loss快照到592步：前50步均值0.163014，最近50步0.025443，下降84.39%；
+  301～350步均值0.029387，451～500步0.026792，后期仍有小幅改善与随机波动。
+  结论是明显收敛趋势、进入缓慢下降阶段，不能仅凭含padding/兼容维度的原生loss认定充分拟合。
+  第500步结果与曲线已在用户询问loss的回复中报告，监控不重复通知该节点。
+- 本地曲线：`outputs/pi05_loss_20260909_snapshot_01.png`，同名JSON记录窗口统计与快照时间；
+  文件为CPU绘图产物，不加载另一份模型、不修改正在运行的训练。
+- 当前尚无1000步完成审计或真机成功证据；完整保存/重载结果必须等结束审计。
+
+### 重画loss快照
+
+使用已有含matplotlib的硬件/数据环境，**不向π0.5训练环境安装依赖**。每次选择新的输出文件名：
+
+```bash
+MPLCONFIGDIR=/tmp/ur5e-pi05-matplotlib \
+  /home/zhangw/anaconda3/envs/RoboTwinSimReal/bin/python scripts/plot_pi05_loss.py \
+  --metrics logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z/metrics.jsonl \
+  --output outputs/pi05_loss_NEW_SNAPSHOT.png
+```
+
+脚本只读取已写完整的JSONL行，绘制原始loss和50步滑动均值，以及后期放大图；
+输出不可覆盖，保存PNG与统计JSON。两幅图纵轴不同；整体图不截掉初期高loss。
 
 ## 500 / 1000步交接检查
 

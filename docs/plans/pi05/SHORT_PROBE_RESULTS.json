@@ -1,5 +1,6 @@
 {
   "date": "2026-09-09",
+  "paths_relative_to": "repository_root",
   "scope": "few_step_coarse_probe_not_convergence",
   "model": "native pi05_base; frozen backbones; action expert + projections trained",
   "dataset": "ur5e/pick_place_cube_joint_5_v20260908",
@@ -29,7 +30,7 @@
       "trainable_changed": true,
       "checkpoint_reload": true,
       "optimizer_reload": true,
-      "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b2/20260909T081606481988Z",
+      "log_dir": "logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b2/20260909T081606481988Z",
       "source": "logs/pi05_batch_probe_20260909_01/summary.json"
     },
     {
@@ -50,7 +51,7 @@
       "trainable_changed": true,
       "checkpoint_reload": false,
       "optimizer_reload": false,
-      "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b4/20260909T081938104242Z",
+      "log_dir": "logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b4/20260909T081938104242Z",
       "source": "logs/pi05_batch_probe_20260909_01/summary.json"
     },
     {
@@ -71,7 +72,7 @@
       "trainable_changed": true,
       "checkpoint_reload": false,
       "optimizer_reload": false,
-      "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b8/20260909T082201877046Z",
+      "log_dir": "logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b8/20260909T082201877046Z",
       "source": "logs/pi05_batch_probe_20260909_01/summary.json"
     },
     {
@@ -92,7 +93,7 @@
       "trainable_changed": true,
       "checkpoint_reload": false,
       "optimizer_reload": false,
-      "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_workers2_20260909_01/runs/joint5_batch_probe_workers2_20260909_01_b8/20260909T082530483149Z",
+      "log_dir": "logs/pi05_batch_probe_workers2_20260909_01/runs/joint5_batch_probe_workers2_20260909_01_b8/20260909T082530483149Z",
       "source": "logs/pi05_batch_probe_workers2_20260909_01/summary.json"
     }
   ]

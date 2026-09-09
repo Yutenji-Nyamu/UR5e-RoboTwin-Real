@@ -1,5 +1,6 @@
 {
   "experiment": "joint5_sft_20260909_01",
+  "paths_relative_to": "repository_root",
   "training_code_commit": "c7e95a791fcb98b5f5be6c15f27b51bc4dba9dbb",
   "state": "completed_and_verified_not_physical_validation",
   "service": {
@@ -54,7 +55,7 @@
     "optimizer_sha256": "0ea87b68de1692a51fb5c04d884afb698cd04d118332ee9c7f8f24a847d84604",
     "elapsed_s": 1858.8093566650005,
     "status": "SFT_not_physical_validation",
-    "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z",
+    "log_dir": "logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z",
     "batch_size": 8,
     "physical_execution": false,
     "measured_warm_steps": 999,
@@ -62,7 +63,7 @@
     "warm_step_median_s": 1.6210580309998477,
     "warm_samples_per_s": 4.9193490871843,
     "measurement_scope": "training_invocation",
-    "checkpoint": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_sft_20260909_01/1000"
+    "checkpoint": "checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_sft_20260909_01/1000"
   },
   "resources": {
     "samples": 895,
@@ -117,7 +118,7 @@
   ],
   "loss": {
     "scope": "training_flow_matching_loss_including_native_padding",
-    "metrics": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z/metrics.jsonl",
+    "metrics": "logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z/metrics.jsonl",
     "step": 1000,
     "snapshot_time_utc": "2026-09-09T09:26:41.297171+00:00",
     "window": 50,

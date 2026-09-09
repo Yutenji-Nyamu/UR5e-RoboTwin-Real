@@ -38,6 +38,19 @@ def test_empty_masks_and_nonfinite_predictions_rejected():
         action_metrics(target + np.nan, target, np.ones(50, dtype=bool))
 
 
+def test_legacy_six_step_diagnostic_is_not_relabelled_as_twenty_steps():
+    target = np.zeros((50, 14))
+    prediction = target.copy()
+    prediction[6:20, :6] = 0.1
+    mask = np.ones(50, dtype=bool)
+    legacy = action_metrics(prediction, target, mask)
+    twenty = action_metrics(prediction, target, mask, first_steps=20)
+    assert legacy["prefix_targets"] == 6
+    assert legacy["prefix_joint_mae_rad"] == 0
+    assert twenty["prefix_targets"] == 20
+    assert twenty["prefix_joint_mae_rad"] == pytest.approx(0.07)
+
+
 def test_gpu_na_is_unknown_not_zero():
     parsed = parse_gpu_csv("0, GPU-test, 49140, 12000, 36000, 80, [N/A], 65\n")
     assert parsed[0]["memory_free_mib"] == 36000

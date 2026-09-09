@@ -42,7 +42,7 @@ def load_selection(path: Path) -> dict:
     if not re.fullmatch(r"[A-Za-z0-9_-]+/[A-Za-z0-9_-]+", selection["repo_id"]):
         raise ValueError("dataset repo_id must be a safe org/name identifier")
     if selection["fps"] != 10 or selection["action_horizon"] != 50:
-        raise ValueError("the native pi05 MVP contract uses 10 Hz / horizon 50")
+        raise ValueError("this UR pi05 dataset contract uses 10 Hz / horizon 50")
     for name in (
         "motion_threshold_rad",
         "release_tail_s",

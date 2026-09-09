@@ -129,7 +129,7 @@ systemctl --user stop ur5e-pi05-joint5-sft-20260909-01.service
 
 ```bash
 MPLCONFIGDIR=/tmp/ur5e-pi05-matplotlib \
-  /home/zhangw/anaconda3/envs/RoboTwinSimReal/bin/python scripts/plot_pi05_loss.py \
+  conda run --no-capture-output -n RoboTwinSimReal python scripts/plot_pi05_loss.py \
   --metrics logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z/metrics.jsonl \
   --output outputs/pi05_loss_NEW_SNAPSHOT.png
 ```

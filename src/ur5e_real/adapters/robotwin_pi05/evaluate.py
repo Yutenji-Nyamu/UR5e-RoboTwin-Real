@@ -17,6 +17,8 @@ from .native import CHECKPOINT_COMPAT
 
 
 def action_metrics(predicted, expected, valid_mask, *, first_steps=6):
+    # Preserve the original training diagnostic; this is not the live execution K.
+    # Deployment now defaults to K=20. A matching diagnostic must request first_steps=20.
     joints, _ = decode_actions(predicted)
     expected, mask = np.asarray(expected), np.asarray(valid_mask, dtype=bool)
     if expected.shape != np.asarray(predicted).shape or mask.shape != (len(joints),) or not mask.any():

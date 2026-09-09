@@ -7,6 +7,8 @@
 模型运行在独立 Python3.11/JAX 环境；硬件环境保留现有 DP/PyTorch，二者只用 localhost WebSocket 通信。
 `offline` 默认不连接硬件；`shadow` 只读；`prepare --execute`、`infer --mode execute` 才会运动。
 当前适配不涉及 RoboTwin 仿真、charger 或 RLT。
+2026-09-09 用户确认首轮执行前缀 K=20；H=50 和数据10Hz不变。
+各参数的原生/训练/用户/硬件来源见 [推理参数溯源](INFERENCE_PARAMETERS.md)，不能整体照搬 DP。
 
 ## 1. 环境
 
@@ -150,15 +152,21 @@ python -m ur5e_real.adapters.robotwin_pi05 infer \
 
 # 受控真机测试时才执行：开始会开爪；Ctrl-C/异常会停止 joint 控制。
 python -m ur5e_real.adapters.robotwin_pi05 infer \
-  --dataset "$PI05_DATA" --lab-config configs/lab.yaml --mode execute --chunks 30
+  --dataset "$PI05_DATA" --lab-config configs/lab.yaml --mode execute --action-steps 20 --chunks 30
 ```
 
 shadow 不创建串口、运动脚本或 servo 输入 recipe；夹爪状态由 `--shadow-gripper 0/1` 指定，非实测开口。
 execute 要求当前 q 对齐 home（各轴0.03rad内），不偷偷自动回 home；TCP offset 必须与采集一致。
 先停机检查，再将持久寄存器 prime 为 actual_q/mode0；新脚本需正确 program ID＋本次nonce＋runtime2回执。
-K=6，关节500Hz插值，上限0.6rad/s；允许最大2倍时间拉伸，完整目标预检；偏差过大时不执行对应夹爪事件。
+K=20（用户选定，并非原生默认）；每次仍预测H=50，仅执行前20点后重新观察/推理。
+10Hz下每段名义2秒；推理等待和限速重定时会延长实际周期，不是模型每秒推理10次。
+关节500Hz插值，上限0.6rad/s；允许最大2倍时间拉伸，完整执行前缀预检；偏差过大时不执行对应夹爪事件。
 短调度延迟不追赶式突发发点；命令生产超时、状态/相机过旧、超demo范围等均终止控制。
 一次close→open后保留1秒稳定hold再停止；不引入连续遥操作。
+`--chunks 30`仍是本地有界试跑上限，不是模型参数；K=20时最多600个策略点、名义60秒，
+close→open通常会提前结束。停止条件不是自动识别任务成功，保持1秒也不是完成全部余下预测。
+每段日志记录H/K/动作点频率；真实执行数量以 `executed_waypoints` 为准。
+原训练评估的 `prefix_*` 仍是前6点历史诊断，未重算成前20点，详见参数溯源。
 
 这些是软件约束，不是整臂碰撞规划或现场安全认证。新 joint URScript/watchdog 与运动时序仍须现场核验；
 旧 TCP DP/手工回放继续独立，不把它们已有的真机结果算作 π0.5 成功。

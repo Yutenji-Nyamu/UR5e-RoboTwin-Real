@@ -10,6 +10,7 @@
 本目录是当前 π0.5 的独立上下文，优先于旧 [π0.5/RLT 联合规划](../pi05-rlt/README.md)。继续工作先读 [决策与实施顺序](DECISIONS.md)，原生源码逐项对照见 [适配审查](ADAPTATION.md)，旧方块数据见 [数据审计](DATA_AUDIT.md)。
 
 已开发入口与命令见 [操作说明](USAGE.md)，新5条实测joint数据见 [新数据审计](JOINT5_DATA_AUDIT.json)。
+最新推理参数见 [逐项来源与K=20决策](INFERENCE_PARAMETERS.md)：原生、训练契约、用户选择和硬件参数分开管理。
 
 ## 1. 当前用户决策
 
@@ -85,7 +86,7 @@
 | 动作变换 | 保留原生 joint delta：相对**本次观测 q**；输出恢复绝对 q | 数据文件仍存下一步绝对 q；禁止二次累加/逆变换 |
 | 图像 | head + physical wrist，显式 BGR→RGB；缺失 wrist 置零并 mask | 用原生 AlohaInputs 缺相机机制；不把复制相机当真实新视角 |
 | 语言 | 固定 `Pick up the cube and place it back on the table.` | 描述当前示教，不引入随机指令/新任务 |
-| 时序 | 示教/数据 10 Hz；H=50，实际执行 K=6；servoJ 500 Hz | 继承 DP 的短 chunk；不是一口气执行 50 步 |
+| 时序 | 示教/数据 10 Hz；H=50，实际执行 K=20；servoJ 500 Hz | H来自原生/训练，10Hz来自本次数据；K=20由用户09-09确认，取代借用DP的6点初值；500Hz来自UR控制层 |
 | 初始条件 | 补采时固定起始 q；执行前对齐同一关节姿态 | 相同 TCP 不保证相同整臂姿态 |
 
 14D 是首版工程兼容建议，不是 π0.5 必须双臂，也不是模型 action_dim 改成 14；内部 32D 与 base 权重投影保持一致。7D 简化可以以后单独改 adapter，不影响这次 joint 决策。默认保留原生 padding/loss 行为，不为第一轮另改模型损失。
@@ -118,7 +119,7 @@
 | 学习率 | peak `2.5e-5`，warmup 100；原生 AdamW | 首版无需算法调参搜索；decay horizon 与实际训练预算匹配 |
 | 保存 | 每 500 steps + final，保留独立版本/配置/数据清单 | 能重载、可比较；不开覆盖旧结果 |
 | worker/log | data workers 0 起步，W&B disabled/offline | 减少多进程/GPU初始化和外部服务依赖 |
-| 推理 | H=50、K=6、denoise steps=10；先热身再计端到端 p50/p95 | 需要缩短盲区时才调 K/steps；先不做 RTC |
+| 推理 | H=50、K=20、denoise steps=10；先热身再计端到端 p50/p95 | K=20为用户选定的首次实机折中；不是原生部署50点或DP的6点；H/10Hz/归一化保持训练契约，先不做RTC |
 | 关节软速度 | 默认上限0.6 rad/s，可调低；必要时保端点重定时，超过2倍则整段拒绝 | 新示教峰值约0.526 rad/s；这是软件上限，不是硬件/碰撞保证 |
 | servoJ | 500 Hz，lookahead 0.1，gain 300 | 沿用已用参数，不同时改变控制调优 |
 | 首尾 | 起始运动前保留 3 帧；末尾至少覆盖最后 open 后 1 秒 | 旧图像显示 pose 静止不代表夹爪已释放 |

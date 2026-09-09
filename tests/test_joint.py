@@ -83,6 +83,19 @@ def test_waypoint_callback_and_no_catchup_after_short_callback_delay():
     assert clock.now == pytest.approx(0.28)
 
 
+def test_twenty_waypoint_prefix_has_two_second_nominal_duration():
+    controller, clock = FakeController(), FakeClock()
+    # The model still produces 50 targets; the real-robot loop selects the first 20.
+    predicted = np.repeat((np.arange(1, 51) * 0.01)[:, None], 6, axis=1)
+    result = stream_joint_chunk(controller, predicted[:20], motion(), clock=clock, sleep=clock.sleep)
+    assert result["executed_waypoints"] == 20
+    assert result["servo_steps"] == 1000
+    assert result["planned_duration_s"] == pytest.approx(2.0)
+    assert clock.now == pytest.approx(2.0)
+    np.testing.assert_allclose(controller.q, predicted[19])
+    assert not controller.stopped
+
+
 def test_cancel_tracking_and_lateness_stop_without_gripper():
     for mode in ("cancel", "tracking", "late"):
         controller, clock, callback = FakeController(), FakeClock(), MagicMock()

@@ -1,9 +1,11 @@
 import json
+from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import numpy as np
 import pytest
 
+from ur5e_real.adapters.robotwin_pi05 import infer as pi05_infer
 from ur5e_real.adapters.robotwin_pi05.config import action_expert_path
 from ur5e_real.adapters.robotwin_pi05.contract import (
     JOINT_ORDER,
@@ -144,3 +146,53 @@ def test_all_new_cli_modules_import_without_model_libraries():
 
     for name in ("infer", "serve", "train", "process_data", "__main__"):
         importlib.import_module(f"ur5e_real.adapters.robotwin_pi05.{name}")
+
+
+@pytest.mark.parametrize("extra, expected", [([], 20), (["--action-steps", "6"], 6), (["--action-steps", "50"], 50)])
+def test_inference_cli_defaults_to_user_selected_prefix_without_loading_a_model(extra, expected):
+    with patch("sys.argv", ["pi05-infer", "--dataset", "unused", *extra]), patch.object(pi05_infer, "run") as run:
+        pi05_infer.main()
+    assert run.call_args.args[0].action_steps == expected
+    assert run.call_args.args[0].mode == "offline"
+
+
+def test_shadow_selects_twenty_of_fifty_predictions_and_records_the_actual_settings(tmp_path):
+    image = np.zeros((4, 5, 3), dtype=np.uint8)
+    actions = np.stack([encode_state(np.full(6, i * 0.01), 0) for i in range(1, 51)])
+    output = tmp_path / "shadow.json"
+    argv = [
+        "pi05-infer",
+        "--dataset",
+        "unused",
+        "--lab-config",
+        "unused",
+        "--mode",
+        "shadow",
+        "--chunks",
+        "1",
+        "--output",
+        str(output),
+    ]
+    with (
+        patch("sys.argv", argv),
+        patch.object(pi05_infer, "validate_dataset", return_value=(contract() | {"prompt": "cube"}, {})),
+        patch.object(pi05_infer, "load_config", return_value=MagicMock()),
+        patch.object(pi05_infer, "PolicyClient") as client,
+        patch.object(pi05_infer, "FreshCameras") as cameras,
+        patch.object(pi05_infer, "RtdeStateClient") as reader,
+        patch.object(pi05_infer, "JointServoJController") as controller,
+        patch.object(pi05_infer, "GripperSerial") as gripper,
+        patch.object(pi05_infer, "plan_joint_chunk", wraps=pi05_infer.plan_joint_chunk) as plan,
+    ):
+        client.return_value.__enter__.return_value.infer.return_value = {"actions": actions, "client_elapsed_s": 0.1}
+        cameras.return_value.__enter__.return_value.read.return_value = SimpleNamespace(head=image, wrist=image)
+        reader.return_value.__enter__.return_value.receive_state.return_value = SimpleNamespace(actual_q=np.zeros(6))
+        pi05_infer.main()
+        np.testing.assert_allclose(plan.call_args.args[1], actions[:20, :6])
+        controller.assert_not_called()
+        gripper.assert_not_called()
+    report = json.loads(output.read_text())[0]
+    assert report["action_horizon"] == 50
+    assert report["action_steps"] == 20
+    assert report["policy_hz"] == 10
+    assert report["execution_preflight"] == "pass"

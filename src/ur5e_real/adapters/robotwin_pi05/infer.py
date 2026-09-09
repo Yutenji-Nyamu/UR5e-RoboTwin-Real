@@ -89,7 +89,14 @@ def run(args):
             result = client.infer(obs)
             joints, grips = decode_actions(result["actions"])
             targets = joints[: args.action_steps]
-            report = {"chunk": chunk + 1, "mode": args.mode, "client_elapsed_s": result["client_elapsed_s"]}
+            report = {
+                "chunk": chunk + 1,
+                "mode": args.mode,
+                "client_elapsed_s": result["client_elapsed_s"],
+                "action_horizon": contract["action_horizon"],
+                "action_steps": args.action_steps,
+                "policy_hz": motion.policy_hz,
+            }
             if controller:
                 # Preflight every executed target before sending the first servo command.
                 plan_joint_chunk(controller.get_commanded_joints(), targets, motion)
@@ -126,7 +133,12 @@ def main():
     parser.add_argument("--lab-config", type=Path)
     parser.add_argument("--port", type=int, default=8005)
     parser.add_argument("--timeout", type=float, default=1.5)
-    parser.add_argument("--action-steps", type=int, default=6)
+    parser.add_argument(
+        "--action-steps",
+        type=int,
+        default=20,
+        help="executed prefix K (default: 20, user-selected UR trial); model horizon H remains 50",
+    )
     parser.add_argument("--chunks", type=int, default=30)
     parser.add_argument("--speed", type=float, default=0.6)
     parser.add_argument(

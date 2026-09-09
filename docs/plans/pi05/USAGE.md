@@ -10,6 +10,31 @@
 2026-09-09 用户确认首轮执行前缀 K=20；H=50 和数据10Hz不变。
 各参数的原生/训练/用户/硬件来源见 [推理参数溯源](INFERENCE_PARAMETERS.md)，不能整体照搬 DP。
 
+## 常用：两条短命令
+
+```bash
+# PolyScope保持Remote Control；检查设备、回示教关节原位、打开夹爪
+ur5e-pi05-infer-init
+
+# 自动加载1000步权重并预热；K=20，RTDE 500Hz joint servoJ
+ur5e-pi05-infer 20260909_01:1000 --execute
+```
+
+无需切目录、激活环境或另开模型终端；首次加载/预热需要等待。
+初始化默认对应本次 `joint5_sft_20260909_01:1000`，换模型时可给初始化命令也传入 `run:step`。
+推理命令也接受完整checkpoint目录；短名不唯一时拒绝猜测。
+`--action-steps 20`、`--chunks 30`、`--speed 0.6`、`--diffusion-steps 10`仍可显式覆盖；
+这里的速度单位为rad/s。保留一次close→open后hold1秒停止的现有逻辑，不等于成功判定。
+
+短命令为每次试跑启动独立模型子进程，使用临时localhost端口并核对实例身份；
+正常结束、异常或Ctrl-C时清理自己启动的进程，不占用/关闭用户另开的8005服务。
+模型加载预热期限默认600秒，在线RPC仍为1.5秒，两者不是同一时间预算。
+日志自动存入 `logs/pi05_infer/<UTC时间>/`：`model.log`、`run.json`、`result.json`，
+正常推理结束另存 `execution.json`。Ctrl-C会停止控制，但当前底层中途报告未保证完整落盘。
+`--shadow`只读预测；两条命令的 `--dry-run` 均不连接硬件、不启动真实模型。
+
+下面保留底层模块入口，供调试或需要手动管理模型服务时使用。
+
 ## 1. 环境
 
 从仓库根目录执行；已有锁定的 `.third_party/RoboTwin`。

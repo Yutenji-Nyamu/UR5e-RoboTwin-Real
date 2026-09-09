@@ -19,6 +19,8 @@ commands=(
   ur5e-policy-init
   ur5e-infer-init
   ur5e-infer
+  ur5e-pi05-infer-init
+  ur5e-pi05-infer
   ur5e-storage-repair
 )
 

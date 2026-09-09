@@ -196,3 +196,18 @@ def test_shadow_selects_twenty_of_fifty_predictions_and_records_the_actual_setti
     assert report["action_steps"] == 20
     assert report["policy_hz"] == 10
     assert report["execution_preflight"] == "pass"
+
+
+def test_replaced_model_service_is_rejected_before_hardware_access():
+    args = SimpleNamespace(
+        dataset="unused", action_steps=20, chunks=30, speed=0.6, port=18005, timeout=1.5, expected_instance_id="owned"
+    )
+    with (
+        patch.object(pi05_infer, "validate_dataset", return_value=(contract(), {})),
+        patch.object(pi05_infer, "PolicyClient") as client,
+        patch.object(pi05_infer, "FreshCameras") as cameras,
+    ):
+        client.return_value.__enter__.return_value.metadata = {"instance_id": "different"}
+        with pytest.raises(RuntimeError, match="instance changed"):
+            pi05_infer.run(args)
+        cameras.assert_not_called()

@@ -45,6 +45,7 @@ def main():
     parser.add_argument("--checkpoint", required=True, type=Path)
     parser.add_argument("--port", default=8005, type=int)
     parser.add_argument("--diffusion-steps", default=10, type=int)
+    parser.add_argument("--instance-id", help="internal identity for an operator-owned model process")
     args = parser.parse_args()
     policy, contract, verification = load_policy(args.dataset, args.checkpoint, args.diffusion_steps)
     from openpi.serving.websocket_policy_server import WebsocketPolicyServer
@@ -59,6 +60,8 @@ def main():
         "checkpoint_step": verification["step"],
         "training_status": verification["status"],
         "diffusion_steps": args.diffusion_steps,
+        "instance_id": args.instance_id,
+        "checkpoint_path": str(args.checkpoint.resolve()),
     }
     print(f"[READY] ws://127.0.0.1:{args.port} ; no robot connection", flush=True)
     WebsocketPolicyServer(policy, host="127.0.0.1", port=args.port, metadata=metadata).serve_forever()

@@ -21,6 +21,8 @@ from .contract import decode_actions, motion_config, require_home
 from .dataset import offline_observation, validate_dataset, write_json
 from .runtime import FreshCameras, controller_config, observation
 
+DEFAULT_ACTION_STEPS = 20
+
 
 def run(args):
     contract, _ = validate_dataset(args.dataset)
@@ -30,6 +32,9 @@ def run(args):
         raise ValueError("this demo supports a joint software speed limit in (0, 0.6] rad/s")
     with ExitStack() as stack:
         client = stack.enter_context(PolicyClient(contract, port=args.port, timeout_s=args.timeout))
+        expected_instance = getattr(args, "expected_instance_id", None)
+        if expected_instance is not None and client.metadata.get("instance_id") != expected_instance:
+            raise RuntimeError("model service instance changed; refuse hardware access")
         if args.mode == "offline":
             obs, expected = offline_observation(args.dataset, args.run_id, args.index)
             result = client.infer(obs)
@@ -136,7 +141,7 @@ def main():
     parser.add_argument(
         "--action-steps",
         type=int,
-        default=20,
+        default=DEFAULT_ACTION_STEPS,
         help="executed prefix K (default: 20, user-selected UR trial); model horizon H remains 50",
     )
     parser.add_argument("--chunks", type=int, default=30)

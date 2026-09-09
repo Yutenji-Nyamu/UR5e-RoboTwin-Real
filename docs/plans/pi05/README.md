@@ -11,6 +11,8 @@
 
 已开发入口与命令见 [操作说明](USAGE.md)，新5条实测joint数据见 [新数据审计](JOINT5_DATA_AUDIT.json)。
 最新推理参数见 [逐项来源与K=20决策](INFERENCE_PARAMETERS.md)：原生、训练契约、用户选择和硬件参数分开管理。
+日常现场操作已封装为 `ur5e-pi05-infer-init`、`ur5e-pi05-infer 20260909_01:1000 --execute`；
+自动处理目录、模型环境/预热/进程清理，旧DP命令不变，详见操作说明。
 
 ## 1. 当前用户决策
 

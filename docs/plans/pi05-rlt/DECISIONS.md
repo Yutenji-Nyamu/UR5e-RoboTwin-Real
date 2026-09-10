@@ -1,7 +1,7 @@
 # 决策、开放问题与续接记录
 
 2026-09-10续接改为[方块RLT分阶段规划](CUBE_PLAN.md)：π0.5 joint真机已经成功，
-当前只重新规划cube RLT；旧G01/G02 charger问题不再要求决策。
+cube RLT软件已实施，正式训练/真机验证尚未进行；当前读[实施记录](IMPLEMENTATION.md)和[实验日志](EXPERIMENT_LOG.md)。旧G01/G02 charger问题不再要求决策。
 
 更新：2026-09-07。与 [主规划](README.md) 和 [证据](RESEARCH.md) 一起使用。
 

@@ -2,7 +2,8 @@
 
 **推荐主线：保留成功的原生 JAX π0.5，缓存其冻结特征训练 AR token，再接 PyTorch 小 actor/critic，最后做终端交互的单真机在线 RL。**
 已有5条示教和1000步checkpoint不重做；先实现最小闭环，不以泛化评估或 charger 阻塞。
-这里是待实施方案，不代表已训练token、已接入RLinf或已验证RLT收益。
+2026-09-10已按本方案完成本地算法移植与真机交互接口，见[实施记录](IMPLEMENTATION.md)和[操作说明](USAGE.md)。
+尚未正式训练token/A/C、运行RLT真机回合或验证收益；本地coordinator不等于完整分布式RLinf runner。
 
 训练计数、论文/donor预热差异、验收指标及逐更新保存的讨论，见
 [训练阶段与交互讨论稿](TRAINING_STAGES_DISCUSSION.md)。2026-09-10已确认：分阶段验收，token首段500更新、每100诊断；
@@ -211,11 +212,12 @@ Stage1先缓存再卸载VLA有利于隔离峰值；Stage2只带冻结encoder及�
 后端桥、缓存格式、action-domain一致性、partial-chunk损失和显存属于**开发验收事项**，
 不要求操作者凭空选择实现细节。可直接开始的下一轮范围是S1a及episode记录/假env状态机；
 成功标准和探索预算不阻塞纯离线开发，但不能被规划文档默认为已经批准的在线训练授权。
+实现进度已超出初始S1a建议范围，当前软件与后续待验收项以[实施记录](IMPLEMENTATION.md)为准。
 
 ## 建议代码落点与后续记录
 
 保持[架构边界](../../ARCHITECTURE.md)：模型/训练归RoboTwin与RLinf，设备与执行归本仓库。
-以下为**拟新增**路径，不是可执行命令或已存在实现：
+以下保留原规划落点供对照；实际文件和可执行命令见[实施记录](IMPLEMENTATION.md)与[USAGE](USAGE.md)：
 
 | 部分 | 拟落点 | 最小回归 |
 | --- | --- | --- |

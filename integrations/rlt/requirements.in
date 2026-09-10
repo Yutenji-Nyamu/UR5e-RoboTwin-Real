@@ -1,0 +1,9 @@
+# Separate learner/encoder service; no changes to DP or native JAX environments.
+torch==2.4.1
+numpy==1.26.4
+PyYAML==6.0.2
+psutil==7.0.0
+websockets==15.0.1
+msgpack==1.1.1
+opencv-python==4.11.0.86
+h5py==3.14.0

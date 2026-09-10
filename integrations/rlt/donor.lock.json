@@ -1,0 +1,32 @@
+{
+  "repository": "https://github.com/Yutenji-Nyamu/rlinf_fastwam",
+  "commit": "d3acd650869d376c14c1406d90865ef90d680432",
+  "branch_at_selection": "codex/sz-rlt-pi0-robotwin-ar",
+  "license": "Apache-2.0",
+  "vendored": {
+    "src/ur5e_real/adapters/rlinf_rlt/vendor/rlt_token_transformer.py": {
+      "source": "rlinf/models/embodiment/modules/rlt_token_transformer.py",
+      "sha256": "d72364f58436af345164d9bb574d7f7edf054e5c9d1e94d367ae075b53779332"
+    }
+  },
+  "adapted": [
+    "rlinf/models/embodiment/mlp_policy/rlt_mlp_policy.py",
+    "rlinf/models/embodiment/mlp_policy/mlp_policy.py",
+    "rlinf/models/embodiment/modules/q_head.py",
+    "rlinf/workers/actor/fsdp_rlt_ac_policy_worker.py",
+    "rlinf/workers/actor/fsdp_sac_policy_worker.py",
+    "rlinf/hybrid_engines/fsdp/fsdp_model_manager.py"
+  ],
+  "recipes": [
+    "examples/sft/config/robotwin_rlt_stage1_sft_openpi_current_ar.yaml",
+    "examples/embodiment/config/robotwin_adjust_bottle_rlt_stage2_ac_mlp_current.yaml"
+  ],
+  "native_features": {
+    "repository": "https://github.com/RoboTwin-Platform/RoboTwin",
+    "commit": "210720340637cb4619283b295dde4cdd807c9e66",
+    "source": "policy/pi05/src/openpi/models/pi0.py",
+    "adaptation": "retain final image prefix states during otherwise unchanged sampling",
+    "license_file": "integrations/rlt/LICENSE-OpenPI"
+  },
+  "runtime": "single-device coordinator; not the distributed Ray/FSDP runner"
+}

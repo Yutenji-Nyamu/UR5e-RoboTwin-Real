@@ -21,6 +21,7 @@ commands=(
   ur5e-infer
   ur5e-pi05-infer-init
   ur5e-pi05-infer
+  ur5e-rlt
   ur5e-storage-repair
 )
 

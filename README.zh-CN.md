@@ -81,7 +81,8 @@ ur5e-infer 20260905_150221:600 --shadow --chunks 10
 ## 数据与文档
 
 [原生π0.5关节链](docs/plans/pi05/README.md)已完成双记录、SFT、重载与方块真机执行。
-原TCP DP链不变；后续[方块 RLT 分阶段规划](docs/plans/pi05-rlt/CUBE_PLAN.md)单独维护，尚未实施 RLT。
+原TCP DP链不变。[方块 RLT](docs/plans/pi05-rlt/CUBE_PLAN.md)已实现离线Token/BC、A/C更新与真机每轮4局的交互接口；
+尚未开始正式RLT训练或真机验收。短命令 `ur5e-rlt`、阶段复核与日志见[操作说明](docs/plans/pi05-rlt/USAGE.md)。
 
 数据统一存放在4TB共享盘的 `/data/robotics/ur5e-real`。架构、硬件调试、数据管理、
 训练和推理文档见 [`docs/zh-CN/README.md`](docs/zh-CN/README.md)。

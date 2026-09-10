@@ -59,6 +59,7 @@ ur5e-infer-init = "ur5e_real.operator:infer_init"
 ur5e-infer = "ur5e_real.operator:infer"
 ur5e-pi05-infer-init = "ur5e_real.pi05_operator:infer_init"
 ur5e-pi05-infer = "ur5e_real.pi05_operator:infer"
+ur5e-rlt = "ur5e_real.rlt_operator:main"
 ur5e-storage-repair = "ur5e_real.storage:main"
 
 [tool.setuptools.packages.find]

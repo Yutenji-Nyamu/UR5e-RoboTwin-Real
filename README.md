@@ -90,8 +90,9 @@ for all options.
 
 The [native π0.5 joint-space path](docs/plans/pi05/README.md) now covers dual
 recording, SFT, checkpoint reload and physical cube execution. The existing TCP
-DP path is unchanged. Next-stage [cube RLT planning](docs/plans/pi05-rlt/CUBE_PLAN.md)
-is documented separately; RLT is not yet implemented.
+DP path is unchanged. [Cube RLT](docs/plans/pi05-rlt/CUBE_PLAN.md) now has offline token/BC learners,
+actor–critic updates and a four-episode human-labelled real-robot interface. Formal RLT training and physical
+validation have not started. See [`ur5e-rlt` usage and logs](docs/plans/pi05-rlt/USAGE.md) (Chinese).
 
 Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architecture,
 hardware commissioning, data management, training, and inference documentation

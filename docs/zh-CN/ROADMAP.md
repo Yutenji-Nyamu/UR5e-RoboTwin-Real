@@ -2,6 +2,10 @@
 
 [English](../ROADMAP.md)
 
+最新里程碑（2026-09-10）：原生π0.5关节抓放方块已成功，见
+[真机记录](../plans/pi05/PHYSICAL_RESULT_20260910.md)、[下一阶段cube RLT规划](../plans/pi05-rlt/CUBE_PLAN.md)
+与[新机验收](runbooks/new_machine.md)。RLT尚未实施；下面保留旧TCP/DP路线图，不用其6点chunk定义π0.5的K20。
+
 状态：2026-09-06。设备、采集、重播、DP训练/shadow和RTDE servoJ真机推理均已通过；
 servoJ是当前默认执行后端。RoboTwin 始终位于窄策略适配层之上。
 

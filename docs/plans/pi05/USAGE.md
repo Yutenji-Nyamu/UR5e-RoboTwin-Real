@@ -1,5 +1,8 @@
 # π0.5 joint 接入操作入口
 
+2026-09-10：方块真机demo已反馈成功，见[成功记录](PHYSICAL_RESULT_20260910.md)。
+新电脑先按[新机与检修手册](../../zh-CN/runbooks/new_machine.md)准备完整数据/模型/标定，不能只clone后运行短命令。
+
 2026-09-09 开训工具与短测记录见 [训练准备](TRAINING_PREPARATION.md)。
 随后授权的1000步正式训练与最终审计已完成；实验名、checkpoint与结果见 [运行记录](TRAINING_RUN_20260909.md)，不要重复覆盖。
 

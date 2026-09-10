@@ -168,6 +168,7 @@ def packet(timestamp=1.0, runtime=1):
 
 def fake_connection():
     conn = MagicMock()
+    conn.get_controller_version.return_value = (5, 13, 0, 0)
     conn.receive.return_value = packet()
     conn.send_input_setup.side_effect = [SimpleNamespace(), SimpleNamespace()]
     return conn

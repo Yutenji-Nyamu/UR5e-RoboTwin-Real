@@ -50,8 +50,11 @@ rename or mutate raw files.
   columns; the latest is `20260907_174521`. Old data is TCP-only, not joint data
   despite the downstream RoboTwin name `joint_action`.
 - Identify the boundary by schema **and actual fields**, not by date alone.
-  No old recording is relabeled, synthesized with IK, or overwritten. The first
-  real v3 run ID is still pending; development tests are synthetic.
+  No old recording is relabeled, synthesized with IK, or overwritten. Five real
+  v3 demonstrations were subsequently verified: `20260908_153254`, `153339`,
+  `153413`, `153445`, `153525` (same date prefix). They produced 414 π0.5 training
+  transitions; see the [audit](plans/pi05/JOINT5_DATA_AUDIT.json) and
+  [physical result](plans/pi05/PHYSICAL_RESULT_20260910.md).
 - The same cutover note is appended to the data disk's `DATA_LOG.md`. This
   version-controlled note preserves the boundary even without that disk.
 - Raw dual recording enables later representation-specific exports/checkpoints;

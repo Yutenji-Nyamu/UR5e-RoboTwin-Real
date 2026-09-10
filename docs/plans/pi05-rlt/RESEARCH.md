@@ -1,5 +1,8 @@
 # 调研证据与代码复用清单
 
+后续核验与当前方案见[2026-09-10方块RLT规划](CUBE_PLAN.md)：用户仓库现45分支，
+主AR donor SHA未变；π0.5已完成joint数据/SFT/真机最小demo，下面的本地状态只作09-07快照。
+
 日期：2026-09-07。范围：当前 UR5e 仓库、锁定的 RoboTwin、用户 `rlinf_fastwam` 的 37 个分支 tip，以及官方/原作者公开实现。判断分为“已读源码/记录”“工程推断”“待实测”；没有运行远程仓库代码或复现其训练结果。
 
 本文件保留第一轮证据，不代表当前路线选择；最新为 [RoboTwin 原生 π0.5 joint-space](../pi05/README.md)。原生 expert-only、norm 脚本与 collector/executor 的进一步核验见 [第二轮适配审查](../pi05/ADAPTATION.md)。

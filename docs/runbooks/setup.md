@@ -2,6 +2,10 @@
 
 [简体中文](../zh-CN/runbooks/setup.md)
 
+For the complete hardware-to-policy acceptance order and external asset inventory,
+start with [new-machine commissioning and repair](new_machine.md). This page
+installs software; it does not restore data, trained checkpoints or workcell calibration.
+
 The repository owns command implementations and dependency versions. A new
 machine still needs system drivers, a Conda environment, and site-local
 configuration. Ubuntu 24.04 LTS is the recommended clean baseline. The current
@@ -36,8 +40,9 @@ python -m pip install --no-deps -e .
 ## 2. Install the short operator commands
 
 `pyproject.toml` defines commands such as `ur5e-collect`, `ur5e-replay`, and
-`ur5e-infer`. The editable install generates entry points inside the active
-Conda environment. That is sufficient when the environment is activated.
+`ur5e-infer`, plus `ur5e-pi05-infer-init`/`ur5e-pi05-infer`. The editable install
+generates entry points inside the active Conda environment. That is sufficient
+when the environment is activated.
 
 To use the same commands from any directory without activating Conda, run once:
 

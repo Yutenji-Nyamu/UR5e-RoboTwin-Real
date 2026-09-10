@@ -1,0 +1,204 @@
+{
+  "checked_on": "2026-09-10",
+  "repository": "https://github.com/Yutenji-Nyamu/rlinf_fastwam",
+  "branch_count": 45,
+  "scope": "Remote tip inventory; deep source review of AR RLT and selected conversion paths, not reproduction of every branch experiment.",
+  "primary_rlt_commit": "d3acd650869d376c14c1406d90865ef90d680432",
+  "token_meta_count": {
+    "source": "rlinf/models/embodiment/modules/rlt_token_transformer.py",
+    "input_dim": 2048,
+    "embed_dim": 2048,
+    "prefix_seq_len": 768,
+    "num_layers": 2,
+    "num_heads": 8,
+    "mlp_ratio": 4,
+    "total_parameters": 745715712,
+    "encoder_parameters": 370761728,
+    "fp32_weights_grad_adam_gib": 11.112030029296875,
+    "device": "meta",
+    "cuda_initialized": false,
+    "training_performed": false
+  },
+  "branches": [
+    {
+      "branch": "codex/dsrl-pi0-robotwin",
+      "commit": "48a775db09c16c455aeba7b0600c920e7c80d534"
+    },
+    {
+      "branch": "codex/idea2-dvac-pi0-robotwin",
+      "commit": "61996e15cc7f5a32bd6012b61b20893d94636c82"
+    },
+    {
+      "branch": "codex/idea2-dvac-residual-downweight",
+      "commit": "afdaa2e2aa59aa16128e89f47eb4aaf7a64badd8"
+    },
+    {
+      "branch": "codex/idea2-dvac-train-weighting",
+      "commit": "145fa810f1d8baee23012922b81e496661d61cf5"
+    },
+    {
+      "branch": "codex/ogpo-pi0-robotwin",
+      "commit": "5d5c84e3ac4efa1713a4139a05ac1b776e634ed3"
+    },
+    {
+      "branch": "codex/qam-pi0-robotwin",
+      "commit": "ff8e28ef6a4d485642e695b6b76c5c84187e134e"
+    },
+    {
+      "branch": "codex/rlt-dvac-pure-reference-bc",
+      "commit": "f0aaf4b71669fad38d11ac85c90670386242c29d"
+    },
+    {
+      "branch": "codex/rlt-dvac-success-episode-bc",
+      "commit": "848b61278687702ea717c56b3734f1486cea3b95"
+    },
+    {
+      "branch": "codex/rlt-pi0-robotwin",
+      "commit": "2b8199d8ab2e7b110994fd3234bf7007196c3af9"
+    },
+    {
+      "branch": "codex/rlt-teacher-dvac-weighting",
+      "commit": "74c715515c94fd367aff274871bf9488e95ff6b3"
+    },
+    {
+      "branch": "codex/sz-7d07a421-grpo-pi0-robotwin",
+      "commit": "02b9488329bf0e141a4dc3527e5885bfeae87088"
+    },
+    {
+      "branch": "codex/sz-current-dsrl-pi0-robotwin",
+      "commit": "4ec52bd8d3dad1744b3f61c76636314b9d69c7a6"
+    },
+    {
+      "branch": "codex/sz-current-pi0-dvac-grpo",
+      "commit": "66c863bc5a45e90cb5161b30af54355b1104c810"
+    },
+    {
+      "branch": "codex/sz-current-pi0-dvac-grpo-w0to5",
+      "commit": "ab0988498a04311385600210c5b5ad34f16df1ce"
+    },
+    {
+      "branch": "codex/sz-current-pi0-dvac-observe",
+      "commit": "800baf80d6eab64169cf0e691eb04a681a093ee9"
+    },
+    {
+      "branch": "codex/sz-experiment-archive-20260906",
+      "commit": "da19c0e16d55cb43f8cfebf637cae4f230223f64"
+    },
+    {
+      "branch": "codex/sz-fastwam-action-dvac-adv",
+      "commit": "b816d6d32355977d6c42d6dee9ed732e2ab317ae"
+    },
+    {
+      "branch": "codex/sz-fastwam-current-rlinf-grpo",
+      "commit": "0d5daf6fa98de14865a74be143f51ef2972dab49"
+    },
+    {
+      "branch": "codex/sz-grpo-dvac-action-adv",
+      "commit": "9fc8b403d9158f19d3d5c15065453e275e803e87"
+    },
+    {
+      "branch": "codex/sz-grpo-dvac-action-adv-fix",
+      "commit": "7006ad20a6ad7357c48e6d20e3fcabed6c5609e4"
+    },
+    {
+      "branch": "codex/sz-pi0-online-bc",
+      "commit": "2467d997831166b70444b0c99d5198a2d3dfc8f6"
+    },
+    {
+      "branch": "codex/sz-pi0-online-bc-dvac",
+      "commit": "912808c74c8df218e4a58bab850b18a8b9215b8a"
+    },
+    {
+      "branch": "codex/sz-pi05-grpo-dvac-adv-chunk-positive",
+      "commit": "9d01a7208c563d72d1b86e753fb1c103f95e6905"
+    },
+    {
+      "branch": "codex/sz-pi05-grpo-dvac-adv-new-20260908",
+      "commit": "59c05e68a98178880e249d057125a8b82d75d515"
+    },
+    {
+      "branch": "codex/sz-pi05-grpo-dvac-st-positive",
+      "commit": "5a5ec53dc39de9dadb3cecf5b9f36a678de47a4a"
+    },
+    {
+      "branch": "codex/sz-pi05-online-bc",
+      "commit": "12f5b442d4b3f984b3b574308fdcd61edb59fbf1"
+    },
+    {
+      "branch": "codex/sz-pi05-online-bc-attena-fk-20260909",
+      "commit": "0b9488ef3014f4c5f28479ca998aa6a3a41c0cd2"
+    },
+    {
+      "branch": "codex/sz-pi05-online-bc-dvac",
+      "commit": "5dec6cb3789bbdd8311e24c274407ea351953679"
+    },
+    {
+      "branch": "codex/sz-pi05-online-bc-dvac-new-20260908",
+      "commit": "48a3030f51f2494f11702f9018388d7e429a8586"
+    },
+    {
+      "branch": "codex/sz-pi05-online-bc-dvac-w5",
+      "commit": "ad3da329270960f4ad378842e7138bbde29c521e"
+    },
+    {
+      "branch": "codex/sz-pi05-online-bc-rynnvalue-rabc-20260909",
+      "commit": "4a3d1222b57ff826b4d4edfff239906596e457c5"
+    },
+    {
+      "branch": "codex/sz-pi05-online-bc-u10",
+      "commit": "01d770db3988da7862454e97434d4ff08f726fa2"
+    },
+    {
+      "branch": "codex/sz-pi05-online-iql-rynnvalue-20260909",
+      "commit": "e8ae598fc86e3022a94c1fed020cef5f0db735e1"
+    },
+    {
+      "branch": "codex/sz-pi05-prism-rloo-20260908",
+      "commit": "a03b96938e7e5a7380f44c1090fe0a789d1d78a6"
+    },
+    {
+      "branch": "codex/sz-pi05-robotwin-rl",
+      "commit": "ae7e5da72acf4a47a54cecff4f802ebc174b397a"
+    },
+    {
+      "branch": "codex/sz-ppo-dvac-action-adv-fix",
+      "commit": "036e6bca07a84ff7cfe0c0578f7a81b6afc7355e"
+    },
+    {
+      "branch": "codex/sz-ppo-pi0-robotwin",
+      "commit": "c41b7ff0008574799636abb37783ffbf16c6be11"
+    },
+    {
+      "branch": "codex/sz-prism-dvac-rank-rloo",
+      "commit": "76723092146e17fbb32094267f68cb2de8979828"
+    },
+    {
+      "branch": "codex/sz-rlt-checkpoint-diagnosis",
+      "commit": "f3ea5f691b99fe39e024e5571c0e6ee3d83c51b4"
+    },
+    {
+      "branch": "codex/sz-rlt-dvac-pure-single-gpu",
+      "commit": "30349428c37a008b95342121c1455debfeb4805e"
+    },
+    {
+      "branch": "codex/sz-rlt-pi0-robotwin-ar",
+      "commit": "d3acd650869d376c14c1406d90865ef90d680432"
+    },
+    {
+      "branch": "codex/sz-sidney-pi05-current-rlinf",
+      "commit": "1d015a2aa03ec8132d8207ba47a2be3dbe1d9591"
+    },
+    {
+      "branch": "codex/sz-sidney-pi05-grpo-dvac-adv",
+      "commit": "746f396377de78c9900b6792fd9815530d1bd6dd"
+    },
+    {
+      "branch": "codex/sz-st-dvac-local-shard",
+      "commit": "51dbeaebe94cb218908b388193315a69a9a6c99a"
+    },
+    {
+      "branch": "main",
+      "commit": "8138d6700e3838250c1139289ebfba43d48ff7de"
+    }
+  ]
+}

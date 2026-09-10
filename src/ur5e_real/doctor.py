@@ -30,6 +30,22 @@ def _tcp(host: str, port: int, timeout: float = 0.5) -> Check:
         return Check(f"tcp:{host}:{port}", False, str(exc))
 
 
+def _rtde(host: str, port: int) -> Check:
+    # Complete the protocol exchange instead of opening/abandoning a bare TCP
+    # socket immediately before prepare(). No recipes, registers or motion.
+    from .hardware.rtde import _rtde_module, connect_rtde
+
+    connection = None
+    try:
+        connection, version = connect_rtde(_rtde_module(), host, port)
+        return Check(f"rtde:{host}:{port}", True, f"protocol=2 controller={'.'.join(map(str, version))}")
+    except Exception as exc:
+        return Check(f"rtde:{host}:{port}", False, str(exc))
+    finally:
+        if connection is not None:
+            connection.disconnect()
+
+
 def run_doctor(cfg: LabConfig, hardware: bool = False) -> list[Check]:
     checks = [
         Check("python", sys.version_info[:2] == (3, 10), sys.version.split()[0]),
@@ -54,7 +70,7 @@ def run_doctor(cfg: LabConfig, hardware: bool = False) -> list[Check]:
     checks.extend(
         [
             _tcp(cfg.robot.host, cfg.robot.script_port),
-            _tcp(cfg.robot.host, cfg.robot.rtde_port),
+            _rtde(cfg.robot.host, cfg.robot.rtde_port),
             Check("gripper:serial", Path(cfg.gripper.port).exists(), cfg.gripper.port),
         ]
     )

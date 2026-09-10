@@ -7,11 +7,15 @@
 
 ## 当前工作站基线
 
+这是既有成功现场的分日期快照，不是通用系统锁文件。新工位从
+[逐层部署验收](runbooks/new_machine.md)开始。
+
 | 层 | 当前配置 | 用途 |
 |---|---|---|
 | 系统 | Ubuntu 25.04 | RealSense、USB串口和UR网络主机 |
-| GPU | NVIDIA RTX A6000 48 GB，驱动 `580.95.05` | DP训练与推理 |
-| Python | Conda `RoboTwinSimReal`，Python `3.10.18` | 统一真机与策略环境 |
+| GPU | NVIDIA RTX A6000 48 GB，驱动 `580.95.05` | DP与π0.5训练/推理 |
+| Python | Conda `RoboTwinSimReal`，Python `3.10.18` | 硬件/DP；π0.5只安装客户端 |
+| π0.5模型 | 独立Python3.11/JAX `.venv/pi05`；`integrations/pi05/requirements.lock` | 原生SFT与模型服务，隔离硬件依赖 |
 | PyTorch | `2.4.1+cu121`，CUDA可用 | RoboTwin模型运行 |
 | 数据盘 | 4 TB Seagate NTFS3，自动挂载到 `/data` | raw、转换数据、checkpoint和日志 |
 | RoboTwin | `.third_party/RoboTwin`，固定提交 `21072034...` | 上游模型与训练代码 |
@@ -21,7 +25,7 @@
 按需挂载设计造成的。
 
 新工作站优先使用 Ubuntu 24.04 LTS。RealSense官方二进制安装说明目前覆盖Ubuntu
-20/22/24 LTS；本机25.04是已经工作的现场快照，不应当作为最省事的重装基线。系统层
+20/22/24/26 LTS（2026-09-10复核）；本机25.04是已经工作的现场快照，不应当作为最省事的重装基线。系统层
 至少需要Git、Conda、NVIDIA驱动、RealSense运行库/udev规则、串口组权限，以及使用
 NTFS数据盘时的 `ntfsfix`：
 

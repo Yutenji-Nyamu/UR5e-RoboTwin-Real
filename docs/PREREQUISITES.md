@@ -8,11 +8,15 @@ point.
 
 ## Current workstation baseline
 
+This is a dated working-site inventory, not a universal installation lock.
+Start a new workcell with the [commissioning checklist](runbooks/new_machine.md).
+
 | Layer | Current configuration | Purpose |
 |---|---|---|
 | OS | Ubuntu 25.04 | RealSense, USB serial, and UR network host |
-| GPU | NVIDIA RTX A6000 48 GB, driver `580.95.05` | DP training and inference |
-| Python | Conda `RoboTwinSimReal`, Python `3.10.18` | Shared hardware/policy environment |
+| GPU | NVIDIA RTX A6000 48 GB, driver `580.95.05` | DP and π0.5 training/inference |
+| Python | Conda `RoboTwinSimReal`, Python `3.10.18` | Hardware/DP; π0.5 client only |
+| π0.5 model | Isolated Python3.11/JAX `.venv/pi05`; `integrations/pi05/requirements.lock` | Native SFT and model service, separate from hardware dependencies |
 | PyTorch | `2.4.1+cu121`, CUDA available | RoboTwin model runtime |
 | Data disk | 4 TB Seagate NTFS3, automounted at `/data` | Raw data, conversions, checkpoints, and logs |
 | RoboTwin | `.third_party/RoboTwin` at pinned commit `21072034...` | Upstream model and training code |
@@ -23,7 +27,7 @@ The failure came from an unclean volume state, not permission checks or the
 automount design.
 
 Prefer Ubuntu 24.04 LTS for a clean workstation. Official RealSense binary
-installation instructions currently cover Ubuntu 20/22/24 LTS. This machine's
+installation instructions currently cover Ubuntu 20/22/24/26 LTS (checked 2026-09-10). This machine's
 working 25.04 installation is a verified site snapshot, not the easiest rebuild
 baseline. The system layer needs at least Git, Conda, an NVIDIA driver,
 RealSense runtime/udev rules, serial-group access, and `ntfsfix` when using the

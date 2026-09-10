@@ -9,7 +9,9 @@
 - [RTDE read/write stack](RTDE_STACK.md)
 - [Diffusion Policy real-robot implementation context](DIFFUSION_POLICY_PLAN.md)
 - [Native RoboTwin π0.5 joint-space real-robot plan (current, Chinese)](plans/pi05/README.md)
-- [π0.5 and RLT initial research (deferred scope, Chinese)](plans/pi05-rlt/README.md)
+- [π0.5 physical success record (Chinese)](plans/pi05/PHYSICAL_RESULT_20260910.md)
+- [Cube RLT staged integration plan (current, Chinese; not implemented)](plans/pi05-rlt/CUBE_PLAN.md)
+- [π0.5 and RLT initial research (historical, Chinese)](plans/pi05-rlt/README.md)
 - [Real-robot roadmap](ROADMAP.md)
 - [Migration record](MIGRATION.md)
 
@@ -21,6 +23,7 @@
 
 ## Runbooks
 
+- [New-machine commissioning and repair: start here](runbooks/new_machine.md)
 - [Collection and replay quick reference](runbooks/operator_workflows.md)
 - [Hardware commissioning](runbooks/hardware_commissioning.md)
 - [Setup](runbooks/setup.md)

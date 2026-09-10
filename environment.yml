@@ -17,6 +17,8 @@ dependencies:
       - opencv-python==4.11.0.86
       - pyrealsense2==2.56.5.9235
       - UrRtde==2.7.12
+      - websockets==15.0.1
+      - msgpack==1.1.1
       - mujoco==2.3.7
       - dm-control==1.0.14
       - einops==0.8.1

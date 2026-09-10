@@ -1,11 +1,13 @@
 # RoboTwin 原生 π0.5 → UR5e：joint-space 最小真机 demo
 
-更新：2026-09-09。首轮1000步正式SFT及冻结/参数/optimizer重载审计已完成，监控已暂停；见 [本次训练记录](TRAINING_RUN_20260909.md)。未进行真机验证。
+更新：2026-09-10。**原生π0.5关节抓放方块已由现场操作者确认成功**；两份执行日志与证据边界见
+[真机成功记录](PHYSICAL_RESULT_20260910.md)。首轮1000步SFT及冻结/参数/optimizer重载审计已完成，
+见 [训练记录](TRAINING_RUN_20260909.md)。后续 [cube RLT规划](../pi05-rlt/CUBE_PLAN.md)已重新启动，尚未实施。
 前置工具与数步batch测试见 [训练准备与实测](TRAINING_PREPARATION.md)。
 下文保留总体适配规划；旧batch=2初值已开放为可测配置，不代表显卡上限。
 采集双记录已交付，用户已补采5条 v3 成功示教。
-本轮继续实现 joint 执行、原生训练及推理接入；实际进度/验证边界以
-[实施记录](IMPLEMENTATION.md) 为准，采集历史见 [采集交付](COLLECTION_IMPLEMENTATION.md)。
+joint执行、原生训练及推理接入均已交付；历史开发验证见
+[实施记录](IMPLEMENTATION.md)，采集历史见 [采集交付](COLLECTION_IMPLEMENTATION.md)，最新现场证据见上方成功记录。
 
 本目录是当前 π0.5 的独立上下文，优先于旧 [π0.5/RLT 联合规划](../pi05-rlt/README.md)。继续工作先读 [决策与实施顺序](DECISIONS.md)，原生源码逐项对照见 [适配审查](ADAPTATION.md)，旧方块数据见 [数据审计](DATA_AUDIT.md)。
 
@@ -16,7 +18,7 @@
 
 ## 1. 当前用户决策
 
-- 只先做 `pick_place_cube` 的 π0.5 真机最小跑通；charger、RLT、泛化评估均不进入当前验收。
+- `pick_place_cube` 的π0.5最小跑通已完成；09-10继续规划同一任务的RLT，charger与泛化基准仍不进入首轮验收。
 - 明确选择 **RoboTwin 原生 `policy/pi05`**，参考已经工作的 DP“原生模型 + 本地适配 + 真机执行器”结构。
 - 用户已确认：**首版采用关节动作，接受先补采数据**。新采集同时记录实际关节角与 TCP，保留以后选择表示的能力。
 - 09-08 先完成采集开发；用户补采后，最新请求授权继续开发 π0.5 joint 训推和执行器、检查并推送。

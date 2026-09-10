@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import logging
 import math
 import threading
 import time
@@ -24,6 +25,58 @@ def _rtde_module() -> Any:
     return rtde
 
 
+def connect_rtde(
+    rtde: Any,
+    host: str,
+    port: int = 30004,
+    *,
+    attempts: int = 3,
+    retry_s: float = 0.5,
+    timeout_s: float = 15.0,
+) -> tuple[Any, tuple[int, ...]]:
+    """Retry only the read-only startup handshake, always on a fresh socket.
+
+    UrRtde 2.7.12 reports both a missing reply (its 1 s receive timeout) and a
+    rejected protocol as "Unable to negotiate protocol version". It also leaves
+    the failed socket attached; reconnecting the same object can skip negotiation.
+    Do not change its global timeout or reconnect an active control stream here.
+    timeout_s limits starting another attempt, not an in-flight vendor receive.
+    """
+    if attempts < 1 or retry_s < 0 or timeout_s <= 0:
+        raise ValueError("invalid RTDE startup retry budget")
+    started = time.monotonic()
+    for attempt in range(1, attempts + 1):
+        connection = rtde.RTDE(host, port)
+        try:
+            connection.connect()
+            version = connection.get_controller_version()
+            if not isinstance(version, (tuple, list)) or len(version) != 4 or not all(
+                type(value) is int and value >= 0 for value in version
+            ):
+                raise RuntimeError("no valid RTDE controller-version reply")
+            return connection, tuple(version)
+        except BaseException as exc:
+            # __enter__ has not completed; no caller owns this connection yet.
+            try:
+                connection.disconnect()
+            except Exception:
+                pass
+            if not isinstance(exc, Exception):
+                raise  # Ctrl-C must not be swallowed by startup retries.
+            if attempt == attempts or time.monotonic() - started + retry_s >= timeout_s:
+                raise RuntimeError(
+                    f"RTDE startup failed for {host}:{port} after {attempt} attempts: {exc}. "
+                    "No motion was retried. Check the wired link and controller RTDE availability; "
+                    "a negotiation error alone does not prove a protocol-version mismatch."
+                ) from exc
+            logging.getLogger(__name__).warning(
+                "[RTDE] startup attempt %d/%d failed: %s; fresh connection in %.1fs",
+                attempt, attempts, exc, retry_s,
+            )
+            time.sleep(retry_s)
+    raise AssertionError("unreachable")
+
+
 class RtdeTcpClient:
     OUTPUT_FIELDS = ("timestamp", "actual_TCP_pose")
 
@@ -32,16 +85,18 @@ class RtdeTcpClient:
         self.connection: Any = None
 
     def connect(self) -> None:
+        if self.connection is not None:
+            raise RuntimeError("RTDE is already connected")
         rtde = _rtde_module()
-        connection = rtde.RTDE(self.config.robot_host, self.config.robot_port)
-        connection.connect()
-        connection.get_controller_version()
-        if not connection.send_output_setup(list(self.OUTPUT_FIELDS), frequency=self.config.frequency_hz):
+        connection, _ = connect_rtde(rtde, self.config.robot_host, self.config.robot_port)
+        try:
+            if not connection.send_output_setup(list(self.OUTPUT_FIELDS), frequency=self.config.frequency_hz):
+                raise RuntimeError("failed to configure RTDE output")
+            if not connection.send_start():
+                raise RuntimeError("failed to start RTDE synchronization")
+        except BaseException:
             connection.disconnect()
-            raise RuntimeError("failed to configure RTDE output")
-        if not connection.send_start():
-            connection.disconnect()
-            raise RuntimeError("failed to start RTDE synchronization")
+            raise
         self.connection = connection
 
     def receive(self) -> tuple[float, list[float]] | None:

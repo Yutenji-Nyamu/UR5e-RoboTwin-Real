@@ -2,6 +2,9 @@
 
 [English](../../runbooks/setup.md)
 
+完整硬件→策略验收顺序及外部资产清单见[新机器部署与检修](new_machine.md)。
+本页负责软件安装，不自动恢复原始数据、训练权重或工位标定。
+
 仓库保存命令实现和依赖版本；新机器仍需安装系统驱动、创建 Conda 环境，并写入
 本机配置。推荐使用 Ubuntu 24.04 LTS；当前工作站的 Ubuntu 25.04 已实机验证，但不在
 RealSense 官方预编译包支持的 LTS 列表中。
@@ -32,7 +35,8 @@ python -m pip install --no-deps -e .
 
 ## 2. 安装简洁指令
 
-`pyproject.toml` 定义 `ur5e-collect`、`ur5e-replay`、`ur5e-infer` 等命令；editable
+`pyproject.toml` 定义 `ur5e-collect`、`ur5e-replay`、`ur5e-infer`，以及
+`ur5e-pi05-infer-init`/`ur5e-pi05-infer` 等命令；editable
 安装会在当前 Conda 环境的 `bin/` 生成入口。只在已激活环境中使用时，到这里即可。
 
 若希望未激活 Conda、任意目录都能直接输入这些命令，再执行一次：

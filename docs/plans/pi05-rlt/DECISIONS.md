@@ -1,5 +1,8 @@
 # 决策、开放问题与续接记录
 
+2026-09-10续接改为[方块RLT分阶段规划](CUBE_PLAN.md)：π0.5 joint真机已经成功，
+当前只重新规划cube RLT；旧G01/G02 charger问题不再要求决策。
+
 更新：2026-09-07。与 [主规划](README.md) 和 [证据](RESEARCH.md) 一起使用。
 
 **本文件为第一轮历史记录，不再是当前继续入口。** 最新用户决策：只做 RoboTwin 原生 π0.5 方块最小 demo；**首版 joint-space，接受先补采 q+TCP**。当前请读 [独立决策记录](../pi05/DECISIONS.md)。旧 D02 后端建议撤回；D03 首版 TCP 被覆盖；charger/RLT 与泛化要求暂缓，不再询问旧 G01/G02。

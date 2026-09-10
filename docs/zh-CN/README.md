@@ -9,7 +9,9 @@
 - [RTDE读写链路](RTDE_STACK.md)
 - [Diffusion Policy 真机实施上下文](DIFFUSION_POLICY_PLAN.md)
 - [RoboTwin 原生 π0.5 关节空间真机规划（当前主线）](../plans/pi05/README.md)
-- [π0.5 → RLT 第一轮调研（后续范围暂缓）](../plans/pi05-rlt/README.md)
+- [π0.5 方块真机成功记录](../plans/pi05/PHYSICAL_RESULT_20260910.md)
+- [方块 RLT 分阶段接入规划（当前，未实施）](../plans/pi05-rlt/CUBE_PLAN.md)
+- [π0.5 → RLT 第一轮调研（历史）](../plans/pi05-rlt/README.md)
 - [真机路线图](ROADMAP.md)
 - [迁移记录](MIGRATION.md)
 
@@ -21,6 +23,7 @@
 
 ## 操作手册
 
+- [新机器部署与自底向上检修：从这里开始](runbooks/new_machine.md)
 - [采集与重播速查](runbooks/operator_workflows.md)
 - [硬件逐项调试](runbooks/hardware_commissioning.md)
 - [环境设置](runbooks/setup.md)

@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 
 from ..hardware.dashboard import require_external_motion_ready
-from ..hardware.rtde import RtdeRobotState
+from ..hardware.rtde import RtdeRobotState, connect_rtde
 from ..hardware.urscript import send_urscript
 from .joint import JointMotionConfig, joint_vector
 from .servoj import _imports, render_servoj_program
@@ -106,11 +106,9 @@ class JointServoJController:
         require_external_motion_ready(self.config.robot_host)
         rtde, rtde_config = _imports()
         recipes = rtde_config.ConfigFile(str(self.config.config_xml))
-        connection = rtde.RTDE(self.config.robot_host, self.config.robot_port)
+        connection, _ = connect_rtde(rtde, self.config.robot_host, self.config.robot_port)
         self._connection = connection
         try:
-            connection.connect()
-            connection.get_controller_version()
             names, types = recipes.get_recipe("state")
             if not connection.send_output_setup(names, types, self.config.motion.servo_hz):
                 raise RuntimeError("joint RTDE output recipe rejected")

@@ -2,8 +2,10 @@
 
 [简体中文](../zh-CN/runbooks/hardware_commissioning.md)
 
-Use this order to isolate failures from the bottom up. Steps through section 3
-are read-only and cannot move the robot or gripper.
+Use this order to isolate failures from the bottom up. The software checks in
+sections 2–3 are read-only; pendant power/brake release in section 1 is an on-site
+operation. For installation, migration and acceptance across all layers, start
+with the [new-machine checklist](new_machine.md).
 
 ## Current B81L baseline
 
@@ -36,6 +38,7 @@ on RTDE.
 ```bash
 python examples/smoke/polyscope_status.py --config configs/lab.yaml
 python examples/smoke/rtde_read.py --config configs/lab.yaml --samples 10
+python examples/smoke/rtde_read.py --config configs/lab.yaml --samples 10 --joints
 ```
 
 Expected: Dashboard reports `RUNNING`/`NORMAL`; RTDE prints a stable 10 Hz TCP
@@ -75,3 +78,41 @@ These require a human at the workcell and an explicit `--execute`:
 
 Never combine the first gripper, freedrive, replay, and servoJ tests into one
 command. Each device must have an independently understood failure mode.
+
+## 5. Intermittent RTDE startup negotiation
+
+The reported `ur5e-collect-init` failure was at `RtdeTcpClient.connect()`, before
+`move_linear()` or gripper opening. The home plan is printed before connection,
+so the preceding `moveL` text is not evidence that a motion command was sent.
+
+The installed `UrRtde==2.7.12` uses a 1 s receive timeout. After
+`no data received in last 1 seconds`, its protocol call returns no answer and
+raises `Unable to negotiate protocol version`, the same error used for refusal.
+The evidence establishes a **startup reply timeout**, not a persistent protocol
+incompatibility. The exact controller/network timing cause has not been captured.
+UR distinguishes protocol request/acceptance from the subsequent recipe/start
+exchange. [Official protocol guide](https://docs.universal-robots.com/tutorials/communication-protocol-tutorials/rtde-guide.html)
+
+The 2026-09-10 fix in [the RTDE client](../../src/ur5e_real/hardware/rtde.py):
+
+- Retries only connect/protocol/controller-version startup, at most 3 attempts
+  with 0.5 s spacing. Each attempt uses a fresh object and closes failed sockets.
+- Rejects a missing controller-version response. The old library keeps a failed
+  socket attached and may skip negotiation if the same object is reused;
+  the TCP servoJ startup now shares the fresh-connection helper as well.
+- Cleans failed read-client recipe/start setup; does not retry recipe ownership,
+  register writes, URScript submission, home commands or active motion.
+- `doctor --hardware` performs a complete read-only protocol/version handshake
+  then disconnects, instead of briefly opening/abandoning a bare port 30004 socket.
+  The earlier probe's involvement is plausible, not a proven root cause.
+- Keeps vendor stream timeouts and servoJ watchdogs unchanged. Exhausted startup
+  becomes a clear `[BLOCKED] RTDE startup failed ...` in init, rather than an
+  uncaught vendor traceback. A successful handshake is not a 500 Hz control test.
+
+Validation used fault-injection/unit regressions without connecting hardware;
+the intermittent field failure has not been physically re-induced. If retries
+still exhaust, run the bounded read-only RTDE smoke check and retain the exact
+log/controller state; inspect wired link/IP conflict, controller load/service
+availability, and competing clients. A true unsupported protocol/recipe will
+still fail. Do not automatically downgrade the protocol, disable guards or keep
+re-running motion. Input-register ownership errors occur at a different stage.

@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Sequence
 
 from ..hardware.dashboard import require_external_motion_ready
+from ..hardware.rtde import connect_rtde
 from ..hardware.urscript import send_urscript
 
 SERVOJ_LOOKAHEAD_DECLARATION = "  local servoj_lookahead_time = 0.1"
@@ -100,20 +101,10 @@ class ServoJController:
         state_names, state_types = recipes.get_recipe("state")
         setpoint_names, setpoint_types = recipes.get_recipe("setp")
         watchdog_names, watchdog_types = recipes.get_recipe("watchdog")
-        connection = rtde.RTDE(cfg.robot_host, cfg.robot_port)
-
-        started = time.monotonic()
-        while True:
-            try:
-                connection.connect()
-                connection.get_controller_version()
-                break
-            except Exception as exc:
-                if time.monotonic() - started >= cfg.connect_timeout_s:
-                    raise RuntimeError(
-                        f"RTDE connection timed out for {cfg.robot_host}:{cfg.robot_port}"
-                    ) from exc
-                time.sleep(cfg.connect_retry_s)
+        connection, _ = connect_rtde(
+            rtde, cfg.robot_host, cfg.robot_port,
+            retry_s=cfg.connect_retry_s, timeout_s=cfg.connect_timeout_s,
+        )
 
         connection.send_output_setup(state_names, state_types, cfg.frequency_hz)
         setpoint = connection.send_input_setup(setpoint_names, setpoint_types)

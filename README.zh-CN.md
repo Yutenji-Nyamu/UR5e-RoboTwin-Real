@@ -41,6 +41,17 @@ ur5e-infer 20260905_150221:600 --execute
 时间戳与epoch共同标识checkpoint。默认就是本次实机验证平滑的500 Hz RTDE servoJ、
 10步去噪和持续执行配置；socket对照版本见[《DP推理》](docs/zh-CN/runbooks/infer.md)。
 
+π0.5 真机推理（关节空间抓放方块已反馈成功）：
+
+```bash
+ur5e-pi05-infer-init
+ur5e-pi05-infer 20260909_01:1000 --execute
+```
+
+5 条示教、1000 步 SFT；H=50、每次执行 K=20、目标10 Hz、joint servoJ 500 Hz。
+见[真机成功记录](docs/plans/pi05/PHYSICAL_RESULT_20260910.md)与[操作说明](docs/plans/pi05/USAGE.md)。
+短命令以本地已有配套数据、checkpoint和现场标定为前提，不会自动下载本次实验。
+
 ## Diffusion Policy 快速流程
 
 ```bash
@@ -69,16 +80,14 @@ ur5e-infer 20260905_150221:600 --shadow --chunks 10
 
 ## 数据与文档
 
-新增 [原生π0.5关节适配](docs/plans/pi05/IMPLEMENTATION.md)：已建立隔离模型环境、5条新数据集，
-并验证数据和训练编排；完整基础权重SFT与新关节链真机测试仍待执行。原TCP DP链不变，
-入口见 [π0.5操作说明](docs/plans/pi05/USAGE.md)。
+[原生π0.5关节链](docs/plans/pi05/README.md)已完成双记录、SFT、重载与方块真机执行。
+原TCP DP链不变；后续[方块 RLT 分阶段规划](docs/plans/pi05-rlt/CUBE_PLAN.md)单独维护，尚未实施 RLT。
 
 数据统一存放在4TB共享盘的 `/data/robotics/ur5e-real`。架构、硬件调试、数据管理、
 训练和推理文档见 [`docs/zh-CN/README.md`](docs/zh-CN/README.md)。
 
-新机器部署从[环境部署](docs/zh-CN/runbooks/setup.md)、
-[软硬件前置条件](docs/zh-CN/PREREQUISITES.md)和
-[RTDE读写链路](docs/zh-CN/RTDE_STACK.md)开始。
+新机器部署或检修从[自底向上验收手册](docs/zh-CN/runbooks/new_machine.md)开始：
+串起安装、单设备调试、数据/模型迁移及端到端检查。
 
 Diffusion Policy 主链已打通到 HDF5、Zarr、官方训练、checkpoint离线加载、真机
 shadow和RTDE servoJ平滑执行。命令见

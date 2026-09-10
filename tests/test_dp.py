@@ -163,7 +163,7 @@ class DiffusionPolicyAdapterTest(unittest.TestCase):
                 pass
 
             def get_controller_version(self):
-                pass
+                return (5, 13, 0, 0)
 
             def send_output_setup(self, _names, _types, _frequency):
                 pass

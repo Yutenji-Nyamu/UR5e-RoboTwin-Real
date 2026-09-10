@@ -2,6 +2,12 @@
 
 [简体中文](zh-CN/ROADMAP.md)
 
+Current milestone (2026-09-10): native π0.5 joint-space cube execution succeeded;
+see the [physical record](plans/pi05/PHYSICAL_RESULT_20260910.md),
+[cube RLT next-stage plan](plans/pi05-rlt/CUBE_PLAN.md), and
+[new-machine checklist](runbooks/new_machine.md). RLT is planning-only.
+The remainder is the dated TCP/DP roadmap; its six-point chunks do not specify π0.5's K20.
+
 Status: 2026-09-06. Devices, capture, replay, DP training/shadow, and live RTDE
 servoJ inference pass; servoJ is now the default executor. RoboTwin stays above
 one narrow policy adapter.

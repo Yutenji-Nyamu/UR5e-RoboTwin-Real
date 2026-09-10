@@ -16,6 +16,7 @@ from ur5e_real.hardware.rtde import (
     RtdeStateClient,
     RtdeStateCsvWriter,
     RtdeTcpClient,
+    connect_rtde,
 )
 from ur5e_real.replay import load_action_rows
 
@@ -33,6 +34,7 @@ def packet(timestamp=12.5):
 class RtdeStateTest(unittest.TestCase):
     def test_legacy_client_recipe_and_tuple_api_unchanged(self):
         connection = MagicMock()
+        connection.get_controller_version.return_value = (5, 13, 0, 0)
         original = packet()
         connection.receive.return_value = original
         with patch("ur5e_real.hardware.rtde._rtde_module") as module:
@@ -43,6 +45,7 @@ class RtdeStateTest(unittest.TestCase):
 
     def test_full_state_is_from_one_packet_without_joint_wrapping(self):
         connection = MagicMock()
+        connection.get_controller_version.return_value = (5, 13, 0, 0)
         original = packet()
         connection.receive.return_value = original
         with patch("ur5e_real.hardware.rtde._rtde_module") as module:
@@ -96,6 +99,7 @@ class RtdeStateTest(unittest.TestCase):
 
     def test_recipe_rejection_disconnects(self):
         connection = MagicMock()
+        connection.get_controller_version.return_value = (5, 13, 0, 0)
         connection.send_output_setup.return_value = False
         with patch("ur5e_real.hardware.rtde._rtde_module") as module:
             module.return_value.RTDE.return_value = connection
@@ -104,6 +108,73 @@ class RtdeStateTest(unittest.TestCase):
                 client.connect()
         connection.disconnect.assert_called_once_with()
         self.assertIsNone(client.connection)
+
+    def test_startup_retries_fresh_connections_and_cleans_failed_socket(self):
+        failed, ready = MagicMock(), MagicMock()
+        failed.connect.side_effect = RuntimeError("Unable to negotiate protocol version")
+        ready.get_controller_version.return_value = (5, 13, 0, 0)
+        module = SimpleNamespace(RTDE=MagicMock(side_effect=[failed, ready]))
+        with patch("ur5e_real.hardware.rtde.time.sleep") as sleep:
+            connection, version = connect_rtde(module, "robot.test")
+        self.assertIs(connection, ready)
+        self.assertEqual(version, (5, 13, 0, 0))
+        failed.disconnect.assert_called_once_with()
+        failed.send_start.assert_not_called()
+        ready.disconnect.assert_not_called()
+        sleep.assert_called_once_with(0.5)
+        self.assertEqual(module.RTDE.call_count, 2)
+
+    def test_missing_version_reply_exhausts_bounded_startup_and_cleans_all_sockets(self):
+        connections = [MagicMock() for _ in range(3)]
+        for connection in connections:
+            connection.get_controller_version.return_value = (None, None, None, None)
+        module = SimpleNamespace(RTDE=MagicMock(side_effect=connections))
+        with patch("ur5e_real.hardware.rtde.time.sleep") as sleep:
+            with self.assertRaisesRegex(RuntimeError, "after 3 attempts.*no valid.*controller-version"):
+                connect_rtde(module, "robot.test")
+        self.assertEqual(sleep.call_count, 2)
+        for connection in connections:
+            connection.disconnect.assert_called_once_with()
+            connection.send_start.assert_not_called()
+
+    def test_ctrl_c_cleans_socket_without_retry(self):
+        connection = MagicMock()
+        connection.connect.side_effect = KeyboardInterrupt
+        module = SimpleNamespace(RTDE=MagicMock(return_value=connection))
+        with patch("ur5e_real.hardware.rtde.time.sleep") as sleep:
+            with self.assertRaises(KeyboardInterrupt):
+                connect_rtde(module, "robot.test")
+        connection.disconnect.assert_called_once_with()
+        sleep.assert_not_called()
+        module.RTDE.assert_called_once()
+
+    def test_recipe_exception_is_not_retried_and_disconnects(self):
+        connection = MagicMock()
+        connection.get_controller_version.return_value = (5, 13, 0, 0)
+        connection.send_output_setup.side_effect = RuntimeError("recipe error")
+        with patch("ur5e_real.hardware.rtde._rtde_module") as module:
+            module.return_value.RTDE.return_value = connection
+            client = RtdeStateClient(RtdeOutputConfig("robot.test"))
+            with self.assertRaisesRegex(RuntimeError, "recipe error"):
+                client.connect()
+            module.return_value.RTDE.assert_called_once()
+        connection.disconnect.assert_called_once_with()
+        self.assertIsNone(client.connection)
+
+    def test_doctor_checks_protocol_without_starting_stream_or_motion(self):
+        from ur5e_real.doctor import _rtde
+
+        connection = MagicMock()
+        connection.get_controller_version.return_value = (5, 13, 0, 0)
+        with patch("ur5e_real.hardware.rtde._rtde_module") as module:
+            module.return_value.RTDE.return_value = connection
+            check = _rtde("robot.test", 30004)
+        self.assertTrue(check.ok)
+        self.assertIn("controller=5.13.0.0", check.detail)
+        connection.send_start.assert_not_called()
+        connection.send_output_setup.assert_not_called()
+        connection.send_input_setup.assert_not_called()
+        connection.disconnect.assert_called_once_with()
 
     def test_v3_csv_round_trip_and_legacy_tcp_consumers(self):
         original = packet()

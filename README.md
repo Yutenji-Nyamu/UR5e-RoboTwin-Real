@@ -47,6 +47,18 @@ real-robot configuration: 500 Hz RTDE servoJ, 10 diffusion steps, and continuous
 execution. Socket comparison modes remain available in
 [DP inference](docs/runbooks/infer.md).
 
+Live π0.5 inference (joint-space cube pick-and-place reported successful):
+
+```bash
+ur5e-pi05-infer-init
+ur5e-pi05-infer 20260909_01:1000 --execute
+```
+
+Five demonstrations, 1000 SFT steps; H=50, execute K=20 at 10 Hz through
+500 Hz joint servoJ. See [physical result](docs/plans/pi05/PHYSICAL_RESULT_20260910.md)
+and [π0.5 usage](docs/plans/pi05/USAGE.md). These commands assume matching local
+data, checkpoint and calibrated hardware; they do not download the experiment.
+
 ## Diffusion Policy quick path
 
 ```bash
@@ -76,18 +88,18 @@ for all options.
 
 ## Data and documentation
 
-The new [native pi05 joint-space adapter](docs/plans/pi05/IMPLEMENTATION.md)
-has an isolated model environment, a five-demo dataset, and tested data/training
-plumbing. Full base-model SFT and physical joint execution are still pending;
-the existing TCP DP path is unchanged. See the [pi05 commands](docs/plans/pi05/USAGE.md).
+The [native π0.5 joint-space path](docs/plans/pi05/README.md) now covers dual
+recording, SFT, checkpoint reload and physical cube execution. The existing TCP
+DP path is unchanged. Next-stage [cube RLT planning](docs/plans/pi05-rlt/CUBE_PLAN.md)
+is documented separately; RLT is not yet implemented.
 
 Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architecture,
 hardware commissioning, data management, training, and inference documentation
 is indexed in [`docs/README.md`](docs/README.md).
 
-For a clean-machine deployment, start with [setup](docs/runbooks/setup.md),
-[prerequisites](docs/PREREQUISITES.md), and the complete
-[RTDE read/write stack](docs/RTDE_STACK.md).
+For a clean-machine deployment or repair, start with the
+[bottom-up commissioning checklist](docs/runbooks/new_machine.md). It connects
+installation, individual device tests, data/model migration and end-to-end checks.
 
 The Diffusion Policy path passes HDF5, Zarr, native training, checkpoint loading,
 shadow inference, and smooth RTDE servoJ execution; see

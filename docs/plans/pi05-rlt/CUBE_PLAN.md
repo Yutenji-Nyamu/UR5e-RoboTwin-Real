@@ -4,6 +4,11 @@
 已有5条示教和1000步checkpoint不重做；先实现最小闭环，不以泛化评估或 charger 阻塞。
 这里是待实施方案，不代表已训练token、已接入RLinf或已验证RLT收益。
 
+训练计数、论文/donor预热差异、验收指标及逐更新保存的讨论，见
+[训练阶段与交互讨论稿](TRAINING_STAGES_DISCUSSION.md)。2026-09-10已确认：分阶段验收，token首段500更新、每100诊断；
+真机每轮4局串行交互，助手依据日志判断下一步。旧的分阶段固定局数方案取消。
+首版据此按4局内固定checkpoint、轮末集中更新和复核组织；其余训练超参数仍是候选，本轮尚未开训。
+
 ## 当前起点与方案边界
 
 - `pick_place_cube` π0.5 真机最小demo已由现场操作者确认成功；运行参数/两份执行日志见
@@ -56,14 +61,14 @@ PaliGemma时已有最终prefix hidden states/KV cache，但目前丢弃hidden st
                   │ 本机IPC，保留obs/contract/checkpoint身份
                   ▼
 独立PyTorch/RLinf：冻结token encoder → z + proprio + reference K20
-                  │ reference或actor动作（每回合锁定策略版本）
+                  │ reference或actor动作（每轮4局锁定策略版本）
                   ▼
 UR5 adapter：一次反变换 → q6/夹爪 → 500Hz joint执行
                   │ 实际执行报告 + 末态 + 终端标签
-                  └────────────→ 持久episode → replay → 回合间更新
+                  └────────────→ 逐局持久化 → replay → 每4局轮末更新/复核
 ```
 
-VLA和token均冻结、图像增强关闭时，Stage1可一次缓存414份prefix/mask，再独立训练token；
+VLA冻结、图像增强关闭时，Stage1可一次缓存414份prefix/mask，再独立训练token；token此时仍参与训练。
 这与在线重新提取相同确定性特征有等价条件，必须实测缓存/live对齐，而非默认文件格式相同就等价。
 第一步可独立提取prefix以做parity；正式在线应复用一次prefill，避免每次重复大模型前向。
 JAX和PyTorch进程独立，不能直接跨进程传GPU指针；先用显式CPU张量/类型协议，测拷贝延迟后再优化。
@@ -75,8 +80,8 @@ JAX和PyTorch进程独立，不能直接跨进程传GPU指针；先用显式CPU�
 | S0：冻结成功基线（已具备） | 保留现有SFT和5条数据，不继续训VLA | 固定数据/norm/checkpoint/代码身份；现有两条推理命令不变 |
 | S1a：特征桥（先开发） | 无训练、无机械臂；从现有数据抽样 | 同图/state/prompt/noise、10采样步下参考动作与旧服务一致；输出prefix/mask、normalized state、raw reference、decode context |
 | S1b：AR token训练 | VLA完全冻结，只训token encoder+decoder；使用5条数据缓存 | 一步更新/保存/重载先通；再拟合；检查冻结哈希、masked reconstruction、zero/shuffle token消融，不能只看teacher-forcing loss |
-| S2a：小头初始化 | 冻结VLA+token；先BC模仿reference，独立初始化双Q；随后用已标注reference rollouts预热Q | actor与实际部署的tanh/采样路径一致；动作域往返和夹爪通过；reference回合确实入replay |
-| S2b：在线RLT | 单机械臂，episode完整落盘后更新小头；下一回合才同步actor版本 | 终端reset/start/label/abort闭环；支持partial chunk、超时、崩溃恢复；先少量回合证明collect→update→reload→execute |
+| S2a：小头初始化 | 冻结VLA+token；先离线BC模仿reference，独立初始化双Q；随后采reference每轮4局，进行Q与强BC actor预热 | actor与实际部署的tanh/采样路径一致；动作域往返和夹爪通过；reference回合确实入replay；由指标判定是否进入actor验证 |
+| S2b：在线RLT | 单机械臂，逐局落盘；每轮4局固定checkpoint，轮末更新小头并复核，下一轮同步选定版本 | 终端reset/start/label/abort闭环；支持partial chunk、超时、崩溃恢复；4局是复核节奏，不是训练完成门槛 |
 | S3：冻结比较 | learner关闭，actor确定性eval，不加入探索噪声 | 同一摆场分别跑reference和actor并人工标注；先报告闭环成功，是否优于baseline另作结论 |
 
 S2a是Stage2内部的预热，不是重新训练π0.5。donor以`rlt_train_vla=false/rlt_alpha=0`
@@ -158,13 +163,16 @@ WAIT_RESET → PREPARE/VERIFY → WAIT_START → RUNNING → STOP/FINAL_OBS
   需要解耦。cube首版按整回合reference/actor选择，不增加插入阶段的键盘接管门。[^4]
 - 原始episode用增量日志+完成标记，未完成标注保持pending；图像/状态/命令/特征按时间关联。
   当前短命令的`execution.json`在正常结束才写，不能当成RL replay。先实现记录器，再在线更新。
-- learner回合间运行，保存actor、双Q/target、optimizer、replay游标、更新计数、随机状态；
+- learner在每4局的轮次之间集中运行，保存actor、双Q/target、optimizer、replay游标、更新计数、随机状态；
   feature/token/norm版本变化不得混进同一buffer。恢复后保持WAIT_RESET，不自动继续下发旧chunk。
 - 同一A6000上保留一个JAX VLA副本、一个冻结token encoder，小头learner按需运行。
   token decoder仅Stage1训练使用。使用独立`.venv/rlt`锁环境，不在已成功的两套环境上叠装RLinf。
   首版若RLinf factory强绑定PyTorch VLA，新增feature provider，不能假装只换EnvWorker即可接入。
 - 重用训练资源监控习惯：2秒采样、30秒摘要；分别记录JAX/PyTorch显存、主机可用内存、
   RPC/提特征耗时、观测年龄、执行超期、episode数和真实更新次数。不自动开多环境占用同一机械臂。
+- 日志按“episode原始记录 → round汇总 → 逐更新指标/恢复点 → MD决策摘要”维护；
+  每轮写明阶段、输入/输出checkpoint、数据范围、人工结果、指标和继续/切阶段理由。
+  具体字段与待实现落点见[每轮交互、日志与判定](TRAINING_STAGES_DISCUSSION.md#每轮交互日志与判定)。
 
 ## 参数：哪些沿用，哪些仅是试跑建议
 
@@ -174,12 +182,12 @@ WAIT_RESET → PREPARE/VERIFY → WAIT_START → RUNNING → STOP/FINAL_OBS
 | Stage1冻结 | VLA全冻、只训AR token，`rlt_alpha=0`；donor token-only配方 | optimizer只有token参数，VLA哈希不变 |
 | token维度/层数 | input/z=2048、encoder/decoder各2层、8头、mlp_ratio4；donor初值 | 实际prefix宽度/mask；不硬猜π0与π0.5 prefix长度相同 |
 | token范围 | 先全prefix计算，再取image位置和真实mask；donor image_only=true | 缺失左腕不能当有效图；π0.5 state在prompt中，必要时对比全prefix，不先换成1024假定 |
-| token batch/步数 | 缓存后batch1→4→8，每档3步；正式先500步，每100保存/诊断 | 仅建议；缓存live对齐、loss/消融决定是否续到1000/2000 |
+| token batch/步数 | 已确认首段500步、每100诊断；每100保存及缓存后batch1→4→8每档3步仍是实现候选 | 缓存live对齐、loss/消融决定是否续训；不把batch候选记为已确认 |
 | token optimizer | AdamW，lr2.5e-5、warmup100；donor参考 | 几步短测warmup设0；不是继续SFT optimizer |
-| Stage2预热 | actor先BC-only；Q使用真实reference回合；先20–40个完整chunk量级检查 | 不照搬500transition/5000update；步数与数据重复率一起报告 |
+| Stage2预热 | actor先离线BC；reference每轮4局；轮末Q与强BC actor预热，按指标决定续训或再采一轮 | 不照搬500transition/5000update，不预设20–40个chunk硬门槛；更新量与数据复用率一起报告 |
 | Stage2更新 | 初始batch32，lr1e-4、tau0.005、双Q；γ0.99/动作步 | 每新transition先约1–4次梯度更新作为工程起点，记录Q/BC和actor偏离；不视作调优结论 |
 | 探索/BC权重 | 首先无探索reference和确定性BC小头；再讨论小幅joint探索 | donor fixed_std0.002在tanh前，不是0.002rad；不同关节缩放/夹爪需分开核验 |
-| 保存/评估 | 每回合完成保存episode与恢复点；阶段末另存不可变模型；eval无噪声 | RL结果不能仅看train reward，也不要求先开展泛化基准 |
+| 保存/评估 | 每局保存episode；每轮4局后复核；拟逐learner更新保存小头恢复点，阶段末另存不可变模型；eval无噪声 | 轮内固定checkpoint，下一轮装载选定版本；不把4局结果等同于收敛或泛化结论 |
 
 **显存证据：**本次仅用已审阅的donor独立token模块在PyTorch **meta设备**做参数计数，未初始化CUDA、未训练：
 默认token encoder+decoder为745,715,712参数，encoder为370,761,728参数。
@@ -198,7 +206,7 @@ Stage1先缓存再卸载VLA有利于隔离峰值；Stage2只带冻结encoder及�
 | **cube成功标准** | 方块明确被提起、随后放回桌面、完全脱离夹爪并稳定至少1秒；是否必须落入指定区域待确认 | 真机reward采集前；不等同于“发出open” |
 | **先验哪种结果** | 首轮只验RLT全阶段闭环，同一现有摆场；不声称已优于π0.5 | 训练预算/评估前；若要提升成功率，另设计baseline有失败的合法初态集合 |
 | **一次尝试还是允许重抓** | 保持当前一次close→open，随后停止并标注；失败重开一局 | env和夹爪episode语义锁定前 |
-| **在线回合/探索预算** | 先几局reference/BC验证记录；actor试跑先很小预算，joint与gripper探索分开定 | S2b执行前；不借仿真固定std直接启动真机 |
+| **在线回合/探索预算** | 已确认每轮4局串行交互、轮末由助手复核；不预设分阶段总局数；joint与gripper探索设置仍分别确定 | 4局内固定配置，跨轮修改记日志；探索设置在S2b首次执行前确定 |
 
 后端桥、缓存格式、action-domain一致性、partial-chunk损失和显存属于**开发验收事项**，
 不要求操作者凭空选择实现细节。可直接开始的下一轮范围是S1a及episode记录/假env状态机；

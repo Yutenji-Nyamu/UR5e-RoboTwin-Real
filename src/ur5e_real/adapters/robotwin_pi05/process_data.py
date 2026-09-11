@@ -60,7 +60,15 @@ def load_selection(path: Path) -> dict:
             raise ValueError(f"{name} must be a nonnegative integer")
     if not selection.get("prompt") or not selection.get("task"):
         raise ValueError("task and prompt are required")
+    gripper_cycles(selection)
     return selection
+
+
+def gripper_cycles(selection: dict) -> int:
+    cycles = selection.get("gripper_cycles", 1)
+    if type(cycles) is not int or cycles < 1:
+        raise ValueError("gripper_cycles must be a positive integer")
+    return cycles
 
 
 def _csv(path: Path) -> list[dict]:
@@ -126,14 +134,15 @@ def read_episode(data_root: Path, run_id: str, selection: dict) -> JointEpisode:
     _timeline(st, selection["max_source_gap_s"], f"{run_id} images")
     if st[0] < t[0] - 1e-6 or st[-1] > t[-1] + 1e-6:
         raise ValueError(f"{run_id}: image timestamps outside the robot state timeline")
-    if [event["event"] for event in events] != ["close", "open"]:
-        raise ValueError(f"{run_id}: this single-cycle MVP requires one close then one open")
+    cycles = gripper_cycles(selection)
+    if [event["event"] for event in events] != ["close", "open"] * cycles:
+        raise ValueError(f"{run_id}: require exactly {cycles} ordered close/open gripper cycles")
     event_times = np.asarray([float(event["controller_time_s"]) for event in events])
     if (
         not np.isfinite(event_times).all()
-        or event_times[0] >= event_times[1]
+        or np.any(np.diff(event_times) <= 0)
         or event_times[0] < st[0]
-        or event_times[1] > st[-1]
+        or event_times[-1] > st[-1]
     ):
         raise ValueError(f"{run_id}: invalid or out-of-range gripper events")
     head, wrist = [], []
@@ -173,6 +182,14 @@ def read_episode(data_root: Path, run_id: str, selection: dict) -> JointEpisode:
         "raw_schema_version": 3,
         "raw_robot_samples": len(rows),
         "raw_frame_pairs": len(sync),
+        "raw_image_start_s": float(st[0]),
+        "raw_image_stop_s": float(st[-1]),
+        "trimmed_lead_s": float(grid[0] - st[0]),
+        "trimmed_tail_s": float(st[-1] - grid[-1]),
+        "gripper_cycles": cycles,
+        "gripper_events": [
+            {"event": event["event"], "controller_time_s": float(at)} for event, at in zip(events, event_times)
+        ],
         "crop_start": start,
         "motion_crop_stop_exclusive": stop,
         "grid_frames": len(grid),
@@ -231,6 +248,7 @@ def build_contract(episodes: list[JointEpisode], selection: dict) -> dict:
             "prompt": selection["prompt"],
             "native_patch": NATIVE_PATCH,
             "run_ids": selection["run_ids"],
+            **({"gripper_cycles": gripper_cycles(selection)} if "gripper_cycles" in selection else {}),
             "home_q": np.mean(starts, axis=0).tolist(),
             "joint_lower": (np.min(q, axis=0) - selection["joint_margin_rad"]).tolist(),
             "joint_upper": (np.max(q, axis=0) + selection["joint_margin_rad"]).tolist(),

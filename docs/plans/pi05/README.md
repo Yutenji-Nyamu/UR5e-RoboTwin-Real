@@ -1,5 +1,9 @@
 # RoboTwin 原生 π0.5 → UR5e：joint-space 最小真机 demo
 
+2026-09-11新增：用户改采 `stack_blocks_three`，5条成功、993个克制裁剪后的样本；
+复用原成功SFT参数的新运行见 [叠三块训练记录](TRAINING_RUN_20260911_STACK3.md)。
+旧cube基线保留；新任务两次抓放，不能沿用第一次open即结束的真机验收逻辑。
+
 更新：2026-09-10。**原生π0.5关节抓放方块已由现场操作者确认成功**；两份执行日志与证据边界见
 [真机成功记录](PHYSICAL_RESULT_20260910.md)。首轮1000步SFT及冻结/参数/optimizer重载审计已完成，
 见 [训练记录](TRAINING_RUN_20260909.md)。后续 [cube RLT规划](../pi05-rlt/CUBE_PLAN.md)已重新启动，尚未实施。

@@ -1,0 +1,23 @@
+{
+  "task": "stack_blocks_three",
+  "repo_id": "ur5e/stack_blocks_three_joint_5_v20260911",
+  "run_ids": [
+    "20260911_154322",
+    "20260911_154430",
+    "20260911_154520",
+    "20260911_154720",
+    "20260911_154813"
+  ],
+  "prompt": "Stack the three blocks into a tower.",
+  "gripper_cycles": 2,
+  "fps": 10,
+  "action_horizon": 50,
+  "motion_threshold_rad": 0.005,
+  "lead_in_steps": 3,
+  "tail_steps": 3,
+  "release_tail_s": 1.0,
+  "max_source_gap_s": 0.21,
+  "max_image_offset_s": 0.11,
+  "joint_margin_rad": 0.15,
+  "tcp_margin_m": 0.05
+}

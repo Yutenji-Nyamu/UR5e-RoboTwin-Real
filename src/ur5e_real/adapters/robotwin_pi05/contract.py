@@ -57,6 +57,9 @@ def validate_contract(contract: dict) -> dict:
         raise ValueError("invalid TCP monitoring envelope")
     if not isinstance(contract.get("dataset_id"), str) or not contract["dataset_id"]:
         raise ValueError("dataset identity is required")
+    cycles = contract.get("gripper_cycles", 1)
+    if type(cycles) is not int or cycles < 1:
+        raise ValueError("gripper_cycles must be a positive integer")
     return contract
 
 

@@ -1,5 +1,8 @@
 # π0.5 joint 接入操作入口
 
+2026-09-11：新增 [叠三块五条数据与SFT](TRAINING_RUN_20260911_STACK3.md)，使用独立数据/实验名。
+该数据显式 `gripper_cycles=2`；本页下方cube短命令仍针对旧单次抓放基线。
+
 2026-09-10：方块真机demo已反馈成功，见[成功记录](PHYSICAL_RESULT_20260910.md)。
 新电脑先按[新机与检修手册](../../zh-CN/runbooks/new_machine.md)准备完整数据/模型/标定，不能只clone后运行短命令。
 
@@ -72,7 +75,8 @@ python -m ur5e_real.adapters.robotwin_pi05 data \
 ```
 
 如果目标已存在，不重复执行导出；变更筛选/预处理时使用新的 `repo_id`，不覆盖原始记录或旧导出。
-本版固定 v3 / actual_q / rad / 一次 close→open；旧 TCP 数据会拒绝。
+本版固定 v3 / actual_q / rad；默认一次 close→open，新任务可在selection中显式声明
+`gripper_cycles`，严格匹配全部有序close/open事件；旧 TCP 数据会拒绝。
 10Hz 线性重采样 q/TCP、夹爪零阶保持、图像最近邻；0.2秒 source gap 明确记录，不当作均匀10Hz原始采样。
 观测 q[t] 对应标签 q[t+1]；最后训练观测至少是 open 后1秒，额外0.1秒作末帧标签。
 

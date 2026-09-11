@@ -16,20 +16,28 @@ def main():
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     episodes, _ = audit_selection(args.data_root, load_selection(args.selection))
-    canvas = Image.new("RGB", (6 * 240, len(episodes) * 2 * 200), "white")
+    columns = 3 * episodes[0].audit["gripper_cycles"] + 3
+    canvas = Image.new("RGB", (columns * 240, len(episodes) * 2 * 200), "white")
     draw = ImageDraw.Draw(canvas)
     for row, episode in enumerate(episodes):
-        closed = int(np.flatnonzero(episode.gripper > 0.5)[0])
-        opened = int(np.flatnonzero(np.diff(episode.gripper) < 0)[-1] + 1)
-        indices = [
-            0,
-            closed,
-            closed + int(np.argmax(episode.tcp[closed:opened, 2])),
-            opened,
-            min(opened + 2, len(episode.times) - 1),
-            len(episode.times) - 2,
-        ]
-        for col, (label, i) in enumerate(zip(("start", "close", "highest", "open", "open+0.2s", "last obs"), indices)):
+        closes = np.flatnonzero(np.diff(episode.gripper, prepend=0) > 0)
+        opens = np.flatnonzero(np.diff(episode.gripper, prepend=0) < 0)
+        expected = episode.audit["gripper_cycles"]
+        if len(closes) != expected or len(opens) != expected:
+            raise ValueError(f"{episode.run_id}: resampled labels lost a gripper cycle")
+        points = [("start", 0)]
+        for cycle, (closed, opened) in enumerate(zip(closes, opens), 1):
+            points.extend(
+                [
+                    (f"close {cycle}", int(closed)),
+                    (f"highest {cycle}", int(closed + np.argmax(episode.tcp[closed:opened, 2]))),
+                    (f"open {cycle}", int(opened)),
+                ]
+            )
+        points.extend(
+            [("last open+0.2s", min(int(opens[-1]) + 2, len(episode.times) - 1)), ("last obs", len(episode.times) - 2)]
+        )
+        for col, (label, i) in enumerate(points):
             for offset, (camera, paths) in enumerate((("head", episode.head), ("wrist", episode.wrist))):
                 x, y = col * 240, (row * 2 + offset) * 200
                 with Image.open(paths[i]) as original:

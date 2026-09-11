@@ -1,7 +1,7 @@
 # π0.5 叠三块：五条示教与复用 SFT 配方
 
 2026-09-11。用户授权：选择刚采集的新任务成功数据，克制处理头尾静止，按上次成功 π0.5 的相同参数训练。
-当前状态：数据审计、关键图像复核、不可变导出及原生加载检查通过，待启动后台训练。
+当前状态：数据审计、关键图像复核、不可变导出及原生加载检查通过；16:00:44 CST已启动1000步后台训练。
 
 ## 数据与裁剪
 
@@ -57,7 +57,7 @@
 - 8000样本次约等于新数据8.1遍；旧414样本约19.3遍。仍遵从1000更新，不自动加步。
 - 推理的 K=50、去噪5/2不是本次训练参数；训练仍H50，诊断采样沿用10次去噪。
 
-启动命令（待后台服务执行，不要同时重复启动）：
+本次已执行的训练参数（后台服务正在运行，不要同时重复启动）：
 
 ```bash
 .venv/pi05/bin/python -m ur5e_real.adapters.robotwin_pi05 train \
@@ -75,4 +75,26 @@
 ## 运行与结果
 
 启动前：A6000已用586MiB、空闲47,948MiB；系统available约116GiB，checkpoint盘可用405GiB。
-后台服务、启动时间、首步与结果待启动后补充；没有把数据检查记成训练完成或真机成功。
+- 启动：2026-09-11 16:00:44 CST（08:00:44 UTC）；训练代码 `b92c0a3`，不是覆盖旧cube实验。
+- 后台服务：`ur5e-pi05-stack3-joint5-sft-20260911-01.service`，初始MainPID `53973`；
+  `Restart=no`、`RemainAfterExit=yes`，独立于聊天终端；不自动重启、续训或执行机器人。
+- 控制台：`logs/pi05_stack3_joint5_sft_20260911_01.console.log`。
+- 结构化日志：`logs/pi05/stack3_joint5_sft_20260911_01/20260911T080045088966Z/`。
+- checkpoint目录：`checkpoints/pi05/pi05_ur5e_joint_action_expert/stack3_joint5_sft_20260911_01/`。
+- 已直接对比两份不可变recipe：除 `contract` 与 `dataset_ready` 外，其余训练配置完全相同；
+  基础权重加载命中已校验的本地官方 `pi05_base` 缓存。
+- 内置资源监控持续写JSONL；当前没有新建聊天定时回访。训练完成以 `result.json`、冻结/重载审计
+  和服务正常退出共同确认，不能以 `systemctl Result=success` 在运行中提前认定完成。
+- 16:02:32 CST已完成15/1000步，最近单步约1.57–1.60秒（含取数），loss/梯度有限；
+  显存已用16.91GiB、余量30.48GiB，系统available107.88GiB，资源采样无错误。
+  首批真实optimizer更新已确认，尚未完成SFT，没有新任务真机执行结果。
+
+只读状态和人工停止命令：
+
+```bash
+systemctl --user show ur5e-pi05-stack3-joint5-sft-20260911-01.service \
+  --property=ActiveState,SubState,MainPID,ExecMainStatus,Result
+tail -n 15 logs/pi05_stack3_joint5_sft_20260911_01.console.log
+# 仅当需要停止本次训练时执行；不会补存还未到保存点的更新。
+systemctl --user stop ur5e-pi05-stack3-joint5-sft-20260911-01.service
+```

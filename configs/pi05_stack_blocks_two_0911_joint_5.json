@@ -1,0 +1,23 @@
+{
+  "task": "stack_blocks_two_0911",
+  "repo_id": "ur5e/stack_blocks_two_0911_joint_5_v20260911",
+  "run_ids": [
+    "20260911_170047",
+    "20260911_170120",
+    "20260911_170221",
+    "20260911_170321",
+    "20260911_170406"
+  ],
+  "prompt": "Stack one block on top of the other.",
+  "gripper_cycles": 1,
+  "fps": 10,
+  "action_horizon": 50,
+  "motion_threshold_rad": 0.005,
+  "lead_in_steps": 3,
+  "tail_steps": 3,
+  "release_tail_s": 1.0,
+  "max_source_gap_s": 0.21,
+  "max_image_offset_s": 0.11,
+  "joint_margin_rad": 0.15,
+  "tcp_margin_m": 0.05
+}

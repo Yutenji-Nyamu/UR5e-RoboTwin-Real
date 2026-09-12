@@ -1,0 +1,24 @@
+{
+  "task": "plug_charger",
+  "repo_id": "ur5e/plug_charger_joint_5_v20260912",
+  "run_ids": [
+    "20260912_144757",
+    "20260912_144852",
+    "20260912_144941",
+    "20260912_145043",
+    "20260912_145151"
+  ],
+  "prompt": "Pick up the charger and plug it into the socket.",
+  "gripper_cycles": 1,
+  "allow_repeated_gripper_commands": true,
+  "fps": 10,
+  "action_horizon": 50,
+  "motion_threshold_rad": 0.005,
+  "lead_in_steps": 3,
+  "tail_steps": 3,
+  "release_tail_s": 1.0,
+  "max_source_gap_s": 0.21,
+  "max_image_offset_s": 0.11,
+  "joint_margin_rad": 0.15,
+  "tcp_margin_m": 0.05
+}

@@ -32,6 +32,12 @@ def main():
     rows = [json.loads(line) for line in lines if line.endswith("\n") and line.strip()]
     if len(rows) < args.window:
         parser.error("not enough completed steps for the requested smoothing window")
+    invocation_path = args.metrics.parent / "invocation.json"
+    total_steps = 1000
+    if invocation_path.exists():
+        total_steps = json.loads(invocation_path.read_text(encoding="utf-8"))["requested_steps"]
+    if type(total_steps) is not int or total_steps < rows[-1]["step"]:
+        parser.error("invocation requested_steps must be an integer covering the completed steps")
     steps = np.array([row["step"] for row in rows])
     losses = np.array([row["loss"] for row in rows], dtype=float)
     if not np.isfinite(losses).all() or not np.all(np.diff(steps) == 1):
@@ -51,6 +57,7 @@ def main():
         "scope": "training_flow_matching_loss_including_native_padding",
         "metrics": str(args.metrics.resolve()),
         "step": int(steps[-1]),
+        "total_steps": total_steps,
         "snapshot_time_utc": rows[-1]["time_utc"],
         "window": args.window,
         "first_window_mean": first_mean,
@@ -96,7 +103,7 @@ def main():
         arrowprops={"arrowstyle": "-", "color": "#006c70"},
     )
     stamp = datetime.fromisoformat(rows[-1]["time_utc"]).astimezone().strftime("%m-%d %H:%M:%S %Z")
-    fig.suptitle(f"π0.5 关节 SFT · Loss 实时快照 · 第 {steps[-1]} / 1000 步", x=0.07, ha="left", fontsize=17)
+    fig.suptitle(f"π0.5 关节 SFT · Loss 实时快照 · 第 {steps[-1]} / {total_steps} 步", x=0.07, ha="left", fontsize=17)
     fig.text(
         0.07,
         0.865,

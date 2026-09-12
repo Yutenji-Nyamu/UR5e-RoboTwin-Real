@@ -35,7 +35,20 @@ def main():
                 ]
             )
         points.extend(
-            [("last open+0.2s", min(int(opens[-1]) + 2, len(episode.times) - 1)), ("last obs", len(episode.times) - 2)]
+            [
+                (
+                    "last cmd open+0.2s",
+                    min(
+                        int(
+                            np.searchsorted(
+                                episode.times, episode.audit["gripper_events"][-1]["controller_time_s"] + 0.2 - 1e-6
+                            )
+                        ),
+                        len(episode.times) - 1,
+                    ),
+                ),
+                ("last obs", len(episode.times) - 2),
+            ]
         )
         for col, (label, i) in enumerate(points):
             for offset, (camera, paths) in enumerate((("head", episode.head), ("wrist", episode.wrist))):

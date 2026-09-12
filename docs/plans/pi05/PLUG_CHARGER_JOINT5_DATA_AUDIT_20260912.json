@@ -1,0 +1,468 @@
+{
+  "selection": {
+    "task": "plug_charger",
+    "repo_id": "ur5e/plug_charger_joint_5_v20260912",
+    "run_ids": [
+      "20260912_144757",
+      "20260912_144852",
+      "20260912_144941",
+      "20260912_145043",
+      "20260912_145151"
+    ],
+    "prompt": "Pick up the charger and plug it into the socket.",
+    "gripper_cycles": 1,
+    "allow_repeated_gripper_commands": true,
+    "fps": 10,
+    "action_horizon": 50,
+    "motion_threshold_rad": 0.005,
+    "lead_in_steps": 3,
+    "tail_steps": 3,
+    "release_tail_s": 1.0,
+    "max_source_gap_s": 0.21,
+    "max_image_offset_s": 0.11,
+    "joint_margin_rad": 0.15,
+    "tcp_margin_m": 0.05
+  },
+  "contract": {
+    "version": 1,
+    "policy": "pi05",
+    "action_space": "joint_position",
+    "state_layout": "ur5e_joint14_v1",
+    "joint_unit": "rad",
+    "joint_order": [
+      "base",
+      "shoulder",
+      "elbow",
+      "wrist_1",
+      "wrist_2",
+      "wrist_3"
+    ],
+    "fps": 10,
+    "action_horizon": 50,
+    "adapt_to_pi": false,
+    "delta_joint_actions": true,
+    "robotwin_commit": "210720340637cb4619283b295dde4cdd807c9e66",
+    "dataset_id": "ur5e/plug_charger_joint_5_v20260912",
+    "prompt": "Pick up the charger and plug it into the socket.",
+    "native_patch": "ur5e_pi05_config_import_v1",
+    "run_ids": [
+      "20260912_144757",
+      "20260912_144852",
+      "20260912_144941",
+      "20260912_145043",
+      "20260912_145151"
+    ],
+    "gripper_cycles": 1,
+    "home_q": [
+      0.6091250777244568,
+      -1.1708363813212892,
+      1.4655305067645472,
+      -1.8609161816039026,
+      -1.528742520009176,
+      -0.2147218863116663
+    ],
+    "joint_lower": [
+      0.4590887188911438,
+      -1.5407647889903564,
+      1.3155140081988734,
+      -2.388773008386129,
+      -1.7155248800860803,
+      -0.3647701422320765
+    ],
+    "joint_upper": [
+      1.215446376800537,
+      -1.0204944235137483,
+      2.094930378590719,
+      -1.7105529270567836,
+      -1.3780273596393031,
+      -0.0646857420550746
+    ],
+    "tcp_lower": [
+      -0.49790443872814427,
+      -0.6229758148401979,
+      0.1629463406513919
+    ],
+    "tcp_upper": [
+      -0.09152067038997726,
+      -0.42791975784769415,
+      0.4575476782207119
+    ],
+    "tcp_offset": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_semantics": "commanded_open_0_closed_1",
+    "image_semantics": "head_and_right_wrist_RGB; left_wrist_missing_mask_false"
+  },
+  "episodes": [
+    {
+      "run_id": "20260912_144757",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 254,
+      "raw_frame_pairs": 253,
+      "raw_image_start_s": 990.434,
+      "raw_image_stop_s": 1015.7339999999999,
+      "trimmed_lead_s": 1.6000000000000227,
+      "trimmed_tail_s": 0.4999999999998863,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 998.6339999999999
+        },
+        {
+          "event": "close",
+          "controller_time_s": 1000.434
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1012.1339999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1014.1339999999999
+        }
+      ],
+      "gripper_event_validation": "binary_transitions_allow_repeated_commands",
+      "repeated_gripper_commands": 2,
+      "binary_gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 998.6339999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1012.1339999999999
+        }
+      ],
+      "gripper_label_scope": "binary_command_state; repeated presses are not separate action labels",
+      "crop_start": 15,
+      "motion_crop_stop_exclusive": 219,
+      "grid_frames": 233,
+      "training_transitions": 232,
+      "grid_controller_start_s": 992.034,
+      "grid_controller_stop_s": 1015.234,
+      "release_tail_s": 1.1000000000001364,
+      "last_observation_release_tail_s": 1.0000000000001137,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.1999999999999318
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 1.1368683772161603e-13,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.27937471866637975,
+        0.1813307404520037,
+        0.37783622741656364,
+        0.7504940032955032,
+        0.00427722930907759,
+        0.00049591064453125
+      ],
+      "source_sha256": {
+        "session_20260912_144757.json": "6a02aa71245571aa55194d6327dcc15d631ad8619c48c3c008de3d37498218e7",
+        "rtde_tcp_gripper_20260912_144757.csv": "5e6583b7213fa8f2f34db19a5bb94087f4823dcc5238006d58cd42d01a6922cc",
+        "sync_action_cam_20260912_144757.csv": "4a8f61c30c2a0cdbdb4d94ae3cd73d3d33ac4715dee45b3a4e8d9b925acb69ea",
+        "gripper_events_20260912_144757.csv": "b821c4d520d4cefc75f228f783ca6f63d1c9bd0e2e7637dfff9c0b4fd539b5ba"
+      }
+    },
+    {
+      "run_id": "20260912_144852",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 226,
+      "raw_frame_pairs": 225,
+      "raw_image_start_s": 1045.984,
+      "raw_image_stop_s": 1068.484,
+      "trimmed_lead_s": 1.2999999999999545,
+      "trimmed_tail_s": 2.2999999999999545,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 1053.384
+        },
+        {
+          "event": "close",
+          "controller_time_s": 1055.2839999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1063.2839999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1065.084
+        }
+      ],
+      "gripper_event_validation": "binary_transitions_allow_repeated_commands",
+      "repeated_gripper_commands": 2,
+      "binary_gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 1053.384
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1063.2839999999999
+        }
+      ],
+      "gripper_label_scope": "binary_command_state; repeated presses are not separate action labels",
+      "crop_start": 12,
+      "motion_crop_stop_exclusive": 175,
+      "grid_frames": 190,
+      "training_transitions": 189,
+      "grid_controller_start_s": 1047.2839999999999,
+      "grid_controller_stop_s": 1066.184,
+      "release_tail_s": 1.099999999999909,
+      "last_observation_release_tail_s": 0.9999999999997726,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.20000000000004547
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 2.2737367544323206e-13,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.2636098861694336,
+        0.2490037679666579,
+        0.4984378814708257,
+        0.6332302093491471,
+        0.0074291229248046875,
+        0.0006008148193345497
+      ],
+      "source_sha256": {
+        "session_20260912_144852.json": "848967b6ca74a090c5eba3e67e08561b74f5dd43fac157d29ef5f697958aa66d",
+        "rtde_tcp_gripper_20260912_144852.csv": "eecd820e5b860d758f5a41e271753e0cb0578a4c200c72f32d24845bdc12df56",
+        "sync_action_cam_20260912_144852.csv": "0d81fe724d36aedf9dd8925bd757343400602bece0befdbd1e5937c5a49c49f8",
+        "gripper_events_20260912_144852.csv": "f2df067fb8e3c90911360f46de20fe35f546288684d03f0fc874b61ddf4eda61"
+      }
+    },
+    {
+      "run_id": "20260912_144941",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 305,
+      "raw_frame_pairs": 304,
+      "raw_image_start_s": 1095.1299999999999,
+      "raw_image_stop_s": 1125.53,
+      "trimmed_lead_s": 1.400000000000091,
+      "trimmed_tail_s": 0.5,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 1104.1299999999999
+        },
+        {
+          "event": "close",
+          "controller_time_s": 1106.23
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1121.6299999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1123.9299999999998
+        }
+      ],
+      "gripper_event_validation": "binary_transitions_allow_repeated_commands",
+      "repeated_gripper_commands": 2,
+      "binary_gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 1104.1299999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1121.6299999999999
+        }
+      ],
+      "gripper_label_scope": "binary_command_state; repeated presses are not separate action labels",
+      "crop_start": 13,
+      "motion_crop_stop_exclusive": 267,
+      "grid_frames": 286,
+      "training_transitions": 285,
+      "grid_controller_start_s": 1096.53,
+      "grid_controller_stop_s": 1125.03,
+      "release_tail_s": 1.1000000000001364,
+      "last_observation_release_tail_s": 1.0000000000002274,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.20000000000004547
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 2.2737367544323206e-13,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.34876585006713867,
+        0.17494976520498584,
+        0.4589223861694336,
+        0.6818914413452148,
+        0.006098747253417969,
+        0.0006246566772460938
+      ],
+      "source_sha256": {
+        "session_20260912_144941.json": "4f6f1543fe4ab582cf542ed651868ec2e861695abdb52d7b58759216c0b0e5ea",
+        "rtde_tcp_gripper_20260912_144941.csv": "c764b5ab727c5e07495eaa05ea127f7f2a14248242ac286c5bba267edbbcff1d",
+        "sync_action_cam_20260912_144941.csv": "ea8127c7ce770bc7e0dd417d6674dede835c5668b2c4c69dd51a0b94840e7f46",
+        "gripper_events_20260912_144941.csv": "68aec6ebddff0d11e551de7c034b0ec675827733010838c0f0084bbf1d6f3eae"
+      }
+    },
+    {
+      "run_id": "20260912_145043",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 254,
+      "raw_frame_pairs": 253,
+      "raw_image_start_s": 1157.078,
+      "raw_image_stop_s": 1182.378,
+      "trimmed_lead_s": 1.3999999999998636,
+      "trimmed_tail_s": 0.900000000000091,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 1166.4779999999998
+        },
+        {
+          "event": "close",
+          "controller_time_s": 1168.578
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1178.1779999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1180.378
+        }
+      ],
+      "gripper_event_validation": "binary_transitions_allow_repeated_commands",
+      "repeated_gripper_commands": 2,
+      "binary_gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 1166.4779999999998
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1178.1779999999999
+        }
+      ],
+      "gripper_label_scope": "binary_command_state; repeated presses are not separate action labels",
+      "crop_start": 13,
+      "motion_crop_stop_exclusive": 242,
+      "grid_frames": 231,
+      "training_transitions": 230,
+      "grid_controller_start_s": 1158.4779999999998,
+      "grid_controller_stop_s": 1181.4779999999998,
+      "release_tail_s": 1.099999999999909,
+      "last_observation_release_tail_s": 1.0,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.20000000000004547
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 2.2737367544323206e-13,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.33222377300186956,
+        0.20643204450560448,
+        0.27572154998779297,
+        0.8297824859619141,
+        0.0106239318847412,
+        0.0005054473876947574
+      ],
+      "source_sha256": {
+        "session_20260912_145043.json": "53da5ae943d4ab927cd4293130f22a9115129729ad727d274fe49bc4771bc1ea",
+        "rtde_tcp_gripper_20260912_145043.csv": "6d6d9d94ba0b5b124b60d43ed5821610951bc8708037747459dba395b8505232",
+        "sync_action_cam_20260912_145043.csv": "b923d8bd7e41b3fc027ac4565bb789f7bd974cf6d5aa0ff56de3e7767f87250e",
+        "gripper_events_20260912_145043.csv": "e4f80e50b042ac112aab6a7e41b5d17ca43b3dff0721aefec1119b6a5d80091b"
+      }
+    },
+    {
+      "run_id": "20260912_145151",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 308,
+      "raw_frame_pairs": 307,
+      "raw_image_start_s": 1224.704,
+      "raw_image_stop_s": 1255.404,
+      "trimmed_lead_s": 1.400000000000091,
+      "trimmed_tail_s": 1.2999999999999545,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 1233.404
+        },
+        {
+          "event": "close",
+          "controller_time_s": 1235.204
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1251.3039999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1253.004
+        }
+      ],
+      "gripper_event_validation": "binary_transitions_allow_repeated_commands",
+      "repeated_gripper_commands": 2,
+      "binary_gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 1233.404
+        },
+        {
+          "event": "open",
+          "controller_time_s": 1251.3039999999999
+        }
+      ],
+      "gripper_label_scope": "binary_command_state; repeated presses are not separate action labels",
+      "crop_start": 13,
+      "motion_crop_stop_exclusive": 268,
+      "grid_frames": 281,
+      "training_transitions": 280,
+      "grid_controller_start_s": 1226.104,
+      "grid_controller_stop_s": 1254.104,
+      "release_tail_s": 1.1000000000001364,
+      "last_observation_release_tail_s": 1.0000000000002274,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.20000000000004547
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 2.2737367544323206e-13,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.2902197837835985,
+        0.23151725530571765,
+        0.32229900360034147,
+        0.6037378311167219,
+        0.10793685913108586,
+        0.0005340576171869449
+      ],
+      "source_sha256": {
+        "session_20260912_145151.json": "757b179e80cc3dda9c502ec748a79366526b8bdb585a905b180757e77f67d91a",
+        "rtde_tcp_gripper_20260912_145151.csv": "245c8bc6a237889e1198f2c8c9225f076f99be83528f4bea7251041aa6f2df5c",
+        "sync_action_cam_20260912_145151.csv": "70034de55603e0e6f797f9a46d3c41cde2d33169f4b76634d669e870544457bf",
+        "gripper_events_20260912_145151.csv": "4704c80b3e476100934fdbfca5c41f4975962611e68e597289186a454b8ea055"
+      }
+    }
+  ]
+}

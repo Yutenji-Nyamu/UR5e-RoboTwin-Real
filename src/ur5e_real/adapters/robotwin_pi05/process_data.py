@@ -60,6 +60,8 @@ def load_selection(path: Path) -> dict:
             raise ValueError(f"{name} must be a nonnegative integer")
     if not selection.get("prompt") or not selection.get("task"):
         raise ValueError("task and prompt are required")
+    if type(selection.get("allow_repeated_gripper_commands", False)) is not bool:
+        raise ValueError("allow_repeated_gripper_commands must be a boolean")
     gripper_cycles(selection)
     return selection
 
@@ -135,7 +137,12 @@ def read_episode(data_root: Path, run_id: str, selection: dict) -> JointEpisode:
     if st[0] < t[0] - 1e-6 or st[-1] > t[-1] + 1e-6:
         raise ValueError(f"{run_id}: image timestamps outside the robot state timeline")
     cycles = gripper_cycles(selection)
-    if [event["event"] for event in events] != ["close", "open"] * cycles:
+    allow_repeats = selection.get("allow_repeated_gripper_commands", False)
+    binary_events = [event for i, event in enumerate(events) if i == 0 or event["event"] != events[i - 1]["event"]]
+    # This opt-in validates the existing binary action labels, not button-press replay.
+    # Keep every source event and timestamp for provenance and final-release cropping.
+    checked_events = binary_events if allow_repeats else events
+    if [event["event"] for event in checked_events] != ["close", "open"] * cycles:
         raise ValueError(f"{run_id}: require exactly {cycles} ordered close/open gripper cycles")
     event_times = np.asarray([float(event["controller_time_s"]) for event in events])
     if (
@@ -190,6 +197,19 @@ def read_episode(data_root: Path, run_id: str, selection: dict) -> JointEpisode:
         "gripper_events": [
             {"event": event["event"], "controller_time_s": float(at)} for event, at in zip(events, event_times)
         ],
+        **(
+            {
+                "gripper_event_validation": "binary_transitions_allow_repeated_commands",
+                "repeated_gripper_commands": len(events) - len(binary_events),
+                "binary_gripper_events": [
+                    {"event": event["event"], "controller_time_s": float(event["controller_time_s"])}
+                    for event in binary_events
+                ],
+                "gripper_label_scope": "binary_command_state; repeated presses are not separate action labels",
+            }
+            if allow_repeats
+            else {}
+        ),
         "crop_start": start,
         "motion_crop_stop_exclusive": stop,
         "grid_frames": len(grid),

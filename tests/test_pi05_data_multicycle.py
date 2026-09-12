@@ -1,5 +1,6 @@
 import csv
 import json
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -107,4 +108,65 @@ def test_invalid_cycle_selection_rejected(tmp_path, cycles):
     path = tmp_path / "selection.json"
     path.write_text(json.dumps(selection))
     with pytest.raises(ValueError, match="gripper_cycles"):
+        load_selection(path)
+
+
+REPEATED_COMMANDS = (
+    "controller_time_s,event\n104,close\n105,close\n107,open\n109,open\n111,close\n112,close\n115,open\n118,open\n"
+)
+
+
+def test_repeated_commands_require_explicit_selection(two_cycle_episode):
+    root, selection, paths = two_cycle_episode
+    Path(paths["gripper_events"]).write_text(REPEATED_COMMANDS)
+    with pytest.raises(ValueError, match="exactly 2"):
+        read_episode(root, selection["run_ids"][0], selection)
+
+
+def test_repeated_commands_preserve_raw_events_labels_and_last_open_tail(two_cycle_episode):
+    root, selection, paths = two_cycle_episode
+    selection["allow_repeated_gripper_commands"] = True
+    events = Path(paths["gripper_events"])
+    events.write_text(REPEATED_COMMANDS)
+    source_before = {key: Path(paths[key]).read_bytes() for key in ("rtde", "sync", "gripper_events")}
+    episode = read_episode(root, selection["run_ids"][0], selection)
+    expected = (
+        ((episode.times >= 104) & (episode.times < 107)) | ((episode.times >= 111) & (episode.times < 115))
+    ).astype(int)
+    np.testing.assert_array_equal(episode.gripper, expected)
+    assert len(episode.audit["gripper_events"]) == 8
+    assert episode.audit["repeated_gripper_commands"] == 4
+    assert [row["controller_time_s"] for row in episode.audit["binary_gripper_events"]] == [104, 107, 111, 115]
+    assert episode.audit["gripper_events"][-1]["controller_time_s"] == 118
+    assert episode.times[-2] >= 119  # Final command, not the earlier binary state transition.
+    assert episode.audit["last_observation_release_tail_s"] >= 1.0
+    for key, original in source_before.items():
+        assert Path(paths[key]).read_bytes() == original
+
+
+@pytest.mark.parametrize("invalid", ["103", "104", "nan"])
+def test_repeated_event_timestamps_are_not_skipped(two_cycle_episode, invalid):
+    root, selection, paths = two_cycle_episode
+    selection["allow_repeated_gripper_commands"] = True
+    Path(paths["gripper_events"]).write_text(REPEATED_COMMANDS.replace("105,close", f"{invalid},close"))
+    with pytest.raises(ValueError, match="gripper events"):
+        read_episode(root, selection["run_ids"][0], selection)
+
+
+@pytest.mark.parametrize("events", ["104,open\n115,close", "104,close\n105,close", "104,stop\n115,open"])
+def test_repeat_opt_in_does_not_allow_bad_cycles(two_cycle_episode, events):
+    root, selection, paths = two_cycle_episode
+    selection.update(gripper_cycles=1, allow_repeated_gripper_commands=True)
+    Path(paths["gripper_events"]).write_text(f"controller_time_s,event\n{events}\n")
+    with pytest.raises(ValueError, match="exactly 1"):
+        read_episode(root, selection["run_ids"][0], selection)
+
+
+@pytest.mark.parametrize("flag", ["true", 1, None])
+def test_repeat_opt_in_must_be_boolean(tmp_path, flag):
+    selection = json.loads((REPOSITORY / "configs/pi05_cube_joint_5.json").read_text())
+    selection["allow_repeated_gripper_commands"] = flag
+    path = tmp_path / "selection.json"
+    path.write_text(json.dumps(selection))
+    with pytest.raises(ValueError, match="allow_repeated_gripper_commands"):
         load_selection(path)

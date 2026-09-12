@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "snapshot_started_at_utc": "2026-09-12T07:27:09.732541+00:00",
+  "snapshot_started_at_utc": "2026-09-12T07:55:36.522597+00:00",
   "repository": "/home/zhangw/UR5e_RoboTwin_Real",
   "data_root": "/data/robotics/ur5e-real",
   "max_file_bytes": 10485760,
@@ -61,13 +61,13 @@
     {
       "archive": "data_root/DATA_LOG.md",
       "source": "/data/robotics/ur5e-real/DATA_LOG.md",
-      "source_mtime_ns": 1789196954767930800,
-      "source_bytes_read": 8843,
-      "source_sha256": "4f4c622de7b1cb97c170c2c7baa3145aaf9dd96334589ca09261890c507e8de2",
-      "archived_bytes": 8843,
-      "archived_sha256": "4f4c622de7b1cb97c170c2c7baa3145aaf9dd96334589ca09261890c507e8de2",
+      "source_mtime_ns": 1789199736307897300,
+      "source_bytes_read": 9527,
+      "source_sha256": "840e2ee17f0efc7f6da4d63ce3e8f50d30ab49ed8f360be4be33030b9a1a3176",
+      "archived_bytes": 9527,
+      "archived_sha256": "840e2ee17f0efc7f6da4d63ce3e8f50d30ab49ed8f360be4be33030b9a1a3176",
       "incomplete_tail_bytes_omitted": 0,
-      "captured_at_utc": "2026-09-12T07:27:09.732541+00:00"
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
     },
     {
       "archive": "data_root/checkpoints/dp/pick_place_cube-simple-17-trim2mm-v20260905_150058-seed0-20260905_150221/.hydra/config.yaml",
@@ -5746,6 +5746,193 @@
       "captured_at_utc": "2026-09-12T07:27:09.732541+00:00"
     },
     {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/_CHECKPOINT_METADATA",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/_CHECKPOINT_METADATA",
+      "source_mtime_ns": 1789198540633544965,
+      "source_bytes_read": 417,
+      "source_sha256": "095150512ecc224160c82cc3e4e4a6cbbd27dc51b3466d833541311507b5513c",
+      "archived_bytes": 417,
+      "archived_sha256": "095150512ecc224160c82cc3e4e4a6cbbd27dc51b3466d833541311507b5513c",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/assets/ur5e_joint14_v1/norm_stats.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/assets/ur5e_joint14_v1/norm_stats.json",
+      "source_mtime_ns": 1789198528903906101,
+      "source_bytes_read": 3352,
+      "source_sha256": "b188c9365a84354b1a0d3f5101cab8b919f6e75c146c8991a338cf105b17a2a6",
+      "archived_bytes": 3352,
+      "archived_sha256": "b188c9365a84354b1a0d3f5101cab8b919f6e75c146c8991a338cf105b17a2a6",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/params/_METADATA",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/params/_METADATA",
+      "source_mtime_ns": 1789198540591549367,
+      "source_bytes_read": 22038,
+      "source_sha256": "4292d734e52ebf8111126bc166d60a48c592d532472c2ca5461a283759ee8ea4",
+      "archived_bytes": 22038,
+      "archived_sha256": "4292d734e52ebf8111126bc166d60a48c592d532472c2ca5461a283759ee8ea4",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/params/_sharding",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/params/_sharding",
+      "source_mtime_ns": 1789198540557972667,
+      "source_bytes_read": 12797,
+      "source_sha256": "7e65c8b63fafedfedb52bf416d6bfde394c1c88fd28dc02f18a7911f2581c183",
+      "archived_bytes": 12797,
+      "archived_sha256": "7e65c8b63fafedfedb52bf416d6bfde394c1c88fd28dc02f18a7911f2581c183",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/train_state/_METADATA",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/train_state/_METADATA",
+      "source_mtime_ns": 1789198540539496100,
+      "source_bytes_read": 20044,
+      "source_sha256": "792367a3da71f94b3beef715cdffc3b3250e98565b24b7647599c9578069846c",
+      "archived_bytes": 20044,
+      "archived_sha256": "792367a3da71f94b3beef715cdffc3b3250e98565b24b7647599c9578069846c",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/train_state/_sharding",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/train_state/_sharding",
+      "source_mtime_ns": 1789198540378062531,
+      "source_bytes_read": 10029,
+      "source_sha256": "b052b96287514aad7773feaa390cca9d4ca9d471909b79de86eb7d04157f346b",
+      "archived_bytes": 10029,
+      "archived_sha256": "b052b96287514aad7773feaa390cca9d4ca9d471909b79de86eb7d04157f346b",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/ur5e_evaluation_manifest.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1000/ur5e_evaluation_manifest.json",
+      "source_mtime_ns": 1789198540635509769,
+      "source_bytes_read": 2961,
+      "source_sha256": "07f49c8f6c8858e2e4cb522cb56fd9fbdb36adee876730a3c9a929782bd32494",
+      "archived_bytes": 2961,
+      "archived_sha256": "07f49c8f6c8858e2e4cb522cb56fd9fbdb36adee876730a3c9a929782bd32494",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/_CHECKPOINT_METADATA",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/_CHECKPOINT_METADATA",
+      "source_mtime_ns": 1789199368174543881,
+      "source_bytes_read": 417,
+      "source_sha256": "e46e4919a78c8d42c5c1a9e7d698707b0527a8b10ddb6b262694f89a3b5c78a9",
+      "archived_bytes": 417,
+      "archived_sha256": "e46e4919a78c8d42c5c1a9e7d698707b0527a8b10ddb6b262694f89a3b5c78a9",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/assets/ur5e_joint14_v1/norm_stats.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/assets/ur5e_joint14_v1/norm_stats.json",
+      "source_mtime_ns": 1789199356336967728,
+      "source_bytes_read": 3352,
+      "source_sha256": "b188c9365a84354b1a0d3f5101cab8b919f6e75c146c8991a338cf105b17a2a6",
+      "archived_bytes": 3352,
+      "archived_sha256": "b188c9365a84354b1a0d3f5101cab8b919f6e75c146c8991a338cf105b17a2a6",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/params/_METADATA",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/params/_METADATA",
+      "source_mtime_ns": 1789199368111324801,
+      "source_bytes_read": 22038,
+      "source_sha256": "4292d734e52ebf8111126bc166d60a48c592d532472c2ca5461a283759ee8ea4",
+      "archived_bytes": 22038,
+      "archived_sha256": "4292d734e52ebf8111126bc166d60a48c592d532472c2ca5461a283759ee8ea4",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/params/_sharding",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/params/_sharding",
+      "source_mtime_ns": 1789199368080454817,
+      "source_bytes_read": 12797,
+      "source_sha256": "7e65c8b63fafedfedb52bf416d6bfde394c1c88fd28dc02f18a7911f2581c183",
+      "archived_bytes": 12797,
+      "archived_sha256": "7e65c8b63fafedfedb52bf416d6bfde394c1c88fd28dc02f18a7911f2581c183",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/train_state/_METADATA",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/train_state/_METADATA",
+      "source_mtime_ns": 1789199367483713834,
+      "source_bytes_read": 20044,
+      "source_sha256": "792367a3da71f94b3beef715cdffc3b3250e98565b24b7647599c9578069846c",
+      "archived_bytes": 20044,
+      "archived_sha256": "792367a3da71f94b3beef715cdffc3b3250e98565b24b7647599c9578069846c",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/train_state/_sharding",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/train_state/_sharding",
+      "source_mtime_ns": 1789199367341772739,
+      "source_bytes_read": 10029,
+      "source_sha256": "b052b96287514aad7773feaa390cca9d4ca9d471909b79de86eb7d04157f346b",
+      "archived_bytes": 10029,
+      "archived_sha256": "b052b96287514aad7773feaa390cca9d4ca9d471909b79de86eb7d04157f346b",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/ur5e_contract.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/ur5e_contract.json",
+      "source_mtime_ns": 1789199455766232662,
+      "source_bytes_read": 1630,
+      "source_sha256": "e9211c9a801419f0450786b17f3a8faf53add8cc82fc7289a2291511d90b1d37",
+      "archived_bytes": 1630,
+      "archived_sha256": "e9211c9a801419f0450786b17f3a8faf53add8cc82fc7289a2291511d90b1d37",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/ur5e_evaluation_manifest.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/ur5e_evaluation_manifest.json",
+      "source_mtime_ns": 1789199368176372873,
+      "source_bytes_read": 2961,
+      "source_sha256": "eae5e8146988a84ebf9d98c748d1fd6d08b93d55e14c5aee291cd7b2692425cb",
+      "archived_bytes": 2961,
+      "archived_sha256": "eae5e8146988a84ebf9d98c748d1fd6d08b93d55e14c5aee291cd7b2692425cb",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/ur5e_recipe.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/ur5e_recipe.json",
+      "source_mtime_ns": 1789199455767069582,
+      "source_bytes_read": 3171,
+      "source_sha256": "eb4185e11e9df1f6ca3b3505444c1ba5210a175d7604c76f5a510511697dec09",
+      "archived_bytes": 3171,
+      "archived_sha256": "eb4185e11e9df1f6ca3b3505444c1ba5210a175d7604c76f5a510511697dec09",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/ur5e_verification.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/1500/ur5e_verification.json",
+      "source_mtime_ns": 1789199455766873144,
+      "source_bytes_read": 1476,
+      "source_sha256": "0025488a9f1382e6765ea7b7d60fb5b509ae3ea6e05d56d2b5d1c5575cc96ff7",
+      "archived_bytes": 1476,
+      "archived_sha256": "0025488a9f1382e6765ea7b7d60fb5b509ae3ea6e05d56d2b5d1c5575cc96ff7",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
       "archive": "repository/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/500/_CHECKPOINT_METADATA",
       "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/plug_charger_joint5_sft_20260912_01/500/_CHECKPOINT_METADATA",
       "source_mtime_ns": 1789197705586741539,
@@ -6505,6 +6692,28 @@
       "captured_at_utc": "2026-09-12T07:27:09.732541+00:00"
     },
     {
+      "archive": "repository/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/evaluation_1000.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/evaluation_1000.json",
+      "source_mtime_ns": 1789198543543560063,
+      "source_bytes_read": 9813,
+      "source_sha256": "a33c434e663648bf776ff68107348a6e482177046316e528154211b5fe8deb79",
+      "archived_bytes": 9813,
+      "archived_sha256": "a33c434e663648bf776ff68107348a6e482177046316e528154211b5fe8deb79",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/evaluation_1500.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/evaluation_1500.json",
+      "source_mtime_ns": 1789199371017365064,
+      "source_bytes_read": 9823,
+      "source_sha256": "b08618b5cb6cdd497066930bbd71d8f657da110e1a294055dc5f49aa3bc1a8ce",
+      "archived_bytes": 9823,
+      "archived_sha256": "b08618b5cb6cdd497066930bbd71d8f657da110e1a294055dc5f49aa3bc1a8ce",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
       "archive": "repository/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/evaluation_500.json",
       "source": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/evaluation_500.json",
       "source_mtime_ns": 1789197713077724753,
@@ -6529,13 +6738,13 @@
     {
       "archive": "repository/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/metrics.jsonl",
       "source": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/metrics.jsonl",
-      "source_mtime_ns": 1789198029451418133,
-      "source_bytes_read": 366771,
-      "source_sha256": "9aa4cecb044fb37a284d9aaac9a4a08f6a06cd364fd6729bce6fdd9715b3389e",
-      "archived_bytes": 366771,
-      "archived_sha256": "9aa4cecb044fb37a284d9aaac9a4a08f6a06cd364fd6729bce6fdd9715b3389e",
+      "source_mtime_ns": 1789199356292408057,
+      "source_bytes_read": 793739,
+      "source_sha256": "575dc22e7201395020e7a8b6bc854bc15cb8d24eb8880067fa422bcd533d913a",
+      "archived_bytes": 793739,
+      "archived_sha256": "575dc22e7201395020e7a8b6bc854bc15cb8d24eb8880067fa422bcd533d913a",
       "incomplete_tail_bytes_omitted": 0,
-      "captured_at_utc": "2026-09-12T07:27:09.732541+00:00"
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
     },
     {
       "archive": "repository/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/recipe.json",
@@ -6551,13 +6760,35 @@
     {
       "archive": "repository/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/resources.jsonl",
       "source": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/resources.jsonl",
-      "source_mtime_ns": 1789198028679407485,
-      "source_bytes_read": 341774,
-      "source_sha256": "58765fd1d4e8db584251c955e8ee5a3b39b236874890a99951f0c6c427704208",
-      "archived_bytes": 341774,
-      "archived_sha256": "58765fd1d4e8db584251c955e8ee5a3b39b236874890a99951f0c6c427704208",
+      "source_mtime_ns": 1789199457200232000,
+      "source_bytes_read": 740832,
+      "source_sha256": "5e45242310392cd204b999f220f5d479271626f80b340e4a6a0f874d9b88b675",
+      "archived_bytes": 740832,
+      "archived_sha256": "5e45242310392cd204b999f220f5d479271626f80b340e4a6a0f874d9b88b675",
       "incomplete_tail_bytes_omitted": 0,
-      "captured_at_utc": "2026-09-12T07:27:09.732541+00:00"
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/resources_summary.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/resources_summary.json",
+      "source_mtime_ns": 1789199457201769489,
+      "source_bytes_read": 475,
+      "source_sha256": "05aba89fdbaa942593935f524d6432925b973ff9719ca4d37ecc8e56220f616c",
+      "archived_bytes": 475,
+      "archived_sha256": "05aba89fdbaa942593935f524d6432925b973ff9719ca4d37ecc8e56220f616c",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/result.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/plug_charger_joint5_sft_20260912_01/20260912T070637666460Z/result.json",
+      "source_mtime_ns": 1789199457130300047,
+      "source_bytes_read": 1615,
+      "source_sha256": "d7b8b4451872570936b648720ada9c70616ea14ce9f0771194226e7ddf153df6",
+      "archived_bytes": 1615,
+      "archived_sha256": "d7b8b4451872570936b648720ada9c70616ea14ce9f0771194226e7ddf153df6",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
     },
     {
       "archive": "repository/logs/pi05/stack2_0911_joint5_sft_20260911_01/20260911T091427665881Z/evaluation_1000.json",
@@ -7728,13 +7959,13 @@
     {
       "archive": "repository/logs/pi05_plug_charger_joint5_sft_20260912_01.console.log",
       "source": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_plug_charger_joint5_sft_20260912_01.console.log",
-      "source_mtime_ns": 1789198024625351673,
-      "source_bytes_read": 61692,
-      "source_sha256": "09b6d5b47496830ee411d47c20e2d69e75aa7d9d7597b96f554d71d9efdc1b89",
-      "archived_bytes": 61692,
-      "archived_sha256": "09b6d5b47496830ee411d47c20e2d69e75aa7d9d7597b96f554d71d9efdc1b89",
+      "source_mtime_ns": 1789199455767069582,
+      "source_bytes_read": 135957,
+      "source_sha256": "9279369f7b9f11b5896224538cf5ec88ec38bb15753670507bc88907a4efb8cf",
+      "archived_bytes": 135957,
+      "archived_sha256": "9279369f7b9f11b5896224538cf5ec88ec38bb15753670507bc88907a4efb8cf",
       "incomplete_tail_bytes_omitted": 0,
-      "captured_at_utc": "2026-09-12T07:27:09.732541+00:00"
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
     },
     {
       "archive": "repository/logs/pi05_stack2_0911_joint5_sft_20260911_01.console.log",
@@ -7946,6 +8177,72 @@
       "captured_at_utc": "2026-09-12T07:27:09.732541+00:00"
     },
     {
+      "archive": "repository/outputs/pi05_plug_charger_loss_20260912_final_1500.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/outputs/pi05_plug_charger_loss_20260912_final_1500.json",
+      "source_mtime_ns": 1789199407592499700,
+      "source_bytes_read": 3458,
+      "source_sha256": "44d88e1451283a650190bd9f754a6648a2ed3ea7433640ec43ba37d1ab6cafd6",
+      "archived_bytes": 3458,
+      "archived_sha256": "44d88e1451283a650190bd9f754a6648a2ed3ea7433640ec43ba37d1ab6cafd6",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/outputs/pi05_plug_charger_loss_20260912_final_1500.png",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/outputs/pi05_plug_charger_loss_20260912_final_1500.png",
+      "source_mtime_ns": 1789199407590284688,
+      "source_bytes_read": 251376,
+      "source_sha256": "bb8b3638a4c77165a5a199c542e64f1833d38d09f9c2b1dcef767df867e596a8",
+      "archived_bytes": 251376,
+      "archived_sha256": "bb8b3638a4c77165a5a199c542e64f1833d38d09f9c2b1dcef767df867e596a8",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/outputs/pi05_plug_charger_loss_20260912_progress01.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/outputs/pi05_plug_charger_loss_20260912_progress01.json",
+      "source_mtime_ns": 1789198564801501487,
+      "source_bytes_read": 2554,
+      "source_sha256": "c97d2df4c3e50d4a11c752cb5540665c5e673818f672f5aae2e09134a3cbe2a3",
+      "archived_bytes": 2554,
+      "archived_sha256": "c97d2df4c3e50d4a11c752cb5540665c5e673818f672f5aae2e09134a3cbe2a3",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/outputs/pi05_plug_charger_loss_20260912_progress01.png",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/outputs/pi05_plug_charger_loss_20260912_progress01.png",
+      "source_mtime_ns": 1789198564798928673,
+      "source_bytes_read": 256175,
+      "source_sha256": "5224fed96b69506c51ec6f9071bf52ac9aae95f746f8893f4b3513347f003269",
+      "archived_bytes": 256175,
+      "archived_sha256": "5224fed96b69506c51ec6f9071bf52ac9aae95f746f8893f4b3513347f003269",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/outputs/pi05_plug_charger_loss_20260912_progress02.json",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/outputs/pi05_plug_charger_loss_20260912_progress02.json",
+      "source_mtime_ns": 1789198960178683849,
+      "source_bytes_read": 3052,
+      "source_sha256": "9fb75fa6aebacf725439b666d9d11123329ef356f01afa4af2961d8946cf9570",
+      "archived_bytes": 3052,
+      "archived_sha256": "9fb75fa6aebacf725439b666d9d11123329ef356f01afa4af2961d8946cf9570",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
+      "archive": "repository/outputs/pi05_plug_charger_loss_20260912_progress02.png",
+      "source": "/home/zhangw/UR5e_RoboTwin_Real/outputs/pi05_plug_charger_loss_20260912_progress02.png",
+      "source_mtime_ns": 1789198960177683870,
+      "source_bytes_read": 238988,
+      "source_sha256": "970ce22ad70525ae32408c249c93ed6f7d462af34c60b289b846ca333ff00022",
+      "archived_bytes": 238988,
+      "archived_sha256": "970ce22ad70525ae32408c249c93ed6f7d462af34c60b289b846ca333ff00022",
+      "incomplete_tail_bytes_omitted": 0,
+      "captured_at_utc": "2026-09-12T07:55:36.522597+00:00"
+    },
+    {
       "archive": "repository/outputs/pi05_stack2_0911_joint5_review.png",
       "source": "/home/zhangw/UR5e_RoboTwin_Real/outputs/pi05_stack2_0911_joint5_review.png",
       "source_mtime_ns": 1789117829053702053,
@@ -8102,8 +8399,8 @@
   ],
   "retained_from_earlier_snapshots": [],
   "excluded_counts": {
-    "bulk_payload_or_non_evidence": 41591
+    "bulk_payload_or_non_evidence": 41645
   },
-  "file_count": 731,
-  "total_archived_bytes": 36263107
+  "file_count": 758,
+  "total_archived_bytes": 38090964
 }

@@ -1,0 +1,103 @@
+{
+  "recipe_version": 2,
+  "contract": {
+    "version": 1,
+    "policy": "pi05",
+    "action_space": "joint_position",
+    "state_layout": "ur5e_joint14_v1",
+    "joint_unit": "rad",
+    "joint_order": [
+      "base",
+      "shoulder",
+      "elbow",
+      "wrist_1",
+      "wrist_2",
+      "wrist_3"
+    ],
+    "fps": 10,
+    "action_horizon": 50,
+    "adapt_to_pi": false,
+    "delta_joint_actions": true,
+    "robotwin_commit": "210720340637cb4619283b295dde4cdd807c9e66",
+    "dataset_id": "ur5e/stack_blocks_three_joint_5_v20260911",
+    "prompt": "Stack the three blocks into a tower.",
+    "native_patch": "ur5e_pi05_config_import_v1",
+    "run_ids": [
+      "20260911_154322",
+      "20260911_154430",
+      "20260911_154520",
+      "20260911_154720",
+      "20260911_154813"
+    ],
+    "gripper_cycles": 2,
+    "home_q": [
+      0.6091121792793274,
+      -1.1708316129497072,
+      1.4655290762530726,
+      -1.8609100780882777,
+      -1.5287440458880823,
+      -0.21472226778139286
+    ],
+    "joint_lower": [
+      0.4305624723434448,
+      -1.6955234733274955,
+      1.315510670338766,
+      -2.5809898815550745,
+      -1.852432934437887,
+      -0.364773956929342
+    ],
+    "joint_upper": [
+      1.1991539239883422,
+      -0.7925669473460694,
+      2.2449705282794397,
+      -1.7107918224730434,
+      -1.3087314764605922,
+      -0.06467668214906866
+    ],
+    "tcp_lower": [
+      -0.5413827407476334,
+      -0.5813789653838025,
+      0.14171807344434606
+    ],
+    "tcp_upper": [
+      -0.06249299743012397,
+      -0.37205173043818585,
+      0.4288675182273597
+    ],
+    "tcp_offset": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_semantics": "commanded_open_0_closed_1",
+    "image_semantics": "head_and_right_wrist_RGB; left_wrist_missing_mask_false"
+  },
+  "dataset_ready": {
+    "contract_sha256": "faef6c9e93fd44161070cfdae00dc2b84418c365f0b4071efe61958816bc7bee",
+    "norm_sha256": "20c894084cd66f02f02c745de4266b954e45cb1878e0697aa7113a181e0df510",
+    "episodes": 5,
+    "transitions": 993,
+    "parquet_sha256": {
+      "data/chunk-000/episode_000000.parquet": "400e3a823746e9b6521c6b861d0c2f75f3a997980a1ce122bf65c7e2cee7e757",
+      "data/chunk-000/episode_000001.parquet": "59f5b88b60373c5ab826c58a3f49f3da555d3cb87dbf21fcf7d1e5b0b277d81e",
+      "data/chunk-000/episode_000002.parquet": "7ab2fc6076b5c237804d4f33f69fa4967070cd41ca5c2f94375c4eac6cad41e5",
+      "data/chunk-000/episode_000003.parquet": "9f2b3eee4efa8d1f469f03af2e2a24e4e89675bf860ea4e52153d858f022731f",
+      "data/chunk-000/episode_000004.parquet": "17a544932bdbe7e1a2dc6578757c51c867504059f9b5645088c85e79db2cdf77"
+    },
+    "label": "absolute measured state[t+1]; native delta relative to state[t]; terminal repeat padding"
+  },
+  "base_params": "gs://openpi-assets/checkpoints/pi05_base/params",
+  "native_checkpoint_compat": "ur5e_orbax_0111_callback_v1",
+  "schedule_steps": 3000,
+  "batch_size": 8,
+  "warmup_steps": 100,
+  "learning_rate": 2.5e-05,
+  "seed": 42,
+  "image_augmentation": false,
+  "num_workers": 2,
+  "freeze": "image+language frozen; action expert and action/time projections trainable",
+  "ema": null
+}

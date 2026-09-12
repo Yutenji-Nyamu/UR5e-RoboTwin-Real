@@ -1,0 +1,112 @@
+{
+  "scope": "training_flow_matching_loss_including_native_padding",
+  "metrics": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/stack2_0911_joint5_sft_20260911_01/20260911T091427665881Z/metrics.jsonl",
+  "step": 1000,
+  "snapshot_time_utc": "2026-09-11T09:43:06.764597+00:00",
+  "window": 50,
+  "first_window_mean": 0.14118522003293038,
+  "last_window_mean": 0.02289660779759288,
+  "relative_loss_drop_pct": 83.78257455542979,
+  "nonoverlapping_windows": [
+    {
+      "from_step": 1,
+      "to_step": 50,
+      "mean_loss": 0.14118522003293038
+    },
+    {
+      "from_step": 51,
+      "to_step": 100,
+      "mean_loss": 0.07629705712199211
+    },
+    {
+      "from_step": 101,
+      "to_step": 150,
+      "mean_loss": 0.05220250733196735
+    },
+    {
+      "from_step": 151,
+      "to_step": 200,
+      "mean_loss": 0.03807107735425234
+    },
+    {
+      "from_step": 201,
+      "to_step": 250,
+      "mean_loss": 0.03569466162472963
+    },
+    {
+      "from_step": 251,
+      "to_step": 300,
+      "mean_loss": 0.03305679053068161
+    },
+    {
+      "from_step": 301,
+      "to_step": 350,
+      "mean_loss": 0.028869363348931074
+    },
+    {
+      "from_step": 351,
+      "to_step": 400,
+      "mean_loss": 0.02728080118075013
+    },
+    {
+      "from_step": 401,
+      "to_step": 450,
+      "mean_loss": 0.02932276714593172
+    },
+    {
+      "from_step": 451,
+      "to_step": 500,
+      "mean_loss": 0.027055926881730558
+    },
+    {
+      "from_step": 501,
+      "to_step": 550,
+      "mean_loss": 0.0257449303381145
+    },
+    {
+      "from_step": 551,
+      "to_step": 600,
+      "mean_loss": 0.025997688937932254
+    },
+    {
+      "from_step": 601,
+      "to_step": 650,
+      "mean_loss": 0.025606962814927102
+    },
+    {
+      "from_step": 651,
+      "to_step": 700,
+      "mean_loss": 0.022711849976330994
+    },
+    {
+      "from_step": 701,
+      "to_step": 750,
+      "mean_loss": 0.02247207287698984
+    },
+    {
+      "from_step": 751,
+      "to_step": 800,
+      "mean_loss": 0.023717863503843545
+    },
+    {
+      "from_step": 801,
+      "to_step": 850,
+      "mean_loss": 0.023170573487877846
+    },
+    {
+      "from_step": 851,
+      "to_step": 900,
+      "mean_loss": 0.022339532021433114
+    },
+    {
+      "from_step": 901,
+      "to_step": 950,
+      "mean_loss": 0.021929545700550078
+    },
+    {
+      "from_step": 951,
+      "to_step": 1000,
+      "mean_loss": 0.02289660779759288
+    }
+  ]
+}

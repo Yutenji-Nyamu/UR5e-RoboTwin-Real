@@ -17,8 +17,8 @@ UR5e_RoboTwin_Real（本仓库跟踪、维护）
 ```
 
 依赖只能单向：本仓库适配层可以调用 RoboTwin；RoboTwin 不导入真机硬件模块，
-底层硬件也不导入 RoboTwin。训练输出、生成的任务配置和 checkpoint 都是运行产物，
-不提交到 Git。
+底层硬件也不导入 RoboTwin。第三方工作树和模型本体不提交；训练日志、配置和checkpoint
+小型元信息通过[实验资料归档](../experiments/README.md)保存Git副本，运行目录仍被忽略。
 
 ## 现有 ACT 真机链路
 

@@ -1,2 +1,4 @@
 # Unified patch context lines intentionally contain one leading space.
 *.patch -whitespace
+# Evidence hashes cover original bytes, including historical log/CSV line endings.
+docs/experiments/evidence/** -text -whitespace

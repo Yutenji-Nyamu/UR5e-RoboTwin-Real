@@ -1,0 +1,331 @@
+{
+  "step": 500,
+  "scope": "teacher_forced_training_set_only",
+  "physical_execution": false,
+  "samples": 15,
+  "valid_targets": 464,
+  "padded_targets_excluded": 286,
+  "rows": [
+    {
+      "episode": 0,
+      "index": 0,
+      "valid_targets": 50,
+      "padded_targets_excluded": 0,
+      "joint_mae_rad": 0.014611881422469164,
+      "joint_max_error_rad": 0.14892009791007332,
+      "joint_mae_per_axis_rad": [
+        0.01958028019464841,
+        0.01707858966282581,
+        0.050130663635434135,
+        0.0004025991741905255,
+        0.0004617345957040886,
+        1.742127201203758e-05
+      ],
+      "gripper_mae": 0.23890461731041612,
+      "gripper_accuracy": 0.76,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.01350186712987065,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 0,
+      "index": 50,
+      "valid_targets": 50,
+      "padded_targets_excluded": 0,
+      "joint_mae_rad": 0.0031943991137609786,
+      "joint_max_error_rad": 0.032836725575214554,
+      "joint_mae_per_axis_rad": [
+        0.005123050185417739,
+        0.006530281647321428,
+        0.007355288234536821,
+        9.989513354001556e-05,
+        4.1362060745964155e-05,
+        1.651742100390652e-05
+      ],
+      "gripper_mae": 0.030480292901684608,
+      "gripper_accuracy": 0.98,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.0015872985398917919,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 0,
+      "index": 101,
+      "valid_targets": 1,
+      "padded_targets_excluded": 49,
+      "joint_mae_rad": 0.0014966297456804935,
+      "joint_max_error_rad": 0.004395188263114025,
+      "joint_mae_per_axis_rad": [
+        0.002465641282804687,
+        0.004395188263114025,
+        0.002034399351255267,
+        3.264697529248295e-05,
+        4.296999015362957e-05,
+        8.93261146286961e-06
+      ],
+      "gripper_mae": 0.009406095143526793,
+      "gripper_accuracy": 1.0,
+      "prefix_targets": 1,
+      "prefix_joint_mae_rad": 0.0014966297456804935,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 1,
+      "index": 102,
+      "valid_targets": 50,
+      "padded_targets_excluded": 0,
+      "joint_mae_rad": 0.005773393912101152,
+      "joint_max_error_rad": 0.05728932121492236,
+      "joint_mae_per_axis_rad": [
+        0.0113261794818363,
+        0.007824140809900371,
+        0.014914339352591028,
+        0.00042346454687751666,
+        0.0001401707845443445,
+        1.2068496857358669e-05
+      ],
+      "gripper_mae": 0.010369891735261056,
+      "gripper_accuracy": 1.0,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.003943746520652166,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 1,
+      "index": 142,
+      "valid_targets": 41,
+      "padded_targets_excluded": 9,
+      "joint_mae_rad": 0.019104501344165394,
+      "joint_max_error_rad": 0.2251639012215947,
+      "joint_mae_per_axis_rad": [
+        0.021567677531055814,
+        0.035036732955025865,
+        0.05741202126462072,
+        0.0005700636126713446,
+        2.5633931679406225e-05,
+        1.4878769939211991e-05
+      ],
+      "gripper_mae": 0.18103177018769553,
+      "gripper_accuracy": 0.8292682926829268,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.003229629666264461,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 1,
+      "index": 182,
+      "valid_targets": 1,
+      "padded_targets_excluded": 49,
+      "joint_mae_rad": 0.0031289845775364414,
+      "joint_max_error_rad": 0.012174387753502547,
+      "joint_mae_per_axis_rad": [
+        0.0013828994408585649,
+        0.005194432950383909,
+        0.012174387753502547,
+        7.740696128522018e-07,
+        2.104251319368089e-05,
+        3.7073766709361244e-07
+      ],
+      "gripper_mae": 0.00826712806981802,
+      "gripper_accuracy": 1.0,
+      "prefix_targets": 1,
+      "prefix_joint_mae_rad": 0.0031289845775364414,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 2,
+      "index": 183,
+      "valid_targets": 50,
+      "padded_targets_excluded": 0,
+      "joint_mae_rad": 0.021854362452056075,
+      "joint_max_error_rad": 0.2899228162807992,
+      "joint_mae_per_axis_rad": [
+        0.04905931950906089,
+        0.022561374711024346,
+        0.059215864078533534,
+        0.00015512650203060917,
+        0.0001147425702719973,
+        1.9747341415036202e-05
+      ],
+      "gripper_mae": 0.03236344155481037,
+      "gripper_accuracy": 0.98,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.009004253347764241,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 2,
+      "index": 222,
+      "valid_targets": 40,
+      "padded_targets_excluded": 10,
+      "joint_mae_rad": 0.027144260469768044,
+      "joint_max_error_rad": 0.35336284247962313,
+      "joint_mae_per_axis_rad": [
+        0.03287043389970555,
+        0.045073506360744586,
+        0.08419681763314803,
+        0.0006479490332772841,
+        6.385104598421453e-05,
+        1.300484574862093e-05
+      ],
+      "gripper_mae": 0.11264085315584164,
+      "gripper_accuracy": 0.9,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.02034226801840143,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 2,
+      "index": 261,
+      "valid_targets": 1,
+      "padded_targets_excluded": 49,
+      "joint_mae_rad": 0.0032384999189346516,
+      "joint_max_error_rad": 0.01086032134455217,
+      "joint_mae_per_axis_rad": [
+        0.0018437058125314598,
+        0.01086032134455217,
+        0.006635410590071444,
+        7.598332386904438e-05,
+        1.5071447960535167e-05,
+        5.069946232560962e-07
+      ],
+      "gripper_mae": 0.011101122479617597,
+      "gripper_accuracy": 1.0,
+      "prefix_targets": 1,
+      "prefix_joint_mae_rad": 0.0032384999189346516,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 3,
+      "index": 262,
+      "valid_targets": 50,
+      "padded_targets_excluded": 0,
+      "joint_mae_rad": 0.016525514941268492,
+      "joint_max_error_rad": 0.17253311887400002,
+      "joint_mae_per_axis_rad": [
+        0.010888616634576543,
+        0.007883913496202535,
+        0.07985924912281568,
+        0.000418523547506755,
+        8.843530461223103e-05,
+        1.4351541897206776e-05
+      ],
+      "gripper_mae": 0.05650851873365996,
+      "gripper_accuracy": 0.96,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.008209007436598019,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 3,
+      "index": 300,
+      "valid_targets": 40,
+      "padded_targets_excluded": 10,
+      "joint_mae_rad": 0.018290379333465622,
+      "joint_max_error_rad": 0.1848906436560931,
+      "joint_mae_per_axis_rad": [
+        0.019949391278106035,
+        0.030465745298732978,
+        0.05892554019110435,
+        0.0003428818270185596,
+        4.676262590307956e-05,
+        1.1954779928739084e-05
+      ],
+      "gripper_mae": 0.17032018160691856,
+      "gripper_accuracy": 0.85,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.0059227196090418125,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 3,
+      "index": 339,
+      "valid_targets": 1,
+      "padded_targets_excluded": 49,
+      "joint_mae_rad": 0.0031566302105545487,
+      "joint_max_error_rad": 0.007500621375466032,
+      "joint_mae_per_axis_rad": [
+        0.004784050262836126,
+        0.006595315426530357,
+        0.007500621375466032,
+        5.462692183888507e-05,
+        1.5765701262271392e-06,
+        3.5907065296658658e-06
+      ],
+      "gripper_mae": 0.011804734473824501,
+      "gripper_accuracy": 1.0,
+      "prefix_targets": 1,
+      "prefix_joint_mae_rad": 0.0031566302105545487,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 4,
+      "index": 340,
+      "valid_targets": 50,
+      "padded_targets_excluded": 0,
+      "joint_mae_rad": 0.009538951911936405,
+      "joint_max_error_rad": 0.12188589450777565,
+      "joint_mae_per_axis_rad": [
+        0.020777504923144785,
+        0.012833042022304593,
+        0.023310385963318657,
+        0.00014268888637881006,
+        0.000153518456000028,
+        1.6571220471564563e-05
+      ],
+      "gripper_mae": 0.01661755444759247,
+      "gripper_accuracy": 1.0,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.007942037051266976,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 4,
+      "index": 376,
+      "valid_targets": 38,
+      "padded_targets_excluded": 12,
+      "joint_mae_rad": 0.0065917189881128406,
+      "joint_max_error_rad": 0.0782843555858479,
+      "joint_mae_per_axis_rad": [
+        0.00898396738171991,
+        0.013616697352646295,
+        0.01683317966326683,
+        8.013311532830223e-05,
+        1.9376198739274348e-05,
+        1.696021697643616e-05
+      ],
+      "gripper_mae": 0.014949500690912691,
+      "gripper_accuracy": 1.0,
+      "prefix_targets": 6,
+      "prefix_joint_mae_rad": 0.0013266918532549863,
+      "prefix_gripper_accuracy": 1.0
+    },
+    {
+      "episode": 4,
+      "index": 413,
+      "valid_targets": 1,
+      "padded_targets_excluded": 49,
+      "joint_mae_rad": 0.0028220611129835447,
+      "joint_max_error_rad": 0.011579457854324238,
+      "joint_mae_per_axis_rad": [
+        0.0009376935462417357,
+        0.011579457854324238,
+        0.004364631417288489,
+        3.669823499485858e-05,
+        8.074595672757923e-06,
+        5.811029379187982e-06
+      ],
+      "gripper_mae": 0.01740198665946722,
+      "gripper_accuracy": 1.0,
+      "prefix_targets": 1,
+      "prefix_joint_mae_rad": 0.0028220611129835447,
+      "prefix_gripper_accuracy": 1.0
+    }
+  ],
+  "joint_mae_rad": 0.013879145392314047,
+  "gripper_mae": 0.08325220236090106,
+  "gripper_accuracy": 0.9288793103448276,
+  "prefix_joint_mae_rad": 0.007136921855441983,
+  "prefix_gripper_accuracy": 1.0,
+  "elapsed_s": 9.062675701000444
+}

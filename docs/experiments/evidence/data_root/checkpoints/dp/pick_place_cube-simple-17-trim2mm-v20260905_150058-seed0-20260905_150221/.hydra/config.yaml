@@ -1,0 +1,167 @@
+name: robot_${task.name}
+_target_: diffusion_policy.workspace.robotworkspace.RobotWorkspace
+task_name: ${task.name}
+shape_meta: ${task.shape_meta}
+exp_name: pick_place_cube-robot_dp-real
+horizon: 8
+n_obs_steps: 3
+n_action_steps: 6
+n_latency_steps: 0
+dataset_obs_steps: ${n_obs_steps}
+past_action_visible: false
+keypoint_visible_rate: 1.0
+obs_as_global_cond: true
+policy:
+  _target_: diffusion_policy.policy.diffusion_unet_image_policy.DiffusionUnetImagePolicy
+  shape_meta: ${shape_meta}
+  noise_scheduler:
+    _target_: diffusers.schedulers.scheduling_ddpm.DDPMScheduler
+    num_train_timesteps: 100
+    beta_start: 0.0001
+    beta_end: 0.02
+    beta_schedule: squaredcos_cap_v2
+    variance_type: fixed_small
+    clip_sample: true
+    prediction_type: epsilon
+  obs_encoder:
+    _target_: diffusion_policy.model.vision.multi_image_obs_encoder.MultiImageObsEncoder
+    shape_meta: ${shape_meta}
+    rgb_model:
+      _target_: diffusion_policy.model.vision.model_getter.get_resnet
+      name: resnet18
+      weights: null
+    resize_shape: null
+    crop_shape: null
+    random_crop: true
+    use_group_norm: true
+    share_rgb_model: false
+    imagenet_norm: true
+  horizon: ${horizon}
+  n_action_steps: ${eval:'${n_action_steps}+${n_latency_steps}'}
+  n_obs_steps: ${n_obs_steps}
+  num_inference_steps: 100
+  obs_as_global_cond: ${obs_as_global_cond}
+  diffusion_step_embed_dim: 128
+  down_dims:
+  - 256
+  - 512
+  - 1024
+  kernel_size: 5
+  n_groups: 8
+  cond_predict_scale: true
+ema:
+  _target_: diffusion_policy.model.diffusion.ema_model.EMAModel
+  update_after_step: 0
+  inv_gamma: 1.0
+  power: 0.75
+  min_value: 0.0
+  max_value: 0.9999
+dataloader:
+  batch_size: 72
+  num_workers: 0
+  shuffle: true
+  pin_memory: true
+  persistent_workers: false
+val_dataloader:
+  batch_size: 72
+  num_workers: 0
+  shuffle: false
+  pin_memory: true
+  persistent_workers: false
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 0.0001
+  betas:
+  - 0.95
+  - 0.999
+  eps: 1.0e-08
+  weight_decay: 1.0e-06
+training:
+  device: cuda:0
+  seed: 0
+  debug: false
+  resume: false
+  lr_scheduler: cosine
+  lr_warmup_steps: 500
+  num_epochs: 600
+  gradient_accumulate_every: 1
+  use_ema: true
+  freeze_encoder: false
+  rollout_every: 50
+  checkpoint_every: 300
+  val_every: 1
+  sample_every: 5
+  max_train_steps: null
+  max_val_steps: null
+  tqdm_interval_sec: 1.0
+logging:
+  project: diffusion_policy_debug
+  resume: true
+  mode: offline
+  name: ${now:%Y.%m.%d-%H.%M.%S}_${name}_${task_name}
+  tags:
+  - ${name}
+  - ${task_name}
+  - ${exp_name}
+  id: null
+  group: null
+checkpoint:
+  topk:
+    monitor_key: test_mean_score
+    mode: max
+    k: 5
+    format_str: epoch={epoch:04d}-test_mean_score={test_mean_score:.3f}.ckpt
+  save_last_ckpt: true
+  save_last_snapshot: false
+multi_run:
+  run_dir: data/outputs/${now:%Y.%m.%d}/${now:%H.%M.%S}_${name}_${task_name}
+  wandb_name_base: ${now:%Y.%m.%d-%H.%M.%S}_${name}_${task_name}
+setting: simple
+expert_data_num: 17
+head_camera_type: D435
+task:
+  name: pick_place_cube
+  image_shape:
+  - 3
+  - -1
+  - -1
+  shape_meta:
+    obs:
+      head_cam:
+        shape:
+        - 3
+        - -1
+        - -1
+        type: rgb
+      agent_pos:
+        shape:
+        - 14
+        type: low_dim
+    action:
+      shape:
+      - 14
+  env_runner:
+    _target_: diffusion_policy.env_runner.pusht_image_runner.PushTImageRunner
+    n_train: 6
+    n_train_vis: 2
+    train_start_seed: 0
+    n_test: 50
+    n_test_vis: 4
+    legacy_test: true
+    test_start_seed: 100000
+    max_steps: 300
+    n_obs_steps: ${n_obs_steps}
+    n_action_steps: ${n_action_steps}
+    fps: 10
+    past_action: ${past_action_visible}
+    n_envs: null
+  dataset:
+    _target_: diffusion_policy.dataset.robot_image_dataset.RobotImageDataset
+    zarr_path: /data/robotics/ur5e-real/converted/dp/pick_place_cube-simple-17-trim2mm-v20260905_150058.zarr
+    batch_size: 72
+    horizon: ${horizon}
+    pad_before: ${eval:'${n_obs_steps}-1'}
+    pad_after: ${eval:'${n_action_steps}-1'}
+    seed: 42
+    val_ratio: 0.02
+    max_train_episodes: null

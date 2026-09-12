@@ -1,0 +1,96 @@
+{
+  "step": 500,
+  "contract": {
+    "version": 1,
+    "policy": "pi05",
+    "action_space": "joint_position",
+    "state_layout": "ur5e_joint14_v1",
+    "joint_unit": "rad",
+    "joint_order": [
+      "base",
+      "shoulder",
+      "elbow",
+      "wrist_1",
+      "wrist_2",
+      "wrist_3"
+    ],
+    "fps": 10,
+    "action_horizon": 50,
+    "adapt_to_pi": false,
+    "delta_joint_actions": true,
+    "robotwin_commit": "210720340637cb4619283b295dde4cdd807c9e66",
+    "dataset_id": "ur5e/pick_place_cube_joint_5_v20260908",
+    "prompt": "Pick up the cube and place it back on the table.",
+    "native_patch": "ur5e_pi05_config_import_v1",
+    "run_ids": [
+      "20260908_153254",
+      "20260908_153339",
+      "20260908_153413",
+      "20260908_153445",
+      "20260908_153525"
+    ],
+    "home_q": [
+      0.609106469154358,
+      -1.170830176477768,
+      1.4655153433429162,
+      -1.8609076939024867,
+      -1.528741184865133,
+      -0.2147174040423792
+    ],
+    "joint_lower": [
+      0.4590516448020935,
+      -1.3208568793586273,
+      1.1496376196490687,
+      -2.014948888818258,
+      -1.6794345060931604,
+      -0.3647706190692347
+    ],
+    "joint_upper": [
+      1.0622576713561995,
+      -0.7291175049594423,
+      1.8565237204181115,
+      -1.7097303829588832,
+      -1.3778547445880336,
+      -0.06467668214906866
+    ],
+    "tcp_lower": [
+      -0.4980578736109423,
+      -0.6961361410958133,
+      0.14086332832355847
+    ],
+    "tcp_upper": [
+      -0.2593884126099003,
+      -0.42792499578849597,
+      0.38958487174647877
+    ],
+    "tcp_offset": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_semantics": "commanded_open_0_closed_1",
+    "image_semantics": "head_and_right_wrist_RGB; left_wrist_missing_mask_false"
+  },
+  "dataset_ready": {
+    "contract_sha256": "e0529ebff3f4f56d2b6a502e15b8d8402bbeeb3e9a2a9bc8c4d3e464442e2ce9",
+    "norm_sha256": "8b5594de81717458e0496cf080380c15b89061ffbed2712a5c5218cfb5f624bf",
+    "episodes": 5,
+    "transitions": 414,
+    "parquet_sha256": {
+      "data/chunk-000/episode_000000.parquet": "28cb246c7dc285fb66f87524ccb05ba6c910a56a48c8cb42a6062f6b754b4f6a",
+      "data/chunk-000/episode_000001.parquet": "1ed8a446982bf8ca52be573e4fcae8bebadcb1b561e17972bcb1f93173e7121c",
+      "data/chunk-000/episode_000002.parquet": "8d0ad07f6187c8f177e01ce367b88f6d83896742abb2499485fe2d701ad7a968",
+      "data/chunk-000/episode_000003.parquet": "24ed32567e7794013c914c337ececadeff0cb35d884f3ebc3b780ffc8f503c60",
+      "data/chunk-000/episode_000004.parquet": "bbdb9e36d8aed3742ad2a43670dbd76f36f25ffed2a9a4013417fac313e4c970"
+    },
+    "label": "absolute measured state[t+1]; native delta relative to state[t]; terminal repeat padding"
+  },
+  "native_checkpoint_compat": "ur5e_orbax_0111_callback_v1",
+  "checkpoint_saved": true,
+  "image_augmentation": false,
+  "status": "intermediate_offline_only",
+  "physical_execution": false
+}

@@ -1,0 +1,56 @@
+[RUN_DIR] /home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_workers2_20260909_01/runs/joint5_batch_probe_workers2_20260909_01_b8/20260909T082530483149Z
+/home/zhangw/UR5e_RoboTwin_Real/.venv/openpi-assets/big_vision/paligemma_tokenizer.model
+[RESOURCE] {"time_utc": "2026-09-09T08:26:07.341238+00:00", "elapsed_s": 31.194976535000023, "phase": "load_weights_and_initialize", "step": 0, "gpus": [{"index": 0.0, "uuid": "GPU-fc2b57b6-ffd1-1ab3-6ea4-0292c178e5c4", "memory_total_mib": 49140.0, "memory_used_mib": 919.0, "memory_free_mib": 47614.0, "utilization_pct": 13.0, "power_w": 82.38, "temperature_c": 60.0}], "host": {"total_bytes": 132312924160, "available_bytes": 97678069760, "used_bytes": 34634854400, "process_rss_bytes": 23703429120, "children_rss_sum_bytes": 1495896064, "swap_used_bytes": 786432, "swap_free_bytes": 8589144064}, "errors": []}
+[RESOURCE] {"time_utc": "2026-09-09T08:26:39.033215+00:00", "elapsed_s": 62.886963872999786, "phase": "initial_parameter_audit", "step": 0, "gpus": [{"index": 0.0, "uuid": "GPU-fc2b57b6-ffd1-1ab3-6ea4-0292c178e5c4", "memory_total_mib": 49140.0, "memory_used_mib": 17313.0, "memory_free_mib": 31220.0, "utilization_pct": 12.0, "power_w": 83.11, "temperature_c": 61.0}], "host": {"total_bytes": 132312924160, "available_bytes": 109109469184, "used_bytes": 23203454976, "process_rss_bytes": 14081523712, "children_rss_sum_bytes": 1495896064, "swap_used_bytes": 786432, "swap_free_bytes": 8589144064}, "errors": []}
+[FREEZE] {"frozen": {"elements": 2923335408, "leaves": 32, "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"}, "trainable": {"elements": 430098464, "leaves": 19, "sha256": "408c5bbfd4d3066167aeefa6e6ada38d997f7ae71154251fd3521d1de53b4951"}}
+[TRAIN] {"time_utc": "2026-09-09T08:26:51.551720+00:00", "step": 1, "first_step_in_process": true, "compute_s": 7.786801206999826, "data_wait_s": 11.48322060999999, "samples_per_s": 0.41515261767594275, "learning_rate": 2.499999936844688e-05, "batch_size": 8, "jax_memory": [{"bytes_in_use": 11305797376, "peak_bytes_in_use": 15448178176, "bytes_limit": 38167265280, "bytes_reserved": 0, "peak_bytes_reserved": 0, "device": "cuda:0"}], "grad_norm": 1.0041794776916504, "loss": 0.20336323976516724, "param_norm": 1802.38427734375}
+[TRAIN] {"time_utc": "2026-09-09T08:26:53.633219+00:00", "step": 2, "first_step_in_process": false, "compute_s": 1.5461289009999746, "data_wait_s": 0.03851084699999774, "samples_per_s": 5.048466069399731, "learning_rate": 2.499999391147867e-05, "batch_size": 8, "jax_memory": [{"bytes_in_use": 11302225664, "peak_bytes_in_use": 15448178176, "bytes_limit": 38167265280, "bytes_reserved": 0, "peak_bytes_reserved": 0, "device": "cuda:0"}], "grad_norm": 0.5437573194503784, "loss": 0.15873998403549194, "param_norm": 1802.384765625}
+[TRAIN] {"time_utc": "2026-09-09T08:26:55.211465+00:00", "step": 3, "first_step_in_process": false, "compute_s": 1.5316555549998156, "data_wait_s": 0.04112634400007664, "samples_per_s": 5.086528529535517, "learning_rate": 2.4999975721584633e-05, "batch_size": 8, "jax_memory": [{"bytes_in_use": 11305798400, "peak_bytes_in_use": 15448179968, "bytes_limit": 38167265280, "bytes_reserved": 0, "peak_bytes_reserved": 0, "device": "cuda:0"}], "grad_norm": 0.4822108745574951, "loss": 0.15063098073005676, "param_norm": 1802.385009765625}
+[RESOURCE] {"time_utc": "2026-09-09T08:27:10.976009+00:00", "elapsed_s": 94.82974426800001, "phase": "final_parameter_audit", "step": 3, "gpus": [{"index": 0.0, "uuid": "GPU-fc2b57b6-ffd1-1ab3-6ea4-0292c178e5c4", "memory_total_mib": 49140.0, "memory_used_mib": 17356.0, "memory_free_mib": 31177.0, "utilization_pct": 6.0, "power_w": 83.69, "temperature_c": 64.0}], "host": {"total_bytes": 132312924160, "available_bytes": 108357550080, "used_bytes": 23955374080, "process_rss_bytes": 15470018560, "children_rss_sum_bytes": 1492156416, "swap_used_bytes": 786432, "swap_free_bytes": 8589144064}, "errors": []}
+[RESULT] {
+  "step": 3,
+  "metrics": {
+    "grad_norm": 0.4822108745574951,
+    "loss": 0.15063098073005676,
+    "param_norm": 1802.385009765625
+  },
+  "before": {
+    "frozen": {
+      "elements": 2923335408,
+      "leaves": 32,
+      "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+    },
+    "trainable": {
+      "elements": 430098464,
+      "leaves": 19,
+      "sha256": "408c5bbfd4d3066167aeefa6e6ada38d997f7ae71154251fd3521d1de53b4951"
+    }
+  },
+  "after": {
+    "frozen": {
+      "elements": 2923335408,
+      "leaves": 32,
+      "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+    },
+    "trainable": {
+      "elements": 430098464,
+      "leaves": 19,
+      "sha256": "3418621a8cb503a034b0069e7372a1724f548ab996644fc24e50a0d91112dca0"
+    }
+  },
+  "frozen_unchanged": true,
+  "trainable_changed": true,
+  "checkpoint_reload": false,
+  "optimizer_reload": false,
+  "optimizer_sha256": "6dcaf7492efc42f9b1800066d1123249a639988be029d171a48876a0a69ddc4b",
+  "elapsed_s": 114.59657143200002,
+  "status": "benchmark_only",
+  "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_workers2_20260909_01/runs/joint5_batch_probe_workers2_20260909_01_b8/20260909T082530483149Z",
+  "batch_size": 8,
+  "physical_execution": false,
+  "measured_warm_steps": 2,
+  "first_step_compile_and_compute_s": 7.786801206999826,
+  "warm_step_median_s": 1.5787108234999323,
+  "warm_samples_per_s": 5.067425826766901,
+  "measurement_scope": "few_step_coarse_probe_not_convergence"
+}

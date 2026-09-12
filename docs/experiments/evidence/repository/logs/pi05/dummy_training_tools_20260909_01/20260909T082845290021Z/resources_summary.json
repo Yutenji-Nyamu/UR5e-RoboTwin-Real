@@ -1,0 +1,21 @@
+{
+  "samples": 19,
+  "gpus": {
+    "GPU-fc2b57b6-ffd1-1ab3-6ea4-0292c178e5c4": {
+      "memory_used_mib": 1985.0,
+      "memory_free_mib": 46548.0
+    }
+  },
+  "host": {
+    "available_bytes": 118487576576,
+    "process_rss_bytes": 5212950528,
+    "children_rss_sum_bytes": 105164800,
+    "swap_used_bytes": 786432
+  },
+  "errors": [],
+  "jax_peak_bytes": 1116495104,
+  "sampled_peaks_only": true,
+  "interval_s": 2.0,
+  "elapsed_s": 38.71539994500017,
+  "status": "completed"
+}

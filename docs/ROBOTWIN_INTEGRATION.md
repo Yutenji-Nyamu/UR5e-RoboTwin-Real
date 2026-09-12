@@ -18,8 +18,9 @@ UR5e_RoboTwin_Real (tracked, owned here)
 
 Dependency direction is one-way: this repository's adapters may call RoboTwin;
 RoboTwin does not import hardware modules, and core hardware never imports
-RoboTwin. Training output, generated task config, and checkpoints remain runtime
-artifacts and are not committed.
+RoboTwin. The upstream worktree and model payloads stay outside Git. Small training logs,
+configs and checkpoint metadata are versioned through the [evidence archive](experiments/README.md);
+live runtime directories remain ignored.
 
 ## Existing ACT real path
 

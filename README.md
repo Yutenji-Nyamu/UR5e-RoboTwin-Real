@@ -98,6 +98,12 @@ Data lives under `/data/robotics/ur5e-real` on the shared 4 TB disk. Architectur
 hardware commissioning, data management, training, and inference documentation
 is indexed in [`docs/README.md`](docs/README.md).
 
+Small training/inference logs, loss/inspection images, dataset indexes and numeric CSVs,
+checkpoint metadata and the workstation config are kept in the
+[experiment evidence archive](docs/experiments/README.md), with source paths and hashes.
+Run `python scripts/archive_experiment_evidence.py` before committing experiment results;
+bulk datasets and model weights remain external.
+
 For a clean-machine deployment or repair, start with the
 [bottom-up commissioning checklist](docs/runbooks/new_machine.md). It connects
 installation, individual device tests, data/model migration and end-to-end checks.

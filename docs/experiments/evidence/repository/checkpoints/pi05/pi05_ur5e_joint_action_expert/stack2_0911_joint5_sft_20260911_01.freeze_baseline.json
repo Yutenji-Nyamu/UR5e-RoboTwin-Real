@@ -1,0 +1,12 @@
+{
+  "frozen": {
+    "elements": 2923335408,
+    "leaves": 32,
+    "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+  },
+  "trainable": {
+    "elements": 430098464,
+    "leaves": 19,
+    "sha256": "408c5bbfd4d3066167aeefa6e6ada38d997f7ae71154251fd3521d1de53b4951"
+  }
+}

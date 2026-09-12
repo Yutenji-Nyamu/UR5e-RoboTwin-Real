@@ -1,0 +1,97 @@
+{
+  "step": 500,
+  "contract": {
+    "version": 1,
+    "policy": "pi05",
+    "action_space": "joint_position",
+    "state_layout": "ur5e_joint14_v1",
+    "joint_unit": "rad",
+    "joint_order": [
+      "base",
+      "shoulder",
+      "elbow",
+      "wrist_1",
+      "wrist_2",
+      "wrist_3"
+    ],
+    "fps": 10,
+    "action_horizon": 50,
+    "adapt_to_pi": false,
+    "delta_joint_actions": true,
+    "robotwin_commit": "210720340637cb4619283b295dde4cdd807c9e66",
+    "dataset_id": "ur5e/plug_charger_joint_5_v20260912",
+    "prompt": "Pick up the charger and plug it into the socket.",
+    "native_patch": "ur5e_pi05_config_import_v1",
+    "run_ids": [
+      "20260912_144757",
+      "20260912_144852",
+      "20260912_144941",
+      "20260912_145043",
+      "20260912_145151"
+    ],
+    "gripper_cycles": 1,
+    "home_q": [
+      0.6091250777244568,
+      -1.1708363813212892,
+      1.4655305067645472,
+      -1.8609161816039026,
+      -1.528742520009176,
+      -0.2147218863116663
+    ],
+    "joint_lower": [
+      0.4590887188911438,
+      -1.5407647889903564,
+      1.3155140081988734,
+      -2.388773008386129,
+      -1.7155248800860803,
+      -0.3647701422320765
+    ],
+    "joint_upper": [
+      1.215446376800537,
+      -1.0204944235137483,
+      2.094930378590719,
+      -1.7105529270567836,
+      -1.3780273596393031,
+      -0.0646857420550746
+    ],
+    "tcp_lower": [
+      -0.49790443872814427,
+      -0.6229758148401979,
+      0.1629463406513919
+    ],
+    "tcp_upper": [
+      -0.09152067038997726,
+      -0.42791975784769415,
+      0.4575476782207119
+    ],
+    "tcp_offset": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_semantics": "commanded_open_0_closed_1",
+    "image_semantics": "head_and_right_wrist_RGB; left_wrist_missing_mask_false"
+  },
+  "dataset_ready": {
+    "contract_sha256": "710f4d2c950b66b3a9e19927df2d52bab45dd24eeaaa029837933b8c749d7d41",
+    "norm_sha256": "b188c9365a84354b1a0d3f5101cab8b919f6e75c146c8991a338cf105b17a2a6",
+    "episodes": 5,
+    "transitions": 1216,
+    "parquet_sha256": {
+      "data/chunk-000/episode_000000.parquet": "ee56abefa61060f85fe35a23829fb352ae5bbc13b247d9760cff62c49aa7d1a4",
+      "data/chunk-000/episode_000001.parquet": "5f1f401dd8735cbf829a67c9013fe16ad5ebdae3329c8a15a09988e74c45f94f",
+      "data/chunk-000/episode_000002.parquet": "f8444417c74f6d94754d44827e0b98c6330ef3629c94ddb2d1bbbba6b3644dde",
+      "data/chunk-000/episode_000003.parquet": "7a42ec6c5ae4ab0c855e2dcf05346fcd3259e6eedb2110a18a5c957464c36c4b",
+      "data/chunk-000/episode_000004.parquet": "78359ab9e70754ce2d4209c5f5fc95006a322e7a331a982ab84662e2d1f45eed"
+    },
+    "label": "absolute measured state[t+1]; native delta relative to state[t]; terminal repeat padding"
+  },
+  "native_checkpoint_compat": "ur5e_orbax_0111_callback_v1",
+  "checkpoint_saved": true,
+  "image_augmentation": false,
+  "status": "intermediate_offline_only",
+  "physical_execution": false
+}

@@ -1,0 +1,17 @@
+{
+  "source": "native_dummy_pi05",
+  "physical_execution": false,
+  "training": false,
+  "native_max_abs_error": 0.0,
+  "prefix_shape": [
+    768,
+    64
+  ],
+  "valid_image_tokens": 512,
+  "raw_reference_shape": [
+    50,
+    32
+  ],
+  "warm_feature_wall_s": 0.0453739280001173,
+  "live_finite": true
+}

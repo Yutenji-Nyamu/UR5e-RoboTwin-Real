@@ -1,0 +1,176 @@
+{
+  "schema_version": 3,
+  "run_id": "20260911_153114",
+  "task": "pour_beans",
+  "note": "diff place",
+  "started_at": "2026-09-11T15:31:17.524229+08:00",
+  "finished_at": "2026-09-11T15:31:31.250993+08:00",
+  "duration_s": 13.726,
+  "recording_status": "completed",
+  "stop_reason": "user_quit",
+  "outcome": "failure",
+  "reviews": [
+    {
+      "reviewed_at": "2026-09-11T15:31:33.502726+08:00",
+      "result": "failure",
+      "note": null
+    }
+  ],
+  "code_commit": "a09fc68595f1f37905998cf0bdc56ba0fc1ff447",
+  "robot": {
+    "host": "192.168.0.4",
+    "script_port": 30001,
+    "rtde_port": 30004,
+    "rtde_frequency_hz": 10.0,
+    "socket_timeout_s": 10.0,
+    "home_tcp_pose": [
+      -0.4479512414,
+      -0.4779532359,
+      0.3397913564,
+      1.1351054288,
+      2.8938840645,
+      -0.0267875432
+    ]
+  },
+  "gripper": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0",
+    "baudrate": 9600,
+    "timeout_s": 1.0
+  },
+  "cameras": {
+    "head_serial": "243522072333",
+    "wrist_serial": "233522079334",
+    "width": 640,
+    "height": 480,
+    "fps": 30,
+    "save_hz": 10.0,
+    "warmup_frames": 60
+  },
+  "state_recording": {
+    "representations": [
+      "tcp",
+      "joint"
+    ],
+    "rtde_fields": [
+      "timestamp",
+      "actual_TCP_pose",
+      "actual_q",
+      "actual_qd",
+      "tcp_offset"
+    ],
+    "csv_columns": [
+      "controller_time_s",
+      "tcp_x",
+      "tcp_y",
+      "tcp_z",
+      "tcp_rx",
+      "tcp_ry",
+      "tcp_rz",
+      "gripper_state",
+      "gripper_event_counter",
+      "actual_q_0",
+      "actual_q_1",
+      "actual_q_2",
+      "actual_q_3",
+      "actual_q_4",
+      "actual_q_5",
+      "actual_qd_0",
+      "actual_qd_1",
+      "actual_qd_2",
+      "actual_qd_3",
+      "actual_qd_4",
+      "actual_qd_5",
+      "host_receive_time_s"
+    ],
+    "joint_source": "actual_q",
+    "joint_velocity_source": "actual_qd",
+    "tcp_source": "actual_TCP_pose",
+    "joint_order": [
+      "base",
+      "shoulder",
+      "elbow",
+      "wrist_1",
+      "wrist_2",
+      "wrist_3"
+    ],
+    "joint_position_unit": "rad",
+    "joint_velocity_unit": "rad/s",
+    "tcp_pose_units": [
+      "m",
+      "m",
+      "m",
+      "rad",
+      "rad",
+      "rad"
+    ],
+    "tcp_pose_frame": "robot_base",
+    "tcp_orientation": "rotation_vector",
+    "sample_relation": "same_rtde_packet",
+    "host_receive_time_clock": "unix_seconds_not_camera_exposure",
+    "gripper_state_semantics": "commanded_open_0_closed_1_not_measured_width",
+    "tcp_offset_source": "tcp_offset_flange_to_tcp"
+  },
+  "initial_robot_state": {
+    "controller_time_s": 794.193,
+    "tcp_pose": [
+      -0.44795277068055017,
+      -0.4779435940034367,
+      0.3397958547722148,
+      1.1351764133315705,
+      2.8938523626121793,
+      -0.026808919722329627
+    ],
+    "actual_q": [
+      0.6090925335884094,
+      -1.1708570581725617,
+      1.4655254522906702,
+      -1.8609196148314417,
+      -1.5287306944476526,
+      -0.21468907991518194
+    ],
+    "actual_qd": [
+      0.0,
+      0.0,
+      -0.0,
+      -0.0,
+      0.0,
+      0.0
+    ],
+    "tcp_offset": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "host_receive_time_s": 1789111877.3115435
+  },
+  "collection": {
+    "data_root": "/data/robotics/ur5e-real",
+    "enable_freedrive_on_start": true,
+    "initial_gripper_state": "open",
+    "preview": false,
+    "save_video": false
+  },
+  "paths": {
+    "rtde": "/data/robotics/ur5e-real/raw/action/rtde_tcp_gripper_20260911_153114.csv",
+    "gripper_events": "/data/robotics/ur5e-real/raw/action/gripper_events_20260911_153114.csv",
+    "sync": "/data/robotics/ur5e-real/raw/action/sync_action_cam_20260911_153114.csv",
+    "camera": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260911_153114",
+    "head_frames": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260911_153114/head",
+    "wrist_frames": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260911_153114/wrist"
+  },
+  "counts": {
+    "rtde_samples": 134,
+    "gripper_events": 1,
+    "frame_pairs": 133
+  },
+  "quality": {
+    "last_open_controller_time_s": null,
+    "last_frame_controller_time_s": 807.693,
+    "last_open_to_last_frame_s": null,
+    "recommended_release_tail_s": 1.0,
+    "release_tail_complete": null
+  }
+}

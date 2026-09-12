@@ -18,7 +18,7 @@ def repository_files(root: Path):
 
 
 class RepositoryHygieneTest(unittest.TestCase):
-    def test_no_private_paths_secrets_or_large_files(self):
+    def test_portable_source_no_secrets_and_bounded_evidence(self):
         root = Path(__file__).resolve().parents[1]
         text_suffixes = {
             ".py",
@@ -32,9 +32,13 @@ class RepositoryHygieneTest(unittest.TestCase):
             ".xml",
             ".script",
             ".patch",
+            ".jsonl",
+            ".csv",
+            ".txt",
+            ".log",
         }
-        forbidden = [
-            re.compile(r"/home/[A-Za-z0-9_.-]+/"),
+        private_path = re.compile(r"/home/[A-Za-z0-9_.-]+/")
+        secret_patterns = [
             re.compile(r"sk-[A-Za-z0-9_-]{20,}"),
             re.compile(r"AIza[0-9A-Za-z_-]{20,}"),
         ]
@@ -43,12 +47,15 @@ class RepositoryHygieneTest(unittest.TestCase):
         for path in repository_files(root):
             if not path.is_file() or ignored_parts.intersection(path.parts):
                 continue
-            if path.stat().st_size > 1_000_000:
+            evidence = path.is_relative_to(root / "docs/experiments/evidence")
+            limit = 10 * 1024 * 1024 if evidence else 1_000_000
+            if path.stat().st_size > limit:
                 violations.append(f"large file: {path.relative_to(root)}")
             if path.suffix.lower() not in text_suffixes:
                 continue
             content = path.read_text(encoding="utf-8", errors="replace")
-            for pattern in forbidden:
+            # Historical logs retain their original workstation paths; source remains portable.
+            for pattern in secret_patterns + ([] if evidence else [private_path]):
                 if pattern.search(content):
                     violations.append(f"{pattern.pattern}: {path.relative_to(root)}")
         self.assertEqual(violations, [])
@@ -80,6 +87,8 @@ class RepositoryHygieneTest(unittest.TestCase):
                 continue
             if {".git", ".third_party", ".venv"}.intersection(markdown.parts):
                 continue
+            if markdown.is_relative_to(root / "docs/experiments/evidence"):
+                continue  # Source-faithful historical documents may refer to external assets.
             content = markdown.read_text(encoding="utf-8")
             for match in re.finditer(r"\[[^]]*\]\(([^)]+)\)", content):
                 target = unquote(match.group(1).split("#", 1)[0])

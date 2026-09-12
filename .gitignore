@@ -12,7 +12,8 @@ configs/lab.yaml
 .env.*
 !.env.example
 
-# Runtime data and generated artifacts
+# Live runtime files stay local; small evidence snapshots are versioned under
+# docs/experiments/evidence via scripts/archive_experiment_evidence.py.
 /data/
 /raw/
 /outputs/
@@ -31,6 +32,10 @@ RoboTwin_like_data/
 *.pt
 *.pth
 *.ckpt
+
+# Small diagnostic arrays and archived source paths can match generic rules above.
+# Size is checked separately by the evidence exporter and repository hygiene test.
+!/docs/experiments/evidence/**
 
 # Editors and OS
 .vscode/

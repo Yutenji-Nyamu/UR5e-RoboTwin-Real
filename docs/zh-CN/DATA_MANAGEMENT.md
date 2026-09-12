@@ -4,6 +4,14 @@
 
 目标是反复利用有价值的示范数据，同时让每次训练和评估都能追溯到不可变的源数据。
 
+## 小型资料进入 Git
+
+2026-09-12起，除手写摘要外，训练/推理日志、Loss和复核图、session索引、动作CSV、
+数据/模型元信息、小型诊断数组及实际工位配置均保存可追溯的归档副本。
+执行 `python scripts/archive_experiment_evidence.py`，将
+`docs/experiments/evidence/` 连同代码/文档提交；范围、大小规则与完整性说明见
+[实验资料归档](../experiments/README.md)。原始数据和正在写入的日志不改动。
+
 ## 生命周期
 
 1. **Raw**：RTDE、夹爪、图像和同步表只写一次；小型 session manifest 是唯一索引，

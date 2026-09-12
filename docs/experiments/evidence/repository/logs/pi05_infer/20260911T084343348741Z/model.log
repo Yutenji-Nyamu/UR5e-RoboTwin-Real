@@ -1,0 +1,7 @@
+/home/zhangw/UR5e_RoboTwin_Real/.venv/openpi-assets/big_vision/paligemma_tokenizer.model
+[WARMUP] 1: 4015.9ms
+[WARMUP] 2: 179.2ms
+[READY] ws://127.0.0.1:40609 ; no robot connection
+INFO:websockets.server:server listening on 127.0.0.1:40609
+INFO:websockets.server:connection open
+INFO:websockets.server:connection open

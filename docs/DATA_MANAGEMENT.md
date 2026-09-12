@@ -2,6 +2,14 @@
 
 [简体中文](zh-CN/DATA_MANAGEMENT.md)
 
+## Version small evidence in Git
+
+Since 2026-09-12, archive source-faithful copies of training/inference logs, loss and inspection images,
+session indexes, numeric CSVs, dataset/checkpoint metadata, small diagnostic arrays and the workstation config.
+Run `python scripts/archive_experiment_evidence.py` and commit `docs/experiments/evidence/` with
+the experiment code and notes. See [the evidence archive](experiments/README.md) for scope and size rules.
+Raw data and live logs are never modified; large model/data payloads remain external.
+
 The goal is to reuse valuable demonstrations while keeping every training and
 evaluation result traceable to immutable source data.
 

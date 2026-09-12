@@ -87,6 +87,10 @@ ur5e-infer 20260905_150221:600 --shadow --chunks 10
 数据统一存放在4TB共享盘的 `/data/robotics/ur5e-real`。架构、硬件调试、数据管理、
 训练和推理文档见 [`docs/zh-CN/README.md`](docs/zh-CN/README.md)。
 
+小型训练/推理日志、Loss与复核图、数据索引/动作CSV、checkpoint元信息和工位配置
+现统一进入[实验资料归档](docs/experiments/README.md)，附来源和哈希；实验收尾时运行
+`python scripts/archive_experiment_evidence.py` 后一起提交。大数据和模型本体仍在数据盘/本地模型目录。
+
 新机器部署或检修从[自底向上验收手册](docs/zh-CN/runbooks/new_machine.md)开始：
 串起安装、单设备调试、数据/模型迁移及端到端检查。
 

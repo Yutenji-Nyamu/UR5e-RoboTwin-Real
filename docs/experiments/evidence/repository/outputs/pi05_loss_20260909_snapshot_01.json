@@ -1,0 +1,72 @@
+{
+  "scope": "training_flow_matching_loss_including_native_padding",
+  "metrics": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/joint5_sft_20260909_01/20260909T085731277973Z/metrics.jsonl",
+  "step": 592,
+  "snapshot_time_utc": "2026-09-09T09:15:33.936150+00:00",
+  "window": 50,
+  "first_window_mean": 0.16301361575722695,
+  "last_window_mean": 0.025442985966801644,
+  "relative_loss_drop_pct": 84.39210991755843,
+  "nonoverlapping_windows": [
+    {
+      "from_step": 1,
+      "to_step": 50,
+      "mean_loss": 0.16301361575722695
+    },
+    {
+      "from_step": 51,
+      "to_step": 100,
+      "mean_loss": 0.07524517320096492
+    },
+    {
+      "from_step": 101,
+      "to_step": 150,
+      "mean_loss": 0.050335243344306946
+    },
+    {
+      "from_step": 151,
+      "to_step": 200,
+      "mean_loss": 0.0417211652174592
+    },
+    {
+      "from_step": 201,
+      "to_step": 250,
+      "mean_loss": 0.035462691932916644
+    },
+    {
+      "from_step": 251,
+      "to_step": 300,
+      "mean_loss": 0.03452136132866144
+    },
+    {
+      "from_step": 301,
+      "to_step": 350,
+      "mean_loss": 0.029387487396597863
+    },
+    {
+      "from_step": 351,
+      "to_step": 400,
+      "mean_loss": 0.03102137928828597
+    },
+    {
+      "from_step": 401,
+      "to_step": 450,
+      "mean_loss": 0.030560336150228976
+    },
+    {
+      "from_step": 451,
+      "to_step": 500,
+      "mean_loss": 0.026792164612561464
+    },
+    {
+      "from_step": 501,
+      "to_step": 550,
+      "mean_loss": 0.026492366176098583
+    },
+    {
+      "from_step": 551,
+      "to_step": 592,
+      "mean_loss": 0.025966205235038484
+    }
+  ]
+}

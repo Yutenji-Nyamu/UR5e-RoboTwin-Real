@@ -1,0 +1,244 @@
+{
+  "version": 1,
+  "created_at": "2026-09-10T09:25:53.299242+00:00",
+  "config": {
+    "schema": 1,
+    "donor_commit": "d3acd650869d376c14c1406d90865ef90d680432",
+    "token": {
+      "input_dim": 2048,
+      "embed_dim": 2048,
+      "prefix_seq_len": 768,
+      "num_layers": 2,
+      "num_heads": 8,
+      "mlp_ratio": 4.0,
+      "dropout_rate": 0.0
+    },
+    "token_train": {
+      "steps": 500,
+      "diagnostic_interval": 100,
+      "save_interval": 100,
+      "batch_size": 2,
+      "learning_rate": 2.5e-05,
+      "warmup_steps": 100,
+      "weight_decay": 1e-10,
+      "seed": 0
+    },
+    "algorithm": {
+      "hidden_dim": 256,
+      "hidden_layers": 3,
+      "proprio_dim": 13,
+      "learning_rate": 0.0001,
+      "batch_size": 32,
+      "gamma": 0.99,
+      "tau": 0.005,
+      "critic_actor_ratio": 2,
+      "reference_dropout": 0.5,
+      "fixed_std": 0.002,
+      "warmup_bc_weight": 7.0,
+      "warmup_q_weight": 0.05,
+      "online_bc_weight": 2.5,
+      "online_q_weight": 0.45,
+      "ramp_updates": 10000,
+      "gradient_clip": 10.0,
+      "updates_per_transition": 2,
+      "bootstrap_on_timeout": true
+    },
+    "real": {
+      "episodes_per_round": 4,
+      "action_steps": 20,
+      "max_chunks": 30,
+      "speed_rad_s": 0.6,
+      "rpc_timeout_s": 1.5,
+      "release_hold_s": 1.0,
+      "success_instruction": "确认方块已抓起、放下并完全释放；按现场任务标准标注成功或失败。"
+    },
+    "save": {
+      "every_update": true,
+      "keep_last": 20
+    }
+  },
+  "base_identity": {
+    "contract_sha256": "e0529ebff3f4f56d2b6a502e15b8d8402bbeeb3e9a2a9bc8c4d3e464442e2ce9",
+    "norm_sha256": "8b5594de81717458e0496cf080380c15b89061ffbed2712a5c5218cfb5f624bf",
+    "checkpoint": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_sft_20260909_01/1000",
+    "recipe_sha256": "bdc5dcc403d8582aef5791d381b90c913fc49c884490cc1fc799cc69715c4db5",
+    "verification_sha256": "edd7b5c6c5dd8357cb9e56e0e0a7f997882d9548113c1ce7784e5363f43f3b92",
+    "params": [
+      {
+        "file": "_METADATA",
+        "size": 22038,
+        "mtime_ns": 1788946014014251093,
+        "sha256": "4292d734e52ebf8111126bc166d60a48c592d532472c2ca5461a283759ee8ea4"
+      },
+      {
+        "file": "_sharding",
+        "size": 12797,
+        "mtime_ns": 1788946014000193475,
+        "sha256": "7e65c8b63fafedfedb52bf416d6bfde394c1c88fd28dc02f18a7911f2581c183"
+      },
+      {
+        "file": "d/0c3b03419221a30b579b20603b729e5c",
+        "size": 2065,
+        "mtime_ns": 1788946014063524613,
+        "sha256": "1d978858fefb76c7bf16b8e113818b02bfade1328b77e7d186ebe5e5ffcaf7a0"
+      },
+      {
+        "file": "manifest.ocdbt",
+        "size": 117,
+        "mtime_ns": 1788946014067937837,
+        "sha256": "aa340482195824b24e6598a2fb4a49add259793c54ba1dfe13a276148bdee312"
+      },
+      {
+        "file": "ocdbt.process_0/d/2c795d20a0fd303e9cd8b057c4731afc",
+        "size": 225713307,
+        "mtime_ns": 1788946005748590365,
+        "sha256": "2ffd0f9a4d285d074e77a80e16e191f936926cee12a2a0881adcda00611c8595"
+      },
+      {
+        "file": "ocdbt.process_0/d/48753df1cd66a6c2b9d937a0e3a97671",
+        "size": 22352777,
+        "mtime_ns": 1788946005164825477,
+        "sha256": "117470128f92bbe206afc612db44de50f4c098fc21f5abd7eb5ad10faaf8db46"
+      },
+      {
+        "file": "ocdbt.process_0/d/4b2bfcbde7f34cbf90ec880a81d01533",
+        "size": 34945160,
+        "mtime_ns": 1788946005236280004,
+        "sha256": "fa97b7ed364978927376d272cb476af99e035315fc9406963e9f2cd171397ff2"
+      },
+      {
+        "file": "ocdbt.process_0/d/5dd5ada3b8f11f9c9f48b8603bdcc71c",
+        "size": 1891253136,
+        "mtime_ns": 1788946012639947533,
+        "sha256": "2e96349a49e73eb9e2b455cc5c835a362182a2615c1f11549e6d6fec280be576"
+      },
+      {
+        "file": "ocdbt.process_0/d/76ab6484898a444b78df8a82179ad578",
+        "size": 2966,
+        "mtime_ns": 1788946005068484093,
+        "sha256": "a53dc19edcc0a3a62cc08f271f24207d597a2f39b88632dd8980f0cca049ce9d"
+      },
+      {
+        "file": "ocdbt.process_0/d/838219948d926235d77e0c8e87865028",
+        "size": 1137,
+        "mtime_ns": 1788946005084492370,
+        "sha256": "9dcbd97c7f457583fedfb9d9d05e623a242ebf54b1759a420a5e4827828584b0"
+      },
+      {
+        "file": "ocdbt.process_0/d/8c712917c32c5783b5b429ad549afd6c",
+        "size": 1499613912,
+        "mtime_ns": 1788946006983654664,
+        "sha256": "48f9038ff570ab317c12b3180fd822dd9e5d87645b294d496ae10837f2003011"
+      },
+      {
+        "file": "ocdbt.process_0/d/b5a3dc4144822871177bc1dc796ec2fc",
+        "size": 2050,
+        "mtime_ns": 1788946013990447307,
+        "sha256": "cad8c338701a13b8de8f0505096ee5046f17a5ec0cffa0ea9ea1dd6347020c3b"
+      },
+      {
+        "file": "ocdbt.process_0/d/bab0c09bdc95a777800365e9d413a61d",
+        "size": 168594881,
+        "mtime_ns": 1788946005408572641,
+        "sha256": "7c5bb5d033a8e5465ad087cee86fd5add79259f016c5109c51f5d3948cb165ae"
+      },
+      {
+        "file": "ocdbt.process_0/d/bf7ff7026fd1c85cc2d422d439a74fae",
+        "size": 217,
+        "mtime_ns": 1788946005048868020,
+        "sha256": "e94b6f05ceef55173200b9a654bc6d84fae3656f3c7e168fafc6291a2847bc7a"
+      },
+      {
+        "file": "ocdbt.process_0/d/ef1d9b0b85c04d9426bbc94ed0d98ec0",
+        "size": 2333973403,
+        "mtime_ns": 1788946009399780074,
+        "sha256": "d99d666385e2fa6a8fd64157585f05758da0c81d9e9660c66d90bb5e8690afaa"
+      },
+      {
+        "file": "ocdbt.process_0/manifest.ocdbt",
+        "size": 528,
+        "mtime_ns": 1788946013994663263,
+        "sha256": "086065218be26b33800b15623893753e80118c66e3fbff6b675690779721bbe5"
+      }
+    ]
+  },
+  "base_id": "a60004b84cdc291106c05b69d113b73eb473cfd6c554fc6db82e16eff773cf7b",
+  "dataset": "/data/robotics/ur5e-real/pi05/lerobot/ur5e/pick_place_cube_joint_5_v20260908",
+  "checkpoint": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_sft_20260909_01/1000",
+  "contract": {
+    "version": 1,
+    "policy": "pi05",
+    "action_space": "joint_position",
+    "state_layout": "ur5e_joint14_v1",
+    "joint_unit": "rad",
+    "joint_order": [
+      "base",
+      "shoulder",
+      "elbow",
+      "wrist_1",
+      "wrist_2",
+      "wrist_3"
+    ],
+    "fps": 10,
+    "action_horizon": 50,
+    "adapt_to_pi": false,
+    "delta_joint_actions": true,
+    "robotwin_commit": "210720340637cb4619283b295dde4cdd807c9e66",
+    "dataset_id": "ur5e/pick_place_cube_joint_5_v20260908",
+    "prompt": "Pick up the cube and place it back on the table.",
+    "native_patch": "ur5e_pi05_config_import_v1",
+    "run_ids": [
+      "20260908_153254",
+      "20260908_153339",
+      "20260908_153413",
+      "20260908_153445",
+      "20260908_153525"
+    ],
+    "home_q": [
+      0.609106469154358,
+      -1.170830176477768,
+      1.4655153433429162,
+      -1.8609076939024867,
+      -1.528741184865133,
+      -0.2147174040423792
+    ],
+    "joint_lower": [
+      0.4590516448020935,
+      -1.3208568793586273,
+      1.1496376196490687,
+      -2.014948888818258,
+      -1.6794345060931604,
+      -0.3647706190692347
+    ],
+    "joint_upper": [
+      1.0622576713561995,
+      -0.7291175049594423,
+      1.8565237204181115,
+      -1.7097303829588832,
+      -1.3778547445880336,
+      -0.06467668214906866
+    ],
+    "tcp_lower": [
+      -0.4980578736109423,
+      -0.6961361410958133,
+      0.14086332832355847
+    ],
+    "tcp_upper": [
+      -0.2593884126099003,
+      -0.42792499578849597,
+      0.38958487174647877
+    ],
+    "tcp_offset": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_semantics": "commanded_open_0_closed_1",
+    "image_semantics": "head_and_right_wrist_RGB; left_wrist_missing_mask_false"
+  },
+  "lab_config": "/home/zhangw/UR5e_RoboTwin_Real/configs/lab.yaml",
+  "run_id": "f7740f282f400a214686b4928afacf53fd5e873e50bec5536c3b8cc3c782b7d3"
+}

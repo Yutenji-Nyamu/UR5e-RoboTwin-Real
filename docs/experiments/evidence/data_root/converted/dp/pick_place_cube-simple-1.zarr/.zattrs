@@ -1,0 +1,18 @@
+{
+    "action_semantics": "next_absolute_state",
+    "format": "robotwin_dp_real_v1",
+    "image_size_wh": [
+        320,
+        240
+    ],
+    "source": "{\"run_root\": \"/data/robotics/ur5e-real/converted/run_20260904_154212\"}",
+    "source_run_ids": [
+        "20260903_182752"
+    ],
+    "source_schema_versions": [
+        2
+    ],
+    "state_layout": "tcp6,dummy_gripper,tcp6,physical_gripper",
+    "task": "pick_place_cube",
+    "task_config": "simple"
+}

@@ -1,0 +1,17 @@
+{
+  "source": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_sft_20260909_01/1000",
+  "physical_execution": false,
+  "training": false,
+  "native_max_abs_error": 0.0,
+  "prefix_shape": [
+    768,
+    2048
+  ],
+  "valid_image_tokens": 512,
+  "raw_reference_shape": [
+    50,
+    32
+  ],
+  "warm_feature_wall_s": 0.1635002059992985,
+  "live_finite": true
+}

@@ -1,0 +1,128 @@
+{
+  "source": "gs://openpi-assets/checkpoints/pi05_base/params",
+  "local_params": "/home/zhangw/UR5e_RoboTwin_Real/.venv/pi05-base-cache-20260909",
+  "verification": "all_sizes_and_crc32c_match_official_gcs",
+  "files": [
+    {
+      "path": "_CHECKPOINT_METADATA",
+      "size": 258,
+      "generation": "1757354310086279",
+      "crc32c": "3q5lUQ=="
+    },
+    {
+      "path": "_METADATA",
+      "size": 21402,
+      "generation": "1757354310086139",
+      "crc32c": "frXw2w=="
+    },
+    {
+      "path": "_sharding",
+      "size": 11420,
+      "generation": "1757354310089508",
+      "crc32c": "4PKBJg=="
+    },
+    {
+      "path": "array_metadatas/process_0",
+      "size": 8856,
+      "generation": "1757354310090622",
+      "crc32c": "CS/yRg=="
+    },
+    {
+      "path": "commit_success.txt",
+      "size": 0,
+      "generation": "1757354310089792",
+      "crc32c": "AAAAAA=="
+    },
+    {
+      "path": "d/1c4302d2d2000b5f3eb4fa1350fdef9a",
+      "size": 2132,
+      "generation": "1757354310119002",
+      "crc32c": "SGdLxw=="
+    },
+    {
+      "path": "manifest.ocdbt",
+      "size": 117,
+      "generation": "1757354310086335",
+      "crc32c": "SGdLxw=="
+    },
+    {
+      "path": "ocdbt.process_0/d/0832cad6c37f82d4eedd897dcbb8da9d",
+      "size": 2240590484,
+      "generation": "1757354310220587",
+      "crc32c": "4YAIHA=="
+    },
+    {
+      "path": "ocdbt.process_0/d/247d4b7c814d8b1a23fa8a20f36a88f7",
+      "size": 34945019,
+      "generation": "1757354310092980",
+      "crc32c": "ceM1dg=="
+    },
+    {
+      "path": "ocdbt.process_0/d/35a545f74995e511808d4f94dfbef3b6",
+      "size": 70041571,
+      "generation": "1757354310090576",
+      "crc32c": "Iq8YUA=="
+    },
+    {
+      "path": "ocdbt.process_0/d/73bbae8a4deba6498bf07d96b215a574",
+      "size": 2935855,
+      "generation": "1757354310087457",
+      "crc32c": "2IEHcA=="
+    },
+    {
+      "path": "ocdbt.process_0/d/7bc9d3296d23a6fb83a6b3778ac6e964",
+      "size": 2240315383,
+      "generation": "1757354310232242",
+      "crc32c": "R6AiOQ=="
+    },
+    {
+      "path": "ocdbt.process_0/d/7d78f38c5d8be1eea31406644dde9bd6",
+      "size": 133821,
+      "generation": "1757354310097613",
+      "crc32c": "3ljcDg=="
+    },
+    {
+      "path": "ocdbt.process_0/d/828bee85475e37c61e1cc19e32d1c5ef",
+      "size": 929,
+      "generation": "1757354310090811",
+      "crc32c": "SGdLxw=="
+    },
+    {
+      "path": "ocdbt.process_0/d/8c5d7070ea57bdce2f0a19f95b8a21b4",
+      "size": 3077149148,
+      "generation": "1757354310234847",
+      "crc32c": "gQSvJQ=="
+    },
+    {
+      "path": "ocdbt.process_0/d/b4349aaadb7dfa45c3a53fc67c04b8f6",
+      "size": 1120156687,
+      "generation": "1757354310188883",
+      "crc32c": "FlwBrA=="
+    },
+    {
+      "path": "ocdbt.process_0/d/caf01a82962cbd4651563d2ac1063e0b",
+      "size": 27445152,
+      "generation": "1757354310098105",
+      "crc32c": "Yosa6g=="
+    },
+    {
+      "path": "ocdbt.process_0/d/deefd3c43390a50472cbcd317b0fff58",
+      "size": 2393670849,
+      "generation": "1757354310196805",
+      "crc32c": "JyiHIA=="
+    },
+    {
+      "path": "ocdbt.process_0/d/ec484cf8f02dcf59e1892180f0862e40",
+      "size": 1234292390,
+      "generation": "1757354310192419",
+      "crc32c": "TP2sFA=="
+    },
+    {
+      "path": "ocdbt.process_0/manifest.ocdbt",
+      "size": 458,
+      "generation": "1757354310097331",
+      "crc32c": "SGdLxw=="
+    }
+  ],
+  "total_bytes": 12441721931
+}

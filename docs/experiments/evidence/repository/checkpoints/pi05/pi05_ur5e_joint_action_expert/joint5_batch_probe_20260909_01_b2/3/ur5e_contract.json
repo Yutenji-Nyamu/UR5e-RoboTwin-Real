@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "policy": "pi05",
+  "action_space": "joint_position",
+  "state_layout": "ur5e_joint14_v1",
+  "joint_unit": "rad",
+  "joint_order": [
+    "base",
+    "shoulder",
+    "elbow",
+    "wrist_1",
+    "wrist_2",
+    "wrist_3"
+  ],
+  "fps": 10,
+  "action_horizon": 50,
+  "adapt_to_pi": false,
+  "delta_joint_actions": true,
+  "robotwin_commit": "210720340637cb4619283b295dde4cdd807c9e66",
+  "dataset_id": "ur5e/pick_place_cube_joint_5_v20260908",
+  "prompt": "Pick up the cube and place it back on the table.",
+  "native_patch": "ur5e_pi05_config_import_v1",
+  "run_ids": [
+    "20260908_153254",
+    "20260908_153339",
+    "20260908_153413",
+    "20260908_153445",
+    "20260908_153525"
+  ],
+  "home_q": [
+    0.609106469154358,
+    -1.170830176477768,
+    1.4655153433429162,
+    -1.8609076939024867,
+    -1.528741184865133,
+    -0.2147174040423792
+  ],
+  "joint_lower": [
+    0.4590516448020935,
+    -1.3208568793586273,
+    1.1496376196490687,
+    -2.014948888818258,
+    -1.6794345060931604,
+    -0.3647706190692347
+  ],
+  "joint_upper": [
+    1.0622576713561995,
+    -0.7291175049594423,
+    1.8565237204181115,
+    -1.7097303829588832,
+    -1.3778547445880336,
+    -0.06467668214906866
+  ],
+  "tcp_lower": [
+    -0.4980578736109423,
+    -0.6961361410958133,
+    0.14086332832355847
+  ],
+  "tcp_upper": [
+    -0.2593884126099003,
+    -0.42792499578849597,
+    0.38958487174647877
+  ],
+  "tcp_offset": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "gripper_semantics": "commanded_open_0_closed_1",
+  "image_semantics": "head_and_right_wrist_RGB; left_wrist_missing_mask_false"
+}

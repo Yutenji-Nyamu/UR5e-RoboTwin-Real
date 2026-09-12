@@ -1,0 +1,8 @@
+{
+  "requested_steps": 3,
+  "benchmark": true,
+  "save_interval": 500,
+  "eval_interval": 500,
+  "eval_points": 1,
+  "resume": false
+}

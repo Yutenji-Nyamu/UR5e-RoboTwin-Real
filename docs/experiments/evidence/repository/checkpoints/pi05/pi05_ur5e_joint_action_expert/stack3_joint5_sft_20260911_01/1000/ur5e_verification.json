@@ -1,0 +1,47 @@
+{
+  "step": 1000,
+  "metrics": {
+    "grad_norm": 0.12341593205928802,
+    "loss": 0.03093232586979866,
+    "param_norm": 1802.44140625
+  },
+  "before": {
+    "frozen": {
+      "elements": 2923335408,
+      "leaves": 32,
+      "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+    },
+    "trainable": {
+      "elements": 430098464,
+      "leaves": 19,
+      "sha256": "408c5bbfd4d3066167aeefa6e6ada38d997f7ae71154251fd3521d1de53b4951"
+    }
+  },
+  "after": {
+    "frozen": {
+      "elements": 2923335408,
+      "leaves": 32,
+      "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+    },
+    "trainable": {
+      "elements": 430098464,
+      "leaves": 19,
+      "sha256": "f3b4ee52904091dd53181e333fb24138f3505294db0a70f56b1967bdc39a9f14"
+    }
+  },
+  "frozen_unchanged": true,
+  "trainable_changed": true,
+  "checkpoint_reload": true,
+  "optimizer_reload": true,
+  "optimizer_sha256": "44a4c1948b8635629d418f74bad6d35651a4a210110d9e21f1f29171831e3a67",
+  "elapsed_s": 1806.9059322449998,
+  "status": "SFT_not_physical_validation",
+  "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05/stack3_joint5_sft_20260911_01/20260911T080045088966Z",
+  "batch_size": 8,
+  "physical_execution": false,
+  "measured_warm_steps": 999,
+  "first_step_compile_and_compute_s": 7.73669357000017,
+  "warm_step_median_s": 1.5996964330001902,
+  "warm_samples_per_s": 4.981754169049567,
+  "measurement_scope": "training_invocation"
+}

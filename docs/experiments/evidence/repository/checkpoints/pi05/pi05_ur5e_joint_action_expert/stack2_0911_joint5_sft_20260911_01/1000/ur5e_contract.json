@@ -1,0 +1,75 @@
+{
+  "version": 1,
+  "policy": "pi05",
+  "action_space": "joint_position",
+  "state_layout": "ur5e_joint14_v1",
+  "joint_unit": "rad",
+  "joint_order": [
+    "base",
+    "shoulder",
+    "elbow",
+    "wrist_1",
+    "wrist_2",
+    "wrist_3"
+  ],
+  "fps": 10,
+  "action_horizon": 50,
+  "adapt_to_pi": false,
+  "delta_joint_actions": true,
+  "robotwin_commit": "210720340637cb4619283b295dde4cdd807c9e66",
+  "dataset_id": "ur5e/stack_blocks_two_0911_joint_5_v20260911",
+  "prompt": "Stack one block on top of the other.",
+  "native_patch": "ur5e_pi05_config_import_v1",
+  "run_ids": [
+    "20260911_170047",
+    "20260911_170120",
+    "20260911_170221",
+    "20260911_170321",
+    "20260911_170406"
+  ],
+  "gripper_cycles": 1,
+  "home_q": [
+    0.6091116547584534,
+    -1.1708206456950685,
+    1.4655215422259729,
+    -1.8609162769713343,
+    -1.5287371794330042,
+    -0.21471730867494757
+  ],
+  "joint_lower": [
+    0.45908561944961546,
+    -1.5226094526103515,
+    1.1926616827594203,
+    -2.500032945672506,
+    -1.7006537596331994,
+    -0.3647701422320765
+  ],
+  "joint_upper": [
+    1.094935083389282,
+    -0.8099017661860962,
+    2.188748089467184,
+    -1.6756103001036586,
+    -1.3787187735186976,
+    -0.06468907991518194
+  ],
+  "tcp_lower": [
+    -0.49796940140952517,
+    -0.6929664726521301,
+    0.13849132541040993
+  ],
+  "tcp_upper": [
+    -0.22496578274172735,
+    -0.38156818398294656,
+    0.40149314885595605
+  ],
+  "tcp_offset": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "gripper_semantics": "commanded_open_0_closed_1",
+  "image_semantics": "head_and_right_wrist_RGB; left_wrist_missing_mask_false"
+}

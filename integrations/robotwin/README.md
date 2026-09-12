@@ -20,8 +20,9 @@ training/serving, and a separate joint servoJ driver. Its small vendor patches f
 config import, the pinned Orbax asset callback, and download error propagation;
 the model/loss remain native. See [pi05 implementation](../../docs/plans/pi05/IMPLEMENTATION.md).
 
-Do not commit `.third_party/RoboTwin`, trained checkpoints, or generated
-`SIM_TASK_CONFIGS.json`. If upstream is upgraded, update the lock and revalidate
+Do not commit `.third_party/RoboTwin` or model weights. Version small experiment logs,
+configs and checkpoint metadata through the [evidence archive](../../docs/experiments/README.md),
+not by tracking generated files inside the upstream tree. If upstream is upgraded, update the lock and revalidate
 the patch and the complete hardware runbook separately.
 
 See `docs/ROBOTWIN_INTEGRATION.md` for the ownership map, unchanged DP baseline,

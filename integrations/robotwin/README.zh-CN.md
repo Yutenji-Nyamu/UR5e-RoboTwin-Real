@@ -18,8 +18,9 @@
 小型vendor补丁修复配置导入、锁定Orbax的asset回调和下载异常传播；模型和loss仍是原生实现。
 当前进度和验证边界见 [π0.5实施记录](../../docs/plans/pi05/IMPLEMENTATION.md)。
 
-不要提交 `.third_party/RoboTwin`、训练checkpoint或生成的
-`SIM_TASK_CONFIGS.json`。升级上游时，应分别更新lock并重新验证补丁和完整真机
+不要提交 `.third_party/RoboTwin` 或模型权重。小型实验日志/配置和checkpoint元信息通过
+[实验资料归档](../../docs/experiments/README.md)提交副本，不直接跟踪第三方目录下的生成文件。
+升级上游时，应分别更新lock并重新验证补丁和完整真机
 runbook。
 
 归属关系、不修改的DP基线以及socket/RTDE执行选择见

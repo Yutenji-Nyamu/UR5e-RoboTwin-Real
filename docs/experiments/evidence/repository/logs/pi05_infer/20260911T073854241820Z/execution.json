@@ -1,0 +1,26 @@
+[
+  {
+    "chunk": 1,
+    "mode": "execute",
+    "client_elapsed_s": 0.2003654259999621,
+    "action_horizon": 50,
+    "action_steps": 50,
+    "policy_hz": 10.0,
+    "executed_waypoints": 50,
+    "servo_steps": 2500,
+    "planned_duration_s": 5.0,
+    "retimed_waypoints": 0
+  },
+  {
+    "chunk": 2,
+    "mode": "execute",
+    "client_elapsed_s": 0.19832377300008375,
+    "action_horizon": 50,
+    "action_steps": 50,
+    "policy_hz": 10.0,
+    "executed_waypoints": 20,
+    "servo_steps": 1000,
+    "planned_duration_s": 2.0,
+    "retimed_waypoints": 0
+  }
+]

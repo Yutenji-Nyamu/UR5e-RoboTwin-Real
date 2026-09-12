@@ -211,3 +211,77 @@ def test_replaced_model_service_is_rejected_before_hardware_access():
         with pytest.raises(RuntimeError, match="instance changed"):
             pi05_infer.run(args)
         cameras.assert_not_called()
+
+
+@pytest.mark.parametrize("cycles,k,executed", [(1, 20, [8]), (2, 20, [20, 4]), (2, 50, [24])])
+def test_execute_finishes_only_after_contract_cycles_with_final_hold(tmp_path, cycles, k, executed):
+    from ur5e_real.control.joint import stream_joint_chunk as real_stream
+
+    image = np.zeros((4, 5, 3), dtype=np.uint8)
+    selected = contract() | {"prompt": "stack"}
+    if cycles != 1:  # Verify legacy metadata without a count still finishes after one cycle.
+        selected["gripper_cycles"] = cycles
+    state = SimpleNamespace(actual_q=np.zeros(6))
+    timeline = np.r_[np.ones(6), np.zeros(10), np.ones(6), np.zeros(100)]
+    offsets = iter([0, *range(0, 3 * k, k)])  # First RPC is the live-shape warmup.
+    clock = [10.0]
+
+    def sleep(seconds):
+        clock[0] += seconds
+
+    def prediction(_obs):
+        offset = next(offsets)
+        actions = np.stack([encode_state(np.zeros(6), value) for value in timeline[offset : offset + 50]])
+        return {"actions": actions, "client_elapsed_s": 0.1}
+
+    def stream(controller, targets, motion, **options):
+        return real_stream(controller, targets, motion, clock=lambda: clock[0], sleep=sleep, **options)
+
+    output = tmp_path / "execution.json"
+    args = SimpleNamespace(
+        dataset="unused",
+        mode="execute",
+        lab_config="unused",
+        action_steps=k,
+        chunks=3,
+        speed=0.6,
+        port=18005,
+        timeout=1.5,
+        output=output,
+    )
+    with (
+        patch.object(pi05_infer, "validate_dataset", return_value=(selected, {})),
+        patch.object(pi05_infer, "load_config", return_value=MagicMock()),
+        patch.object(pi05_infer, "PolicyClient") as client,
+        patch.object(pi05_infer, "FreshCameras") as cameras,
+        patch.object(pi05_infer, "RtdeStateClient") as reader,
+        patch.object(pi05_infer, "JointServoJController") as controller,
+        patch.object(pi05_infer, "GripperSerial") as serial,
+        patch.object(pi05_infer.time, "sleep", side_effect=sleep),
+        patch("ur5e_real.control.gripper_policy.time.monotonic", side_effect=lambda: clock[0]),
+        patch.object(pi05_infer, "stream_joint_chunk", side_effect=stream) as streamed,
+    ):
+        policy = client.return_value.__enter__.return_value
+        policy.metadata = {"training_status": "SFT_not_physical_validation"}
+        policy.infer.side_effect = prediction
+        cameras.return_value.__enter__.return_value.read.return_value = SimpleNamespace(head=image, wrist=image)
+        reader.return_value.__enter__.return_value.receive_state.return_value = state
+        robot = controller.return_value
+        robot.action_space = "joint_position"
+        robot.get_latest_state.return_value = state
+        robot.get_latest_joints.return_value = np.zeros(6)
+        robot.get_commanded_joints.return_value = np.zeros(6)
+        pi05_infer.run(args)
+        gripper = serial.return_value.__enter__.return_value
+        assert gripper.close.call_count == cycles
+        assert gripper.open.call_count == cycles + 1  # Includes explicit initial open.
+        assert streamed.call_count == len(executed) + 1
+        assert len(streamed.call_args.args[1]) == 10  # One second hold only after the final release.
+        assert not streamed.call_args.kwargs
+        robot.stop.assert_called_once()
+    reports = json.loads(output.read_text())
+    assert [row["executed_waypoints"] for row in reports] == executed
+    assert reports[-1]["gripper_cycles_completed"] == cycles
+    assert all(row["gripper_cycles_required"] == cycles for row in reports)
+    if len(reports) > 1:
+        assert reports[0]["gripper_cycles_completed"] == 1

@@ -1,0 +1,230 @@
+{
+  "scope": "few_step_coarse_probe_not_convergence",
+  "optimizer_steps_per_batch": 3,
+  "physical_execution": false,
+  "rows": [
+    {
+      "batch_size": 2,
+      "exit_code": 0,
+      "wall_s": 211.62430092399973,
+      "log": "logs/pi05_batch_probe_20260909_01/batch_2.log",
+      "result": {
+        "step": 3,
+        "metrics": {
+          "grad_norm": 1.0619088411331177,
+          "loss": 0.20753823220729828,
+          "param_norm": 1802.385009765625
+        },
+        "before": {
+          "frozen": {
+            "elements": 2923335408,
+            "leaves": 32,
+            "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+          },
+          "trainable": {
+            "elements": 430098464,
+            "leaves": 19,
+            "sha256": "408c5bbfd4d3066167aeefa6e6ada38d997f7ae71154251fd3521d1de53b4951"
+          }
+        },
+        "after": {
+          "frozen": {
+            "elements": 2923335408,
+            "leaves": 32,
+            "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+          },
+          "trainable": {
+            "elements": 430098464,
+            "leaves": 19,
+            "sha256": "18f79421561daff0f7bf1a735d4cc0a732fc866dc91fa265013e9daa546058ca"
+          }
+        },
+        "frozen_unchanged": true,
+        "trainable_changed": true,
+        "checkpoint_reload": true,
+        "optimizer_reload": true,
+        "optimizer_sha256": "e3fadf83ec168f67a0eca18747a3a5959c196c36d83c29cd1977366cf0936d28",
+        "elapsed_s": 201.02593973000012,
+        "status": "development_smoke_only",
+        "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b2/20260909T081606481988Z",
+        "batch_size": 2,
+        "physical_execution": false,
+        "measured_warm_steps": 2,
+        "first_step_compile_and_compute_s": 28.92193383899985,
+        "warm_step_median_s": 0.6699082530001306,
+        "warm_samples_per_s": 2.9854834464916054,
+        "measurement_scope": "training_invocation",
+        "checkpoint": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/joint5_batch_probe_20260909_01_b2/3"
+      },
+      "resources": {
+        "samples": 95,
+        "gpus": {
+          "GPU-fc2b57b6-ffd1-1ab3-6ea4-0292c178e5c4": {
+            "memory_used_mib": 17342.0,
+            "memory_free_mib": 31191.0
+          }
+        },
+        "host": {
+          "available_bytes": 92699975680,
+          "process_rss_bytes": 32315748352,
+          "children_rss_sum_bytes": 839598080,
+          "swap_used_bytes": 786432
+        },
+        "errors": [],
+        "jax_peak_bytes": 13751727104,
+        "sampled_peaks_only": true,
+        "interval_s": 2.0,
+        "elapsed_s": 203.26858259999972,
+        "status": "completed"
+      }
+    },
+    {
+      "batch_size": 4,
+      "exit_code": 0,
+      "wall_s": 143.76399188899995,
+      "log": "logs/pi05_batch_probe_20260909_01/batch_4.log",
+      "result": {
+        "step": 3,
+        "metrics": {
+          "grad_norm": 0.5215311646461487,
+          "loss": 0.14413288235664368,
+          "param_norm": 1802.384765625
+        },
+        "before": {
+          "frozen": {
+            "elements": 2923335408,
+            "leaves": 32,
+            "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+          },
+          "trainable": {
+            "elements": 430098464,
+            "leaves": 19,
+            "sha256": "408c5bbfd4d3066167aeefa6e6ada38d997f7ae71154251fd3521d1de53b4951"
+          }
+        },
+        "after": {
+          "frozen": {
+            "elements": 2923335408,
+            "leaves": 32,
+            "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+          },
+          "trainable": {
+            "elements": 430098464,
+            "leaves": 19,
+            "sha256": "85cd2ff1b1fd55fb82192553921cd5444c5a5e0b62d4e4173e91730602dd2a01"
+          }
+        },
+        "frozen_unchanged": true,
+        "trainable_changed": true,
+        "checkpoint_reload": false,
+        "optimizer_reload": false,
+        "optimizer_sha256": "cb6c353cdb654bf727b418bddbc026d8ab0cf73e4300ed0adc2bbef7f7c6587d",
+        "elapsed_s": 132.9458164560001,
+        "status": "benchmark_only",
+        "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b4/20260909T081938104242Z",
+        "batch_size": 4,
+        "physical_execution": false,
+        "measured_warm_steps": 2,
+        "first_step_compile_and_compute_s": 31.87707996800009,
+        "warm_step_median_s": 1.147507375000032,
+        "warm_samples_per_s": 3.485816376561317,
+        "measurement_scope": "few_step_coarse_probe_not_convergence"
+      },
+      "resources": {
+        "samples": 64,
+        "gpus": {
+          "GPU-fc2b57b6-ffd1-1ab3-6ea4-0292c178e5c4": {
+            "memory_used_mib": 17342.0,
+            "memory_free_mib": 31191.0
+          }
+        },
+        "host": {
+          "available_bytes": 94837694464,
+          "process_rss_bytes": 27713368064,
+          "children_rss_sum_bytes": 1125126144,
+          "swap_used_bytes": 786432
+        },
+        "errors": [],
+        "jax_peak_bytes": 14309770496,
+        "sampled_peaks_only": true,
+        "interval_s": 2.0,
+        "elapsed_s": 135.23402189499984,
+        "status": "completed"
+      }
+    },
+    {
+      "batch_size": 8,
+      "exit_code": 0,
+      "wall_s": 139.43695827600004,
+      "log": "logs/pi05_batch_probe_20260909_01/batch_8.log",
+      "result": {
+        "step": 3,
+        "metrics": {
+          "grad_norm": 0.4822108745574951,
+          "loss": 0.15063098073005676,
+          "param_norm": 1802.385009765625
+        },
+        "before": {
+          "frozen": {
+            "elements": 2923335408,
+            "leaves": 32,
+            "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+          },
+          "trainable": {
+            "elements": 430098464,
+            "leaves": 19,
+            "sha256": "408c5bbfd4d3066167aeefa6e6ada38d997f7ae71154251fd3521d1de53b4951"
+          }
+        },
+        "after": {
+          "frozen": {
+            "elements": 2923335408,
+            "leaves": 32,
+            "sha256": "7a9a4730f27af8f5d0c5bb6ba79e54139007ce52e97c7a53b558daebc5fa6a4d"
+          },
+          "trainable": {
+            "elements": 430098464,
+            "leaves": 19,
+            "sha256": "3418621a8cb503a034b0069e7372a1724f548ab996644fc24e50a0d91112dca0"
+          }
+        },
+        "frozen_unchanged": true,
+        "trainable_changed": true,
+        "checkpoint_reload": false,
+        "optimizer_reload": false,
+        "optimizer_sha256": "6dcaf7492efc42f9b1800066d1123249a639988be029d171a48876a0a69ddc4b",
+        "elapsed_s": 128.7048927599999,
+        "status": "benchmark_only",
+        "log_dir": "/home/zhangw/UR5e_RoboTwin_Real/logs/pi05_batch_probe_20260909_01/runs/joint5_batch_probe_20260909_01_b8/20260909T082201877046Z",
+        "batch_size": 8,
+        "physical_execution": false,
+        "measured_warm_steps": 2,
+        "first_step_compile_and_compute_s": 31.93955537199963,
+        "warm_step_median_s": 2.116304956000249,
+        "warm_samples_per_s": 3.7801735413027395,
+        "measurement_scope": "few_step_coarse_probe_not_convergence"
+      },
+      "resources": {
+        "samples": 62,
+        "gpus": {
+          "GPU-fc2b57b6-ffd1-1ab3-6ea4-0292c178e5c4": {
+            "memory_used_mib": 17356.0,
+            "memory_free_mib": 31177.0
+          }
+        },
+        "host": {
+          "available_bytes": 94394134528,
+          "process_rss_bytes": 27814572032,
+          "children_rss_sum_bytes": 1114021888,
+          "swap_used_bytes": 786432
+        },
+        "errors": [],
+        "jax_peak_bytes": 15448179968,
+        "sampled_peaks_only": true,
+        "interval_s": 2.0,
+        "elapsed_s": 131.05874904799975,
+        "status": "completed"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "contract_sha256": "e0529ebff3f4f56d2b6a502e15b8d8402bbeeb3e9a2a9bc8c4d3e464442e2ce9",
+  "norm_sha256": "8b5594de81717458e0496cf080380c15b89061ffbed2712a5c5218cfb5f624bf",
+  "episodes": 5,
+  "transitions": 414,
+  "parquet_sha256": {
+    "data/chunk-000/episode_000000.parquet": "28cb246c7dc285fb66f87524ccb05ba6c910a56a48c8cb42a6062f6b754b4f6a",
+    "data/chunk-000/episode_000001.parquet": "1ed8a446982bf8ca52be573e4fcae8bebadcb1b561e17972bcb1f93173e7121c",
+    "data/chunk-000/episode_000002.parquet": "8d0ad07f6187c8f177e01ce367b88f6d83896742abb2499485fe2d701ad7a968",
+    "data/chunk-000/episode_000003.parquet": "24ed32567e7794013c914c337ececadeff0cb35d884f3ebc3b780ffc8f503c60",
+    "data/chunk-000/episode_000004.parquet": "bbdb9e36d8aed3742ad2a43670dbd76f36f25ffed2a9a4013417fac313e4c970"
+  },
+  "label": "absolute measured state[t+1]; native delta relative to state[t]; terminal repeat padding"
+}

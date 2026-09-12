@@ -1,0 +1,15 @@
+{
+  "checkpoint": "20260911_01:1000",
+  "execute": true,
+  "shadow": false,
+  "dry_run": false,
+  "action_steps": 20,
+  "chunks": 30,
+  "speed": 0.6,
+  "diffusion_steps": 10,
+  "gpu": "0",
+  "timeout": 1.5,
+  "startup_timeout": 600,
+  "checkpoint_path": "/home/zhangw/UR5e_RoboTwin_Real/checkpoints/pi05/pi05_ur5e_joint_action_expert/stack3_joint5_sft_20260911_01/1000",
+  "dataset": "/data/robotics/ur5e-real/pi05/lerobot/ur5e/stack_blocks_three_joint_5_v20260911"
+}

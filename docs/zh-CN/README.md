@@ -21,6 +21,7 @@
 - [软硬件前置条件与分层调试](PREREQUISITES.md)
 - [存储布局](STORAGE.md)
 - [数据管理](DATA_MANAGEMENT.md)
+- [实验资料Git归档与更新命令](../experiments/README.md)
 
 ## 操作手册
 

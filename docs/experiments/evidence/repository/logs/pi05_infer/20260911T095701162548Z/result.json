@@ -1,0 +1,4 @@
+{
+  "status": "failed",
+  "error": "RuntimeError: joint controller failed: joint program stopped or identity changed"
+}

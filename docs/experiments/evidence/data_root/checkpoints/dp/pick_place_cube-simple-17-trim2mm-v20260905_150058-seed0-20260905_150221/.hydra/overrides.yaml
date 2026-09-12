@@ -1,0 +1,15 @@
+- task.name=pick_place_cube
+- task.dataset.zarr_path=/data/robotics/ur5e-real/converted/dp/pick_place_cube-simple-17-trim2mm-v20260905_150058.zarr
+- task.dataset.val_ratio=0.02
+- task.dataset.batch_size=72
+- dataloader.batch_size=72
+- val_dataloader.batch_size=72
+- training.debug=false
+- training.seed=0
+- training.device=cuda:0
+- training.resume=false
+- exp_name=pick_place_cube-robot_dp-real
+- logging.mode=offline
+- setting=simple
+- expert_data_num=17
+- head_camera_type=D435

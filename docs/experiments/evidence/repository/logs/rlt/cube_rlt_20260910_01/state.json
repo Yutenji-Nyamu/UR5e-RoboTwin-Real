@@ -1,0 +1,9 @@
+{
+  "stage": "cache",
+  "selected_token": null,
+  "selected_head": null,
+  "latest_head": null,
+  "latest_token": null,
+  "round": null,
+  "review_pending": false
+}

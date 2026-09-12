@@ -1,0 +1,69 @@
+{
+  "schema_version": 2,
+  "run_id": "20260904_155835",
+  "task": "pick_place_cube",
+  "note": "8th traj of this task",
+  "started_at": "2026-09-04T15:58:38.493709+08:00",
+  "finished_at": "2026-09-04T15:58:51.995638+08:00",
+  "duration_s": 13.501,
+  "recording_status": "completed",
+  "stop_reason": "user_quit",
+  "outcome": "success",
+  "reviews": [
+    {
+      "reviewed_at": "2026-09-04T15:58:54.913092+08:00",
+      "result": "success",
+      "note": null
+    }
+  ],
+  "code_commit": "1a5948f6f07ce5d184a6b9c7937cb39ff2e5d29e",
+  "robot": {
+    "host": "192.168.0.4",
+    "script_port": 30001,
+    "rtde_port": 30004,
+    "rtde_frequency_hz": 10.0,
+    "socket_timeout_s": 10.0,
+    "home_tcp_pose": [
+      -0.4479512414,
+      -0.4779532359,
+      0.3397913564,
+      1.1351054288,
+      2.8938840645,
+      -0.0267875432
+    ]
+  },
+  "gripper": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0",
+    "baudrate": 9600,
+    "timeout_s": 1.0
+  },
+  "cameras": {
+    "head_serial": "243522072333",
+    "wrist_serial": "233522079334",
+    "width": 640,
+    "height": 480,
+    "fps": 30,
+    "save_hz": 10.0,
+    "warmup_frames": 60
+  },
+  "collection": {
+    "data_root": "/data/robotics/ur5e-real",
+    "enable_freedrive_on_start": true,
+    "initial_gripper_state": "open",
+    "preview": false,
+    "save_video": false
+  },
+  "paths": {
+    "rtde": "/data/robotics/ur5e-real/raw/action/rtde_tcp_gripper_20260904_155835.csv",
+    "gripper_events": "/data/robotics/ur5e-real/raw/action/gripper_events_20260904_155835.csv",
+    "sync": "/data/robotics/ur5e-real/raw/action/sync_action_cam_20260904_155835.csv",
+    "camera": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260904_155835",
+    "head_frames": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260904_155835/head",
+    "wrist_frames": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260904_155835/wrist"
+  },
+  "counts": {
+    "rtde_samples": 128,
+    "gripper_events": 2,
+    "frame_pairs": 127
+  }
+}

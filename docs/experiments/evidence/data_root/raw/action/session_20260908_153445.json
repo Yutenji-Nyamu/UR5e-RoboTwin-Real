@@ -1,0 +1,176 @@
+{
+  "schema_version": 3,
+  "run_id": "20260908_153445",
+  "task": "pick_place_cube",
+  "note": "0908",
+  "started_at": "2026-09-08T15:34:48.429842+08:00",
+  "finished_at": "2026-09-08T15:34:59.928170+08:00",
+  "duration_s": 11.497,
+  "recording_status": "completed",
+  "stop_reason": "user_quit",
+  "outcome": "success",
+  "reviews": [
+    {
+      "reviewed_at": "2026-09-08T15:35:02.717331+08:00",
+      "result": "success",
+      "note": null
+    }
+  ],
+  "code_commit": "a3e54274186afd8db4c3fe549c6d0a658f5ce6de",
+  "robot": {
+    "host": "192.168.0.4",
+    "script_port": 30001,
+    "rtde_port": 30004,
+    "rtde_frequency_hz": 10.0,
+    "socket_timeout_s": 10.0,
+    "home_tcp_pose": [
+      -0.4479512414,
+      -0.4779532359,
+      0.3397913564,
+      1.1351054288,
+      2.8938840645,
+      -0.0267875432
+    ]
+  },
+  "gripper": {
+    "port": "/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0",
+    "baudrate": 9600,
+    "timeout_s": 1.0
+  },
+  "cameras": {
+    "head_serial": "243522072333",
+    "wrist_serial": "233522079334",
+    "width": 640,
+    "height": 480,
+    "fps": 30,
+    "save_hz": 10.0,
+    "warmup_frames": 60
+  },
+  "state_recording": {
+    "representations": [
+      "tcp",
+      "joint"
+    ],
+    "rtde_fields": [
+      "timestamp",
+      "actual_TCP_pose",
+      "actual_q",
+      "actual_qd",
+      "tcp_offset"
+    ],
+    "csv_columns": [
+      "controller_time_s",
+      "tcp_x",
+      "tcp_y",
+      "tcp_z",
+      "tcp_rx",
+      "tcp_ry",
+      "tcp_rz",
+      "gripper_state",
+      "gripper_event_counter",
+      "actual_q_0",
+      "actual_q_1",
+      "actual_q_2",
+      "actual_q_3",
+      "actual_q_4",
+      "actual_q_5",
+      "actual_qd_0",
+      "actual_qd_1",
+      "actual_qd_2",
+      "actual_qd_3",
+      "actual_qd_4",
+      "actual_qd_5",
+      "host_receive_time_s"
+    ],
+    "joint_source": "actual_q",
+    "joint_velocity_source": "actual_qd",
+    "tcp_source": "actual_TCP_pose",
+    "joint_order": [
+      "base",
+      "shoulder",
+      "elbow",
+      "wrist_1",
+      "wrist_2",
+      "wrist_3"
+    ],
+    "joint_position_unit": "rad",
+    "joint_velocity_unit": "rad/s",
+    "tcp_pose_units": [
+      "m",
+      "m",
+      "m",
+      "rad",
+      "rad",
+      "rad"
+    ],
+    "tcp_pose_frame": "robot_base",
+    "tcp_orientation": "rotation_vector",
+    "sample_relation": "same_rtde_packet",
+    "host_receive_time_clock": "unix_seconds_not_camera_exposure",
+    "gripper_state_semantics": "commanded_open_0_closed_1_not_measured_width",
+    "tcp_offset_source": "tcp_offset_flange_to_tcp"
+  },
+  "initial_robot_state": {
+    "controller_time_s": 1369.466,
+    "tcp_pose": [
+      -0.4479493740735164,
+      -0.4779498871048326,
+      0.3398029489339602,
+      1.1351108364011977,
+      2.893883032322031,
+      -0.026809102271287837
+    ],
+    "actual_q": [
+      0.6091042160987854,
+      -1.1708568793586274,
+      1.4655068556415003,
+      -1.8609034023680628,
+      -1.5287345091449183,
+      -0.21472388902773076
+    ],
+    "actual_qd": [
+      0.0,
+      0.0,
+      -0.0,
+      -0.0,
+      -0.0,
+      0.0
+    ],
+    "tcp_offset": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "host_receive_time_s": 1788852888.2188315
+  },
+  "collection": {
+    "data_root": "/data/robotics/ur5e-real",
+    "enable_freedrive_on_start": true,
+    "initial_gripper_state": "open",
+    "preview": false,
+    "save_video": false
+  },
+  "paths": {
+    "rtde": "/data/robotics/ur5e-real/raw/action/rtde_tcp_gripper_20260908_153445.csv",
+    "gripper_events": "/data/robotics/ur5e-real/raw/action/gripper_events_20260908_153445.csv",
+    "sync": "/data/robotics/ur5e-real/raw/action/sync_action_cam_20260908_153445.csv",
+    "camera": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260908_153445",
+    "head_frames": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260908_153445/head",
+    "wrist_frames": "/data/robotics/ur5e-real/raw/camera/cam_dual_20260908_153445/wrist"
+  },
+  "counts": {
+    "rtde_samples": 106,
+    "gripper_events": 2,
+    "frame_pairs": 104
+  },
+  "quality": {
+    "last_open_controller_time_s": 1377.966,
+    "last_frame_controller_time_s": 1380.166,
+    "last_open_to_last_frame_s": 2.2,
+    "recommended_release_tail_s": 1.0,
+    "release_tail_complete": true
+  }
+}

@@ -1,0 +1,362 @@
+{
+  "selection": {
+    "task": "stack_blocks_two_0911",
+    "repo_id": "ur5e/stack_blocks_two_0911_joint_5_v20260911",
+    "run_ids": [
+      "20260911_170047",
+      "20260911_170120",
+      "20260911_170221",
+      "20260911_170321",
+      "20260911_170406"
+    ],
+    "prompt": "Stack one block on top of the other.",
+    "gripper_cycles": 1,
+    "fps": 10,
+    "action_horizon": 50,
+    "motion_threshold_rad": 0.005,
+    "lead_in_steps": 3,
+    "tail_steps": 3,
+    "release_tail_s": 1.0,
+    "max_source_gap_s": 0.21,
+    "max_image_offset_s": 0.11,
+    "joint_margin_rad": 0.15,
+    "tcp_margin_m": 0.05
+  },
+  "contract": {
+    "version": 1,
+    "policy": "pi05",
+    "action_space": "joint_position",
+    "state_layout": "ur5e_joint14_v1",
+    "joint_unit": "rad",
+    "joint_order": [
+      "base",
+      "shoulder",
+      "elbow",
+      "wrist_1",
+      "wrist_2",
+      "wrist_3"
+    ],
+    "fps": 10,
+    "action_horizon": 50,
+    "adapt_to_pi": false,
+    "delta_joint_actions": true,
+    "robotwin_commit": "210720340637cb4619283b295dde4cdd807c9e66",
+    "dataset_id": "ur5e/stack_blocks_two_0911_joint_5_v20260911",
+    "prompt": "Stack one block on top of the other.",
+    "native_patch": "ur5e_pi05_config_import_v1",
+    "run_ids": [
+      "20260911_170047",
+      "20260911_170120",
+      "20260911_170221",
+      "20260911_170321",
+      "20260911_170406"
+    ],
+    "gripper_cycles": 1,
+    "home_q": [
+      0.6091116547584534,
+      -1.1708206456950685,
+      1.4655215422259729,
+      -1.8609162769713343,
+      -1.5287371794330042,
+      -0.21471730867494757
+    ],
+    "joint_lower": [
+      0.45908561944961546,
+      -1.5226094526103515,
+      1.1926616827594203,
+      -2.500032945672506,
+      -1.7006537596331994,
+      -0.3647701422320765
+    ],
+    "joint_upper": [
+      1.094935083389282,
+      -0.8099017661860962,
+      2.188748089467184,
+      -1.6756103001036586,
+      -1.3787187735186976,
+      -0.06468907991518194
+    ],
+    "tcp_lower": [
+      -0.49796940140952517,
+      -0.6929664726521301,
+      0.13849132541040993
+    ],
+    "tcp_upper": [
+      -0.22496578274172735,
+      -0.38156818398294656,
+      0.40149314885595605
+    ],
+    "tcp_offset": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "gripper_semantics": "commanded_open_0_closed_1",
+    "image_semantics": "head_and_right_wrist_RGB; left_wrist_missing_mask_false"
+  },
+  "episodes": [
+    {
+      "run_id": "20260911_170047",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 133,
+      "raw_frame_pairs": 132,
+      "raw_image_start_s": 6167.786999999999,
+      "raw_image_stop_s": 6180.987,
+      "trimmed_lead_s": 1.9000000000005457,
+      "trimmed_tail_s": 1.5,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 6173.0869999999995
+        },
+        {
+          "event": "open",
+          "controller_time_s": 6178.387
+        }
+      ],
+      "crop_start": 18,
+      "motion_crop_stop_exclusive": 108,
+      "grid_frames": 99,
+      "training_transitions": 98,
+      "grid_controller_start_s": 6169.687,
+      "grid_controller_stop_s": 6179.487,
+      "release_tail_s": 1.1000000000003638,
+      "last_observation_release_tail_s": 1.0,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.2000000000007276
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 9.094947017729282e-13,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.23782789707183838,
+        0.39840698242501693,
+        0.5062198638960957,
+        0.8210897445737975,
+        0.0020933151244917347,
+        0.0005054473876953125
+      ],
+      "source_sha256": {
+        "session_20260911_170047.json": "0fbd2d4b56646a07c64f5cbd87e0d5e86bb7c442c8fae123d9ee44b0179b2eb2",
+        "rtde_tcp_gripper_20260911_170047.csv": "55afbca2abf8679b0a06d0c063fcddf365c9adbc62722a263736aebd78ccfde5",
+        "sync_action_cam_20260911_170047.csv": "1eea9e14575cbddfd156128a527fd2f0c2c7fef9191b5d9339e810493364b3b6",
+        "gripper_events_20260911_170047.csv": "1cb5853b45bf10d2fcc99546c8a2af020b31eb9b5cadb159aea11c21a6ff97e8"
+      }
+    },
+    {
+      "run_id": "20260911_170120",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 139,
+      "raw_frame_pairs": 138,
+      "raw_image_start_s": 6200.924999999999,
+      "raw_image_stop_s": 6214.724999999999,
+      "trimmed_lead_s": 1.5,
+      "trimmed_tail_s": 1.4000000000005457,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 6207.025
+        },
+        {
+          "event": "open",
+          "controller_time_s": 6212.224999999999
+        }
+      ],
+      "crop_start": 14,
+      "motion_crop_stop_exclusive": 115,
+      "grid_frames": 110,
+      "training_transitions": 109,
+      "grid_controller_start_s": 6202.424999999999,
+      "grid_controller_stop_s": 6213.324999999999,
+      "release_tail_s": 1.0999999999994543,
+      "last_observation_release_tail_s": 1.0,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.2000000000007276
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 9.094947017729282e-13,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.24357497692318875,
+        0.27687042951804575,
+        0.47651290893121256,
+        0.2289104461649094,
+        0.00270366668701838,
+        0.0006246566772460938
+      ],
+      "source_sha256": {
+        "session_20260911_170120.json": "1c9373fb7df96dbedab31ceb2cdf5a1934ebfa95d686014b17848dd69ded8f2f",
+        "rtde_tcp_gripper_20260911_170120.csv": "9ccbdd09b4e46c6257592271f38d5828c2073a7051c2f8170058a73fd5b82efd",
+        "sync_action_cam_20260911_170120.csv": "d99b4460af4c6ba64ffce5784e5dd38296d23ed0e8fff1181e93c6cc83889ca5",
+        "gripper_events_20260911_170120.csv": "edaf1ca619f8909ec23343b89feb2e92d4e2efceea8e503462390278ca5d503d"
+      }
+    },
+    {
+      "run_id": "20260911_170221",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 128,
+      "raw_frame_pairs": 127,
+      "raw_image_start_s": 6262.093,
+      "raw_image_stop_s": 6274.793,
+      "trimmed_lead_s": 1.199999999999818,
+      "trimmed_tail_s": 2.0,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 6266.4929999999995
+        },
+        {
+          "event": "open",
+          "controller_time_s": 6271.692999999999
+        }
+      ],
+      "crop_start": 11,
+      "motion_crop_stop_exclusive": 98,
+      "grid_frames": 96,
+      "training_transitions": 95,
+      "grid_controller_start_s": 6263.293,
+      "grid_controller_stop_s": 6272.793,
+      "release_tail_s": 1.1000000000003638,
+      "last_observation_release_tail_s": 1.0,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.1999999999998181
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 0.0,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.2171570062637329,
+        0.34562230110168457,
+        0.4903078079223633,
+        0.9936952590942383,
+        0.04474639892578125,
+        0.0005769729614257812
+      ],
+      "source_sha256": {
+        "session_20260911_170221.json": "8dfeb8a3897c24697bd319baaedc4fd9a44a93f34012ee8d5179b6ac35048f25",
+        "rtde_tcp_gripper_20260911_170221.csv": "aa5bba367d234b19ce87ebdb260c7dcba30d77dcdfae090fcb099e8d2d418710",
+        "sync_action_cam_20260911_170221.csv": "bff5c8508992e9f8a6f6b63f2d04b6ede11de88f1322559030e2d333733b842d",
+        "gripper_events_20260911_170221.csv": "1ee80bf05383c0bc0a7536cff7b06c4766ae9ccbff82f7035124081889d24298"
+      }
+    },
+    {
+      "run_id": "20260911_170321",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 130,
+      "raw_frame_pairs": 129,
+      "raw_image_start_s": 6321.659,
+      "raw_image_stop_s": 6334.558999999999,
+      "trimmed_lead_s": 1.699999999999818,
+      "trimmed_tail_s": 1.5,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 6326.558999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 6331.959
+        }
+      ],
+      "crop_start": 16,
+      "motion_crop_stop_exclusive": 105,
+      "grid_frames": 98,
+      "training_transitions": 97,
+      "grid_controller_start_s": 6323.3589999999995,
+      "grid_controller_stop_s": 6333.058999999999,
+      "release_tail_s": 1.0999999999994543,
+      "last_observation_release_tail_s": 1.0,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.1999999999998181
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 9.094947017729282e-13,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.3101539611816406,
+        0.4085332155260035,
+        0.5845260620117188,
+        0.6922054290771484,
+        0.07408618927001953,
+        0.000500679016109673
+      ],
+      "source_sha256": {
+        "session_20260911_170321.json": "a30159e9d64f5f24a4fe3dcd29780a4182c42ee1f3223850d8b5380b14966e57",
+        "rtde_tcp_gripper_20260911_170321.csv": "c10202913b94f95fcb811dd61ad19a0512fd2d34ee919740bd121af405308d70",
+        "sync_action_cam_20260911_170321.csv": "0b32a06e337fe4f82040f6b1a4ea200bc30643f1818e22762c7ba08fa8890720",
+        "gripper_events_20260911_170321.csv": "de093593a3576f8292a19b4e5a2f19c004faa6320a68d363a5f8c56edbe62c1f"
+      }
+    },
+    {
+      "run_id": "20260911_170406",
+      "raw_schema_version": 3,
+      "raw_robot_samples": 141,
+      "raw_frame_pairs": 140,
+      "raw_image_start_s": 6366.808999999999,
+      "raw_image_stop_s": 6380.808999999999,
+      "trimmed_lead_s": 1.6000000000003638,
+      "trimmed_tail_s": 1.8999999999996362,
+      "gripper_cycles": 1,
+      "gripper_events": [
+        {
+          "event": "close",
+          "controller_time_s": 6372.308999999999
+        },
+        {
+          "event": "open",
+          "controller_time_s": 6377.808999999999
+        }
+      ],
+      "crop_start": 15,
+      "motion_crop_stop_exclusive": 112,
+      "grid_frames": 106,
+      "training_transitions": 105,
+      "grid_controller_start_s": 6368.409,
+      "grid_controller_stop_s": 6378.909,
+      "release_tail_s": 1.1000000000003638,
+      "last_observation_release_tail_s": 1.0,
+      "source_image_gaps": [
+        {
+          "after_index": 0,
+          "dt_s": 0.2000000000007276
+        }
+      ],
+      "reused_image_frames": 0,
+      "max_image_offset_s": 0.0,
+      "resampling": "10Hz; linear measured joints/TCP; zero-order gripper; nearest image, ties prefer earlier",
+      "joint_velocity_max_rad_s": [
+        0.26049911975860596,
+        0.3967973589897156,
+        0.6309080123901367,
+        0.8313703536987305,
+        0.0680398941040039,
+        0.0005006790161132812
+      ],
+      "source_sha256": {
+        "session_20260911_170406.json": "8766c929c571ff7923234d786136abe6c0aaf1cc9c614243cc9a53ca8414a95e",
+        "rtde_tcp_gripper_20260911_170406.csv": "4f72faa7133626c0dc2c1998dcbc26cba398f82bae67e2872c385dda854eba56",
+        "sync_action_cam_20260911_170406.csv": "5f5ffa052c719a03472d04dd2f060861eba79286f086b46561483cce03140d7d",
+        "gripper_events_20260911_170406.csv": "bd04ab53c4af54252f4e12f4048f1cde5a72da681660d59d9fb1c33ab7180fca"
+      }
+    }
+  ]
+}

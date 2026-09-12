@@ -26,6 +26,7 @@ DEFAULT_ACTION_STEPS = 20
 
 def run(args):
     contract, _ = validate_dataset(args.dataset)
+    required_cycles = contract.get("gripper_cycles", 1)
     if not 1 <= args.action_steps <= 50 or args.chunks < 1:
         raise ValueError("action steps must be 1..50 and chunks must be bounded and positive")
     if not 0 < args.speed <= 0.6:
@@ -78,9 +79,10 @@ def run(args):
             controller.connect_and_prime()
             require_home(controller.get_latest_joints(), contract)
             controller.start()
-            # Use the existing sparse one-close/one-open policy, with explicit MVP timing.
+            # Dataset contract selects the task's cycle count; legacy cube stays single-cycle.
             gripper_policy = GripperPolicy(
-                gripper, GripperCommandConfig(stable_count=2, minimum_command_interval_s=0.5, maximum_cycles=1)
+                gripper,
+                GripperCommandConfig(stable_count=2, minimum_command_interval_s=0.5, maximum_cycles=required_cycles),
             )
         motion = motion_config(contract, speed=args.speed)
         reports = []
@@ -101,6 +103,7 @@ def run(args):
                 "action_horizon": contract["action_horizon"],
                 "action_steps": args.action_steps,
                 "policy_hz": motion.policy_hz,
+                "gripper_cycles_required": required_cycles,
             }
             if controller:
                 # Preflight every executed target before sending the first servo command.
@@ -111,7 +114,7 @@ def run(args):
                         targets,
                         motion,
                         on_waypoint=lambda i, _q: gripper_policy.step(float(grips[i])),
-                        finish_after_waypoint=lambda _i: gripper_policy.cycles > 0,
+                        finish_after_waypoint=lambda _i: gripper_policy.cycles >= required_cycles,
                     )
                 )
             else:
@@ -120,10 +123,12 @@ def run(args):
                     report["execution_preflight"] = "pass"
                 except ValueError as exc:
                     report["execution_preflight"] = str(exc)
+            if gripper_policy:
+                report["gripper_cycles_completed"] = gripper_policy.cycles
             print(json.dumps(report), flush=True)
             reports.append(report)
-            if gripper_policy and gripper_policy.cycles:
-                # Stop new policy motion after the release; retain one second of stable hold.
+            if gripper_policy and gripper_policy.cycles >= required_cycles:
+                # Only the final task release ends policy motion; retain one second of stable hold.
                 hold = np.asarray(controller.get_commanded_joints())
                 stream_joint_chunk(controller, np.repeat(hold[None], 10, axis=0), motion)
                 break

@@ -43,26 +43,38 @@ def test_checkpoint_reference_resolves_unique_run_and_rejects_ambiguity(tmp_path
 
 
 @pytest.mark.parametrize("dry_run", [True, False])
-def test_init_uses_joint_prepare_and_dry_run_never_checks_hardware(monkeypatch, tmp_path, dry_run):
+@pytest.mark.parametrize("charger_preclose", [False, True])
+def test_init_uses_joint_prepare_and_dry_run_never_checks_hardware(monkeypatch, tmp_path, dry_run, charger_preclose):
     trial = setup_trial(monkeypatch, tmp_path)
     prepare, doctor = MagicMock(), MagicMock(return_value=[])
     monkeypatch.setattr(operator, "prepare", prepare)
     monkeypatch.setattr(operator, "run_doctor", doctor)
-    monkeypatch.setattr("sys.argv", ["ur5e-pi05-infer-init", *(["--dry-run"] if dry_run else [])])
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "ur5e-pi05-infer-init",
+            *(["--dry-run"] if dry_run else []),
+            *(["--charger-preclose"] if charger_preclose else []),
+        ],
+    )
     assert operator.infer_init() == 0
-    prepare.assert_called_once_with(trial.lab, trial.contract, execute=not dry_run)
+    prepare.assert_called_once_with(trial.lab, trial.contract, execute=not dry_run, charger_preclose=charger_preclose)
     if dry_run:
         doctor.assert_not_called()
     else:
         doctor.assert_called_once_with(trial.lab, hardware=True)
 
 
-def test_dry_run_starts_no_model_or_robot(monkeypatch, tmp_path):
+@pytest.mark.parametrize("charger_preclose", [False, True])
+def test_dry_run_starts_no_model_or_robot(monkeypatch, tmp_path, charger_preclose):
     setup_trial(monkeypatch, tmp_path)
     server, inference = MagicMock(), MagicMock()
     monkeypatch.setattr(operator, "model_server", server)
     monkeypatch.setattr(operator, "run_inference", inference)
-    monkeypatch.setattr("sys.argv", ["ur5e-pi05-infer", "20260909_01:1000", "--dry-run"])
+    monkeypatch.setattr(
+        "sys.argv",
+        ["ur5e-pi05-infer", "20260909_01:1000", "--dry-run", *(["--charger-preclose"] if charger_preclose else [])],
+    )
     assert operator.infer() == 0
     server.assert_not_called()
     inference.assert_not_called()
@@ -70,7 +82,8 @@ def test_dry_run_starts_no_model_or_robot(monkeypatch, tmp_path):
 
 
 @pytest.mark.parametrize("interrupt", [False, True])
-def test_execute_forwards_settings_and_cleans_up_after_interrupt(monkeypatch, tmp_path, interrupt):
+@pytest.mark.parametrize("charger_preclose", [False, True])
+def test_execute_forwards_settings_and_cleans_up_after_interrupt(monkeypatch, tmp_path, interrupt, charger_preclose):
     setup_trial(monkeypatch, tmp_path)
     cleaned = []
 
@@ -84,14 +97,19 @@ def test_execute_forwards_settings_and_cleans_up_after_interrupt(monkeypatch, tm
     inference = MagicMock(side_effect=KeyboardInterrupt if interrupt else None)
     monkeypatch.setattr(operator, "model_server", server)
     monkeypatch.setattr(operator, "run_inference", inference)
-    monkeypatch.setattr("sys.argv", ["ur5e-pi05-infer", "20260909_01:1000", "--execute"])
+    monkeypatch.setattr(
+        "sys.argv",
+        ["ur5e-pi05-infer", "20260909_01:1000", "--execute", *(["--charger-preclose"] if charger_preclose else [])],
+    )
     assert operator.infer() == (130 if interrupt else 0)
     args = inference.call_args.args[0]
     assert (args.mode, args.action_steps, args.chunks, args.speed) == ("execute", 20, 30, 0.6)
     assert args.port == 18005 and args.expected_instance_id == "owned-instance"
+    assert args.charger_preclose is charger_preclose
     assert cleaned == [True]
     result_path = next((tmp_path / "logs/pi05_infer").glob("*/result.json"))
     assert json.loads(result_path.read_text())["status"] == ("interrupted" if interrupt else "completed")
+    assert json.loads(result_path.with_name("run.json").read_text())["charger_preclose"] is charger_preclose
 
 
 def test_model_start_failure_cleans_only_owned_process_without_robot_access(monkeypatch, tmp_path):

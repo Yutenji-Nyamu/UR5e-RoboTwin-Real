@@ -80,6 +80,9 @@ def infer_init() -> int:
         prog="ur5e-pi05-infer-init", description="check devices, joint home, then open gripper"
     )
     parser.add_argument("checkpoint", nargs="?", default=DEFAULT_CHECKPOINT)
+    parser.add_argument(
+        "--charger-preclose", action="store_true", help="charger task: open twice, then close once; wait 2s after each"
+    )
     parser.add_argument("--dry-run", action="store_true", help="resolve and print only; no hardware or model process")
     args = parser.parse_args()
     try:
@@ -88,7 +91,7 @@ def infer_init() -> int:
         print(f"[PI05 INIT] checkpoint={trial.checkpoint}; joint home from {trial.contract['dataset_id']}")
         if not args.dry_run and not print_checks(run_doctor(trial.lab, hardware=True)):
             return 1
-        prepare(trial.lab, trial.contract, execute=not args.dry_run)
+        prepare(trial.lab, trial.contract, execute=not args.dry_run, charger_preclose=args.charger_preclose)
         return 0
     except KeyboardInterrupt:
         print("\n[STOPPED] joint initialization interrupted")
@@ -182,6 +185,11 @@ def infer() -> int:
         "--speed", type=float, default=0.6, help="joint speed limit in rad/s, not a playback multiplier"
     )
     parser.add_argument("--diffusion-steps", type=int, default=10)
+    parser.add_argument(
+        "--charger-preclose",
+        action="store_true",
+        help="keep the aperture from infer-init --charger-preclose; skip startup open, still wait for model close",
+    )
     parser.add_argument("--gpu", default="0")
     parser.add_argument("--timeout", type=float, default=1.5, help="live RPC deadline in seconds")
     parser.add_argument("--startup-timeout", type=float, default=600, help="model loading/warmup deadline in seconds")
@@ -199,6 +207,8 @@ def infer() -> int:
         if args.execute and trial.verification.get("status") != "SFT_not_physical_validation":
             raise ValueError("development smoke checkpoints are not eligible for physical execution")
         print(f"[PI05] checkpoint={trial.checkpoint}; H=50 K={args.action_steps} 10Hz; speed<={args.speed}rad/s")
+        if args.charger_preclose:
+            print("[GRIPPER] charger preclose selected; execute keeps initialized aperture, no startup open")
         if args.dry_run:
             print("[DRY RUN] no model process, cameras, gripper or robot connection")
             return 0
@@ -221,6 +231,7 @@ def infer() -> int:
                     chunks=args.chunks,
                     speed=args.speed,
                     shadow_gripper=0.0,
+                    charger_preclose=args.charger_preclose,
                     run_id=None,
                     index=0,
                     output=log_dir / "execution.json",

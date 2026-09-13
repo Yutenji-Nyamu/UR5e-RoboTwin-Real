@@ -100,10 +100,14 @@ def controller_config(lab, contract, *, speed=0.6):
     )
 
 
-def prepare(lab, contract, *, execute=False):
+def prepare(lab, contract, *, execute=False, charger_preclose=False):
     """Explicit, slow joint-only home. The operator must first clear the direct path."""
     target = np.asarray(contract["home_q"])
-    print(f"[JOINT HOME] q={target.tolist()} rad; maximum speed 0.10 rad/s; then open gripper")
+    gripper_commands = ("open", "open", "close") if charger_preclose else ("open",)
+    # Task-level starting interval, based on the demos' 1.8--2.1s between close presses.
+    gripper_wait_s = 2.0 if charger_preclose else 1.0
+    print(f"[JOINT HOME] q={target.tolist()} rad; maximum speed 0.10 rad/s")
+    print(f"[GRIPPER INIT] {' -> '.join(gripper_commands)}; wait {gripper_wait_s:.1f}s after each command")
     if not execute:
         print("[DRY RUN] no hardware connection; inspect the path before adding --execute")
         return
@@ -119,6 +123,10 @@ def prepare(lab, contract, *, execute=False):
         stream_joint_chunk(controller, targets, config.motion)
         require_home(controller.get_latest_joints(), contract)
     with GripperSerial(lab.gripper.port, lab.gripper.baudrate, lab.gripper.timeout_s) as gripper:
-        gripper.open()
-        time.sleep(1.0)
-    print("[READY] measured joint home reached; gripper open command sent")
+        for command in gripper_commands:
+            getattr(gripper, command)()
+            time.sleep(gripper_wait_s)
+    gripper_status = (
+        "charger preclose commands sent; policy-ready state remains 0" if charger_preclose else "open command sent"
+    )
+    print(f"[READY] measured joint home reached; gripper {gripper_status}")

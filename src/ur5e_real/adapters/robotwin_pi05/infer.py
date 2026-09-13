@@ -27,6 +27,7 @@ DEFAULT_ACTION_STEPS = 20
 def run(args):
     contract, _ = validate_dataset(args.dataset)
     required_cycles = contract.get("gripper_cycles", 1)
+    charger_preclose = getattr(args, "charger_preclose", False)
     if not 1 <= args.action_steps <= 50 or args.chunks < 1:
         raise ValueError("action steps must be 1..50 and chunks must be bounded and positive")
     if not 0 < args.speed <= 0.6:
@@ -74,8 +75,13 @@ def run(args):
             stack.callback(controller.stop)
             gripper = stack.enter_context(GripperSerial(lab.gripper.port, lab.gripper.baudrate, lab.gripper.timeout_s))
             gripper.serial.write_timeout = 0.1
-            gripper.open()
-            time.sleep(1.0)
+            if charger_preclose:
+                # Keep the aperture prepared by infer-init; this is not a model grasp.
+                # GripperPolicy still starts at logical 0 / wait_close below.
+                print("[GRIPPER] keeping charger preclose; no startup open; waiting for model close", flush=True)
+            else:
+                gripper.open()
+                time.sleep(1.0)
             controller.connect_and_prime()
             require_home(controller.get_latest_joints(), contract)
             controller.start()
@@ -104,6 +110,7 @@ def run(args):
                 "action_steps": args.action_steps,
                 "policy_hz": motion.policy_hz,
                 "gripper_cycles_required": required_cycles,
+                "charger_preclose": charger_preclose,
             }
             if controller:
                 # Preflight every executed target before sending the first servo command.
@@ -151,6 +158,11 @@ def main():
     )
     parser.add_argument("--chunks", type=int, default=30)
     parser.add_argument("--speed", type=float, default=0.6)
+    parser.add_argument(
+        "--charger-preclose",
+        action="store_true",
+        help="keep the aperture from prepare --charger-preclose; skip startup open, still wait for model close",
+    )
     parser.add_argument(
         "--shadow-gripper",
         type=float,

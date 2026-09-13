@@ -1,8 +1,13 @@
 # π0.5 joint 接入操作入口
 
+2026-09-13：插座任务新增显式 `--charger-preclose`，保留1500步权重；初始化开两次、关一次，
+推理取消启动时的额外open，仍等待模型close。两条命令和适用边界见
+[插座夹爪预关配置](TRAINING_RUN_20260912_PLUG_CHARGER.md#插座夹爪预关配置2026-09-13)。
+不带该参数的cube、叠块和DP路径保持原样。
+
 2026-09-12：插插座新任务 `plug_charger`，5条/1216样本，同参数1500步SFT，
 见 [数据兼容与训练记录](TRAINING_RUN_20260912_PLUG_CHARGER.md)。该数据的重复close/open原事件保留，
-训练仍使用二值开/合状态；不改旧模型和真机执行逻辑。
+训练仍使用二值开/合状态；训练轮未修改旧模型和真机执行逻辑。
 
 2026-09-11当前任务：叠两个方块 `stack_blocks_two_0911`，5条/504样本，
 1000步及保存重载检查已完成，见 [结果和两条推理命令](TRAINING_RUN_20260911_STACK2.md)。
@@ -21,7 +26,7 @@
 本页列操作命令，实际跑过哪些检查以 [实施记录](IMPLEMENTATION.md) 为准。
 模型运行在独立 Python3.11/JAX 环境；硬件环境保留现有 DP/PyTorch，二者只用 localhost WebSocket 通信。
 `offline` 默认不连接硬件；`shadow` 只读；`prepare --execute`、`infer --mode execute` 才会运动。
-当前适配不涉及 RoboTwin 仿真、charger 或 RLT。
+本页覆盖π0.5实机SFT/推理；不涉及RoboTwin仿真或RLT训练。
 2026-09-09 用户确认首轮执行前缀 K=20；H=50 和数据10Hz不变。
 各参数的原生/训练/用户/硬件来源见 [推理参数溯源](INFERENCE_PARAMETERS.md)，不能整体照搬 DP。
 

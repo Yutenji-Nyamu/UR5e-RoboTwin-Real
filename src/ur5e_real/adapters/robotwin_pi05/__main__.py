@@ -20,8 +20,18 @@ def main():
         command.add_argument("--lab-config", type=Path, required=True)
         command.add_argument("--contract", type=Path, required=True)
         command.add_argument("--execute", action="store_true")
+        command.add_argument(
+            "--charger-preclose",
+            action="store_true",
+            help="charger task: open twice, then close once; wait 2s after each",
+        )
         options = command.parse_args(rest)
-        prepare(load_config(options.lab_config), read_contract(options.contract), execute=options.execute)
+        prepare(
+            load_config(options.lab_config),
+            read_contract(options.contract),
+            execute=options.execute,
+            charger_preclose=options.charger_preclose,
+        )
     else:
         sys.argv = [sys.argv[0], *rest]
         module = "process_data" if args.command == "data" else args.command

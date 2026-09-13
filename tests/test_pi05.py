@@ -127,10 +127,32 @@ def test_v2_or_unreviewed_episode_rejected_before_reading_any_actions(tmp_path):
         read_episode(tmp_path, run, selection)
 
 
-def test_prepare_dry_run_never_constructs_a_controller():
-    with patch("ur5e_real.adapters.robotwin_pi05.runtime.JointServoJController") as controller:
-        prepare(MagicMock(), contract(), execute=False)
+@pytest.mark.parametrize("charger_preclose", [False, True])
+def test_prepare_dry_run_never_constructs_a_controller(charger_preclose):
+    with (
+        patch("ur5e_real.adapters.robotwin_pi05.runtime.JointServoJController") as controller,
+        patch("ur5e_real.hardware.gripper.GripperSerial") as gripper,
+    ):
+        prepare(MagicMock(), contract(), execute=False, charger_preclose=charger_preclose)
         controller.assert_not_called()
+        gripper.assert_not_called()
+
+
+@pytest.mark.parametrize("charger_preclose", [False, True])
+def test_prepare_gripper_sequence_and_waits(charger_preclose):
+    events = []
+    with (
+        patch("ur5e_real.adapters.robotwin_pi05.runtime.JointServoJController") as controller,
+        patch("ur5e_real.adapters.robotwin_pi05.runtime.stream_joint_chunk"),
+        patch("ur5e_real.hardware.gripper.GripperSerial") as serial,
+        patch("ur5e_real.adapters.robotwin_pi05.runtime.time.sleep", side_effect=events.append),
+    ):
+        controller.return_value.__enter__.return_value.get_latest_joints.return_value = np.zeros(6)
+        gripper = serial.return_value.__enter__.return_value
+        gripper.open.side_effect = lambda: events.append("open")
+        gripper.close.side_effect = lambda: events.append("close")
+        prepare(MagicMock(), contract(), execute=True, charger_preclose=charger_preclose)
+    assert events == (["open", 2.0, "open", 2.0, "close", 2.0] if charger_preclose else ["open", 1.0])
 
 
 def test_camera_cache_rejects_stale_delivery():
@@ -154,6 +176,29 @@ def test_inference_cli_defaults_to_user_selected_prefix_without_loading_a_model(
         pi05_infer.main()
     assert run.call_args.args[0].action_steps == expected
     assert run.call_args.args[0].mode == "offline"
+    assert run.call_args.args[0].charger_preclose is False
+
+
+def test_inference_cli_accepts_charger_preclose_without_loading_a_model():
+    with (
+        patch("sys.argv", ["pi05-infer", "--dataset", "unused", "--charger-preclose"]),
+        patch.object(pi05_infer, "run") as run,
+    ):
+        pi05_infer.main()
+    assert run.call_args.args[0].charger_preclose is True
+
+
+def test_prepare_module_cli_forwards_charger_preclose():
+    from ur5e_real.adapters.robotwin_pi05 import __main__ as entry
+
+    with (
+        patch("sys.argv", ["pi05", "prepare", "--lab-config", "unused", "--contract", "unused", "--charger-preclose"]),
+        patch("ur5e_real.config.load_config", return_value=MagicMock()) as load_lab,
+        patch("ur5e_real.adapters.robotwin_pi05.contract.read_contract", return_value=contract()),
+        patch("ur5e_real.adapters.robotwin_pi05.runtime.prepare") as run,
+    ):
+        entry.main()
+    run.assert_called_once_with(load_lab.return_value, contract(), execute=False, charger_preclose=True)
 
 
 def test_shadow_selects_twenty_of_fifty_predictions_and_records_the_actual_settings(tmp_path):
@@ -214,7 +259,8 @@ def test_replaced_model_service_is_rejected_before_hardware_access():
 
 
 @pytest.mark.parametrize("cycles,k,executed", [(1, 20, [8]), (2, 20, [20, 4]), (2, 50, [24])])
-def test_execute_finishes_only_after_contract_cycles_with_final_hold(tmp_path, cycles, k, executed):
+@pytest.mark.parametrize("charger_preclose", [False, True])
+def test_execute_finishes_only_after_contract_cycles_with_final_hold(tmp_path, cycles, k, executed, charger_preclose):
     from ur5e_real.control.joint import stream_joint_chunk as real_stream
 
     image = np.zeros((4, 5, 3), dtype=np.uint8)
@@ -225,11 +271,13 @@ def test_execute_finishes_only_after_contract_cycles_with_final_hold(tmp_path, c
     timeline = np.r_[np.ones(6), np.zeros(10), np.ones(6), np.zeros(100)]
     offsets = iter([0, *range(0, 3 * k, k)])  # First RPC is the live-shape warmup.
     clock = [10.0]
+    observed_gripper = []
 
     def sleep(seconds):
         clock[0] += seconds
 
     def prediction(_obs):
+        observed_gripper.append(float(_obs["state"][13]))
         offset = next(offsets)
         actions = np.stack([encode_state(np.zeros(6), value) for value in timeline[offset : offset + 50]])
         return {"actions": actions, "client_elapsed_s": 0.1}
@@ -248,6 +296,7 @@ def test_execute_finishes_only_after_contract_cycles_with_final_hold(tmp_path, c
         port=18005,
         timeout=1.5,
         output=output,
+        charger_preclose=charger_preclose,
     )
     with (
         patch.object(pi05_infer, "validate_dataset", return_value=(selected, {})),
@@ -274,7 +323,10 @@ def test_execute_finishes_only_after_contract_cycles_with_final_hold(tmp_path, c
         pi05_infer.run(args)
         gripper = serial.return_value.__enter__.return_value
         assert gripper.close.call_count == cycles
-        assert gripper.open.call_count == cycles + 1  # Includes explicit initial open.
+        assert gripper.open.call_count == cycles + int(not charger_preclose)
+        expected_commands = ([] if charger_preclose else ["open"]) + ["close", "open"] * cycles
+        assert [call[0] for call in gripper.method_calls] == expected_commands
+        assert observed_gripper[:2] == [0.0, 0.0]  # Warmup and first live observation remain ready-to-close.
         assert streamed.call_count == len(executed) + 1
         assert len(streamed.call_args.args[1]) == 10  # One second hold only after the final release.
         assert not streamed.call_args.kwargs
@@ -283,5 +335,6 @@ def test_execute_finishes_only_after_contract_cycles_with_final_hold(tmp_path, c
     assert [row["executed_waypoints"] for row in reports] == executed
     assert reports[-1]["gripper_cycles_completed"] == cycles
     assert all(row["gripper_cycles_required"] == cycles for row in reports)
+    assert all(row["charger_preclose"] is charger_preclose for row in reports)
     if len(reports) > 1:
         assert reports[0]["gripper_cycles_completed"] == 1

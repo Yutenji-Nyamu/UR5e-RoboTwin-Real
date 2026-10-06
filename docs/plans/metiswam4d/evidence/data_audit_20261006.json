@@ -1,0 +1,203 @@
+{
+  "observed_at": "2026-10-06",
+  "data_root": "/data/robotics/ur5e-real",
+  "sessions": 123,
+  "by_schema": {
+    "2": 29,
+    "3": 94
+  },
+  "by_task": {
+    "pick_place_cube": 29,
+    "charger_plug": 14,
+    "drawer_close": 5,
+    "place_bread_basket": 4,
+    "place_bread_skillet": 3,
+    "place_empty_cup": 4,
+    "stack_blocks_two": 3,
+    "sort_block": 8,
+    "pour_beans": 20,
+    "stack_blocks_three": 6,
+    "stack_blocks_two_0911": 5,
+    "plug_charger": 19,
+    "block_drawer_close": 3
+  },
+  "by_outcome": {
+    "success": 93,
+    "aborted": 2,
+    "failure": 25,
+    "unreviewed": 3
+  },
+  "block_drawer_close": [
+    {
+      "run_id": "20261005_172729",
+      "schema_version": 3,
+      "task": "block_drawer_close",
+      "note": "1005",
+      "outcome": "success",
+      "recording_status": "completed",
+      "counts": {
+        "rtde_samples": 318,
+        "gripper_events": 3,
+        "frame_pairs": 317
+      },
+      "quality": {
+        "last_open_controller_time_s": 7676.737,
+        "last_frame_controller_time_s": 7688.8369999999995,
+        "last_open_to_last_frame_s": 12.1,
+        "recommended_release_tail_s": 1.0,
+        "release_tail_complete": true
+      },
+      "rtde_dt_s_p50_max": [
+        0.1000000000003638,
+        0.1999999999998181
+      ],
+      "image_dt_s_p50_max": [
+        0.1000000000003638,
+        0.2000000000007276
+      ],
+      "q_finite": true,
+      "missing_images": {
+        "head": 0,
+        "wrist": 0
+      },
+      "events": [
+        {
+          "controller_time_s": "7669.036999999999",
+          "event": "close",
+          "gripper_state": "1"
+        },
+        {
+          "controller_time_s": "7676.737",
+          "event": "open",
+          "gripper_state": "0"
+        },
+        {
+          "controller_time_s": "7681.737",
+          "event": "close",
+          "gripper_state": "1"
+        }
+      ],
+      "observed_final_gripper_state": "1",
+      "depth_recorded": false,
+      "source_sha256": {
+        "rtde_tcp_gripper_20261005_172729.csv": "f281670217af72a9f7b43c7dbfbe6a2fe05f0208f6a8be06f9c3c6e49d971e11",
+        "sync_action_cam_20261005_172729.csv": "2c84b1bbdc293033c0ca2572332b8585ab620c105e2d4f1427afeb9fba922ce7",
+        "gripper_events_20261005_172729.csv": "7e82e160124907f33184431f47b73fe5fc7de282438edd8f41c4ebfa6f671d65"
+      }
+    },
+    {
+      "run_id": "20261005_173014",
+      "schema_version": 3,
+      "task": "block_drawer_close",
+      "note": "1005",
+      "outcome": "failure",
+      "recording_status": "completed",
+      "counts": {
+        "rtde_samples": 232,
+        "gripper_events": 3,
+        "frame_pairs": 231
+      },
+      "quality": {
+        "last_open_controller_time_s": 7839.281,
+        "last_frame_controller_time_s": 7845.681,
+        "last_open_to_last_frame_s": 6.4,
+        "recommended_release_tail_s": 1.0,
+        "release_tail_complete": true
+      },
+      "rtde_dt_s_p50_max": [
+        0.1000000000003638,
+        0.1000000000003638
+      ],
+      "image_dt_s_p50_max": [
+        0.1000000000003638,
+        0.2000000000007276
+      ],
+      "q_finite": true,
+      "missing_images": {
+        "head": 0,
+        "wrist": 0
+      },
+      "events": [
+        {
+          "controller_time_s": "7831.281",
+          "event": "close",
+          "gripper_state": "1"
+        },
+        {
+          "controller_time_s": "7832.981",
+          "event": "close",
+          "gripper_state": "1"
+        },
+        {
+          "controller_time_s": "7839.281",
+          "event": "open",
+          "gripper_state": "0"
+        }
+      ],
+      "observed_final_gripper_state": "0",
+      "depth_recorded": false,
+      "source_sha256": {
+        "rtde_tcp_gripper_20261005_173014.csv": "d7370491fbcb876f0f298515d58f018b060128542c2bf72a4034a0ee05153de9",
+        "sync_action_cam_20261005_173014.csv": "fd8e1d17b75fbd877fe02ef26da331ea31a6483fe1d9646c30fd56958c7516d2",
+        "gripper_events_20261005_173014.csv": "33c514c34f0a9c5ab2976955f94be6f09ba516c701417b6ae4f6314b2ce0c94d"
+      }
+    },
+    {
+      "run_id": "20261005_173119",
+      "schema_version": 3,
+      "task": "block_drawer_close",
+      "note": "1005",
+      "outcome": "success",
+      "recording_status": "completed",
+      "counts": {
+        "rtde_samples": 245,
+        "gripper_events": 3,
+        "frame_pairs": 244
+      },
+      "quality": {
+        "last_open_controller_time_s": 7900.839,
+        "last_frame_controller_time_s": 7911.339,
+        "last_open_to_last_frame_s": 10.5,
+        "recommended_release_tail_s": 1.0,
+        "release_tail_complete": true
+      },
+      "rtde_dt_s_p50_max": [
+        0.1000000000003638,
+        0.1000000000003638
+      ],
+      "image_dt_s_p50_max": [
+        0.1000000000003638,
+        0.1999999999998181
+      ],
+      "q_finite": true,
+      "missing_images": {
+        "head": 0,
+        "wrist": 0
+      },
+      "events": [
+        {
+          "controller_time_s": "7894.739",
+          "event": "close",
+          "gripper_state": "1"
+        },
+        {
+          "controller_time_s": "7900.839",
+          "event": "open",
+          "gripper_state": "0"
+        },
+        {
+          "controller_time_s": "7904.839",
+          "event": "close",
+          "gripper_state": "1"
+        }
+      ],
+      "observed_final_gripper_state": "1",
+      "depth_recorded": false,
+      "source_sha256": {
+        "rtde_tcp_gripper_20261005_173119.csv": "7961718583557b9dac03b67a14d11e01d0091bdb14087f844c6d370c0c454d1c",
+        "sync_action_cam_20261005_173119.csv": "59a5c9bf52007383512a9d54c8fa0e6a1376489483e144bd7320cf7b41edcd77",
+        "gripper_events_20261005_173119.csv": "0f02cadf38a60e5f6da220e708027a247939aa3b95b393d84b03282b4b7af9e0"
+      }
+    }
+  ]
+}

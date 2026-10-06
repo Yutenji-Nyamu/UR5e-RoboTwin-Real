@@ -39,6 +39,20 @@ ur5e-collect pick_block_bowl --note "red block, trial 1"
 
 ## 输出
 
+可选地增加两台 D435i 的深度记录：
+
+```bash
+ur5e-collect block_drawer_close --note "1005" --depth
+```
+
+不传 `--depth` 仍只采 RGB。开启后，同一相机 session 下增加 `head_depth/`、
+`wrist_depth/` 的 16 位 PNG，以及 `camera_calibration.json`、`rgbd_frames.csv`。
+深度对齐到各自 RGB；数值乘该相机保存的 depth scale 得到米，0 表示无效深度。
+原 RGB 路径、sync CSV 字段保持兼容，raw schema v3 增加独立版本的 `depth_recording` 扩展。
+启动时先验证双路深度再进入 freedrive，缺帧或写失败直接报错。
+保存标定/时间戳不代表与机器人硬件时间同步，详细格式和实测见
+[深度采集记录](../../plans/metiswam4d/DEPTH_RECORDING.md)。
+
 2026-09-08 采集器更新后，新轨迹使用 **raw schema v3**，同时记录实测关节与 TCP。
 采集命令和按键不变。进入 freedrive 前先验证一个完整 RTDE 数据包；缺少关节字段、
 维度错误或出现 NaN/Inf 会直接报错，不填零继续录制。启动时会显示：

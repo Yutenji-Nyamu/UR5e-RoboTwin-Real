@@ -30,6 +30,7 @@ def _parser() -> argparse.ArgumentParser:
     collect.add_argument("--note", help="optional setup or variation note")
     collect.add_argument("--preview", action=argparse.BooleanOptionalAction, default=None)
     collect.add_argument("--save-video", action=argparse.BooleanOptionalAction, default=None)
+    collect.add_argument("--depth", action="store_true", help="also record aligned head/wrist depth and calibration")
 
     sessions = sub.add_parser("sessions", help="list recent raw recording sessions")
     sessions.add_argument("--config", required=True)
@@ -163,6 +164,7 @@ def main(argv: list[str] | None = None) -> int:
             note=args.note,
             preview=args.preview,
             save_video=args.save_video,
+            record_depth=args.depth,
         )
         return 0
 

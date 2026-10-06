@@ -13,9 +13,11 @@ from ..data.schema import RAW_SCHEMA_VERSION
 from ..data.session_manifest import write_manifest
 from ..hardware.gripper import GripperSerial
 from ..hardware.realsense import DualColorCamera
+from ..hardware.rgbd import DualRgbdCamera
 from ..hardware.rtde import RtdeOutputConfig, RtdeStateClient, RtdeStateCsvWriter
 from ..hardware.urscript import start_freedrive, stop_freedrive
 from .terminal import TerminalKeyPoller
+from .depth import DepthWriter
 
 
 def _run_id() -> str:
@@ -41,6 +43,7 @@ def run_collection(
     note: str | None = None,
     preview: bool | None = None,
     save_video: bool | None = None,
+    record_depth: bool = False,
 ) -> Path:
     import cv2
 
@@ -128,9 +131,22 @@ def run_collection(
     if write_video:
         manifest["paths"]["head_video"] = str(camera_dir / "head.mp4")
         manifest["paths"]["wrist_video"] = str(camera_dir / "wrist.mp4")
+    if record_depth:
+        manifest["depth_recording"] = {
+            "version": 1, "enabled": True, "encoding": "png_uint16", "alignment": "depth_to_color",
+            "invalid_value": 0, "complete_pairs": 0,
+            "units": "device_units; multiply by per-camera depth_scale_m_per_unit in calibration",
+        }
+        manifest["paths"].update({
+            "head_depth_frames": str(camera_dir / "head_depth"),
+            "wrist_depth_frames": str(camera_dir / "wrist_depth"),
+            "camera_calibration": str(camera_dir / "camera_calibration.json"),
+            "rgbd_sync": str(camera_dir / "rgbd_frames.csv"),
+        })
     write_manifest(manifest_path, manifest)
 
-    cameras = DualColorCamera(
+    camera_class = DualRgbdCamera if record_depth else DualColorCamera
+    cameras = camera_class(
         cfg.cameras.head_serial,
         cfg.cameras.wrist_serial,
         cfg.cameras.width,
@@ -145,6 +161,7 @@ def run_collection(
     sync_handle: Any = None
     head_video: Any = None
     wrist_video: Any = None
+    depth_writer: DepthWriter | None = None
     freedrive_started = False
     started_monotonic: float | None = None
     rtde_sample_count = 0
@@ -156,6 +173,8 @@ def run_collection(
 
     try:
         cameras.start()
+        if record_depth:
+            depth_writer = DepthWriter(camera_dir, cameras.calibration)
         rtde.connect()
         initial_state = rtde.receive_state()
         if initial_state is None:
@@ -199,6 +218,8 @@ def run_collection(
         next_save = time.monotonic()
         print(f"[RUN] {run_id}")
         print(f"[STATE] schema={RAW_SCHEMA_VERSION} actual_q[6] + actual_qd[6] + TCP[6]; same RTDE packet")
+        if record_depth:
+            print("[DEPTH] head + wrist; RGB-aligned uint16 PNG; calibration + camera timestamps recorded")
         print(f"[READY] recording active; freedrive={'on' if freedrive_started else 'off'}")
         print("Keys: c=close, o=open, q=quit; Ctrl+C also stops.")
         print("Keep recording for at least 1 second after the final open, until release is complete.")
@@ -255,6 +276,8 @@ def run_collection(
                     if head_video is not None:
                         head_video.write(pair.head)
                         wrist_video.write(pair.wrist)
+                    if depth_writer is not None:
+                        depth_writer.write(next_frame_index, controller_time, pair)
                     sync_writer.writerow([controller_time, next_frame_index, head_name, wrist_name])
                     sync_handle.flush()
                     frame_index = next_frame_index
@@ -280,6 +303,8 @@ def run_collection(
             gripper.shutdown()
         rtde.close()
         cameras.stop()
+        if depth_writer is not None:
+            depth_writer.close()
         if rtde_writer is not None:
             rtde_writer.close()
         for handle in (events_handle, sync_handle):
@@ -313,6 +338,8 @@ def run_collection(
                 None if last_open_time is None else release_tail is not None and release_tail >= 1.0
             ),
         }
+        if record_depth:
+            manifest["depth_recording"]["complete_pairs"] = frame_index
         write_manifest(manifest_path, manifest)
         if manifest["quality"]["release_tail_complete"] is False:
             print("[WARN] less than 1 second of images after final open; check release before marking success")

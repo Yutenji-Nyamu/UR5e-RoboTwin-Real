@@ -68,6 +68,7 @@ def collect() -> int:
     parser.add_argument("--note")
     parser.add_argument("--preview", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--save-video", action=argparse.BooleanOptionalAction, default=None)
+    parser.add_argument("--depth", action="store_true", help="also record aligned head/wrist depth and calibration")
     args = parser.parse_args()
 
     _enter_repository()
@@ -78,6 +79,7 @@ def collect() -> int:
         note=args.note,
         preview=args.preview,
         save_video=args.save_video,
+        record_depth=args.depth,
     )
     choices = {"s": "success", "f": "failure", "a": "aborted"}
     while True:

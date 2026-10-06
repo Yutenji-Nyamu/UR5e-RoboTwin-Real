@@ -9,6 +9,7 @@
 - [RTDE read/write stack](RTDE_STACK.md)
 - [Diffusion Policy real-robot implementation context](DIFFUSION_POLICY_PLAN.md)
 - [Native RoboTwin π0.5 joint-space real-robot plan (current, Chinese)](plans/pi05/README.md)
+- [MetisWAM4D Action baseline and opt-in RGB-D collection (Chinese)](plans/metiswam4d/README.md)
 - [π0.5 physical success record (Chinese)](plans/pi05/PHYSICAL_RESULT_20260910.md)
 - [Cube RLT staged plan (current, Chinese; implementation available, not yet trained)](plans/pi05-rlt/CUBE_PLAN.md)
 - [RLT commands, stage decisions and logs (Chinese)](plans/pi05-rlt/USAGE.md)

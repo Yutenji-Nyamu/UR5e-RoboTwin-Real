@@ -13,6 +13,7 @@ from ur5e_real.collection.session import run_collection
 from ur5e_real.config import CameraConfig, CollectionConfig, GripperConfig, LabConfig, RobotConfig, ServoJConfig
 from ur5e_real.data.session_manifest import load_manifest
 from ur5e_real.hardware.realsense import FramePair
+from ur5e_real.hardware.rgbd import RgbdPair
 from ur5e_real.hardware.rtde import RtdeRobotState, RtdeStateClient
 
 
@@ -66,10 +67,82 @@ class CollectionTest(unittest.TestCase):
     def manifest_path(self):
         return self.root / "raw" / "action" / "session_test.json"
 
-    def run_capture(self, keys):
+    def run_capture(self, keys, *, record_depth=False):
         self.keys.poll.side_effect = keys
         self.rtde.receive_state.side_effect = [robot_state(i) for i in range(len(keys) + 1)]
-        return run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open")
+        return run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open",
+                              record_depth=record_depth)
+
+    def depth_camera(self):
+        camera = self.stack.enter_context(patch("ur5e_real.collection.session.DualRgbdCamera")).return_value
+        camera.calibration = {"version": 1, "cameras": {}}
+        depth = np.arange(64, dtype=np.uint16).reshape(8, 8) * 1000
+        meta = {
+            role: {
+                "color": {"frame_number": 7, "timestamp_ms": 45.0, "timestamp_domain": "hardware_clock"},
+                "depth": {"frame_number": 8, "timestamp_ms": 45.1, "timestamp_domain": "hardware_clock"},
+                "host_receive_time_s": 1000.1, "host_receive_monotonic_s": 20.2,
+                "valid_depth_fraction": 63 / 64,
+            } for role in ("head", "wrist")
+        }
+        camera.read.return_value = RgbdPair(self.pair.head, self.pair.wrist, depth, depth, meta)
+        return camera
+
+    def test_depth_capture_preserves_uint16_and_links_to_unchanged_sync(self):
+        import cv2
+
+        camera = self.depth_camera()
+        manifest = load_manifest(self.run_capture(["c", "o", "c", "q"], record_depth=True))
+        self.assertEqual(manifest["schema_version"], 3)
+        self.assertEqual(manifest["depth_recording"]["complete_pairs"], 3)
+        self.assertEqual(manifest["counts"]["frame_pairs"], 3)
+        self.camera.start.assert_not_called()
+        camera.stop.assert_called_once()
+        for role in ("head", "wrist"):
+            paths = sorted(Path(manifest["paths"][f"{role}_depth_frames"]).glob("*.png"))
+            self.assertEqual(len(paths), 3)
+            for p in paths:
+                actual = cv2.imread(str(p), cv2.IMREAD_UNCHANGED)
+                self.assertEqual(actual.dtype, np.uint16)
+                np.testing.assert_array_equal(actual, camera.read.return_value.head_depth)
+        with Path(manifest["paths"]["rgbd_sync"]).open() as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(len(rows), 6)
+        self.assertEqual([r["frame_idx"] for r in rows], ["1", "1", "2", "2", "3", "3"])
+        self.assertEqual(rows[0]["depth_timestamp_domain"], "hardware_clock")
+        self.assertEqual(rows[0]["depth_image"], "head_depth/frame_00001.png")
+        with Path(manifest["paths"]["sync"]).open() as handle:
+            reader = csv.DictReader(handle)
+            self.assertEqual(reader.fieldnames, ["controller_time_s", "frame_idx", "head_image", "wrist_image"])
+            self.assertEqual(len(list(reader)), 3)
+
+    def test_missing_initial_depth_never_starts_robot_or_gripper(self):
+        camera = self.depth_camera()
+        camera.start.side_effect = RuntimeError("missing depth frame")
+        with self.assertRaisesRegex(RuntimeError, "missing depth"):
+            self.run_capture(["q"], record_depth=True)
+        self.rtde.connect.assert_not_called()
+        self.gripper_factory.assert_not_called()
+        self.start_freedrive.assert_not_called()
+        self.assertEqual(load_manifest(self.manifest_path)["recording_status"], "failed")
+        camera.stop.assert_called_once()
+
+    def test_failed_depth_write_never_publishes_a_complete_rgbd_pair(self):
+        import cv2
+
+        self.depth_camera()
+        imwrite = cv2.imwrite
+        with patch("cv2.imwrite", side_effect=lambda p, a: False if "wrist_depth" in p else imwrite(p, a)):
+            with self.assertRaisesRegex(RuntimeError, "failed to write wrist depth"):
+                self.run_capture(["c", "q"], record_depth=True)
+        manifest = load_manifest(self.manifest_path)
+        self.assertEqual(manifest["recording_status"], "failed")
+        self.assertEqual(manifest["depth_recording"]["complete_pairs"], 0)
+        self.assertEqual(manifest["counts"]["rtde_samples"], 1)
+        for name in ("sync", "rgbd_sync"):
+            with Path(manifest["paths"][name]).open() as handle:
+                self.assertEqual(list(csv.DictReader(handle)), [])
+        self.stop_freedrive.assert_called_once()
 
     def assert_resources_closed(self):
         self.rtde.close.assert_called_once_with()

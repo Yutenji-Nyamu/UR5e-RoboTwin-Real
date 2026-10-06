@@ -40,6 +40,25 @@ press Enter to review later. Add a setup note when needed:
 ur5e-collect pick_block_bowl --note "red block, trial 1"
 ```
 
+## Optional depth
+
+Add `--depth` to record aligned depth from both D435i cameras:
+
+```bash
+ur5e-collect block_drawer_close --note "1005" --depth
+```
+
+The default remains RGB only. Depth mode adds `head_depth/` and `wrist_depth/`
+16-bit PNGs, `camera_calibration.json`, and `rgbd_frames.csv` under the same camera
+session. Multiply each depth value by its camera's recorded scale to obtain meters;
+zero means invalid depth. Existing RGB paths and sync CSV columns remain unchanged,
+and raw schema v3 gains a versioned `depth_recording` extension.
+
+Depth startup validates both streams before freedrive. Missing frames or failed
+writes stop the session with an error. Calibration and timestamps are recorded;
+geometric alignment does not imply robot/camera hardware time synchronization.
+See the [format and camera-only validation](../plans/metiswam4d/DEPTH_RECORDING.md).
+
 ## Output
 
 Since the 2026-09-08 collector update, new sessions use **raw schema v3** and

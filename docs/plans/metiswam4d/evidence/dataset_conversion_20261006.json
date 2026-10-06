@@ -1,0 +1,70 @@
+{
+  "scope": "explicit two successful episodes, no image copy or source mutation",
+  "episodes": [
+    {
+      "run_id": "20261005_172729",
+      "grid_frames": 319,
+      "transitions": 318,
+      "max_image_offset_s": 0.1000000000003638,
+      "events": [
+        {
+          "controller_time_s": "7669.036999999999",
+          "event": "close",
+          "gripper_state": "1"
+        },
+        {
+          "controller_time_s": "7676.737",
+          "event": "open",
+          "gripper_state": "0"
+        },
+        {
+          "controller_time_s": "7681.737",
+          "event": "close",
+          "gripper_state": "1"
+        }
+      ],
+      "source_sha256": {
+        "session_20261005_172729.json": "19894ba8c50b9b18feda518d3601d8838ba4cfa1d335378363ba7f65f41730d6",
+        "rtde_tcp_gripper_20261005_172729.csv": "f281670217af72a9f7b43c7dbfbe6a2fe05f0208f6a8be06f9c3c6e49d971e11",
+        "sync_action_cam_20261005_172729.csv": "2c84b1bbdc293033c0ca2572332b8585ab620c105e2d4f1427afeb9fba922ce7",
+        "gripper_events_20261005_172729.csv": "7e82e160124907f33184431f47b73fe5fc7de282438edd8f41c4ebfa6f671d65"
+      }
+    },
+    {
+      "run_id": "20261005_173119",
+      "grid_frames": 245,
+      "transitions": 244,
+      "max_image_offset_s": 0.0999999999994543,
+      "events": [
+        {
+          "controller_time_s": "7894.739",
+          "event": "close",
+          "gripper_state": "1"
+        },
+        {
+          "controller_time_s": "7900.839",
+          "event": "open",
+          "gripper_state": "0"
+        },
+        {
+          "controller_time_s": "7904.839",
+          "event": "close",
+          "gripper_state": "1"
+        }
+      ],
+      "source_sha256": {
+        "session_20261005_173119.json": "f760a82d71ccc8148fc0de2db6bc855ed1ff5e0e402bf347c48cd71b3d6daa06",
+        "rtde_tcp_gripper_20261005_173119.csv": "7961718583557b9dac03b67a14d11e01d0091bdb14087f844c6d370c0c454d1c",
+        "sync_action_cam_20261005_173119.csv": "59a5c9bf52007383512a9d54c8fa0e6a1376489483e144bd7320cf7b41edcd77",
+        "gripper_events_20261005_173119.csv": "0f02cadf38a60e5f6da220e708027a247939aa3b95b393d84b03282b4b7af9e0"
+      }
+    }
+  ],
+  "training_windows": 562,
+  "fps": 10,
+  "horizon": 50,
+  "crop": "none",
+  "source_max_gap_s": 0.25,
+  "max_image_offset_s": 0.1,
+  "tail_padding": "last target repeated; padded steps masked out"
+}

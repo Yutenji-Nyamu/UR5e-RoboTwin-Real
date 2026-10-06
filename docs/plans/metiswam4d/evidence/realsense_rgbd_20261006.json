@@ -1,0 +1,3379 @@
+{
+  "started_at": "2026-10-06T07:06:21.015629+00:00",
+  "scope": "camera-only sequential dual read; no RTDE, gripper or freedrive",
+  "versions": {
+    "pyrealsense2": "2.56.5.9235",
+    "numpy": "1.26.4",
+    "opencv-python": "4.11.0.86"
+  },
+  "requested_profile": {
+    "width": 640,
+    "height": 480,
+    "fps": 30
+  },
+  "warmup_pairs": 60,
+  "requested_pairs": 60,
+  "cameras": {
+    "head": {
+      "serial": "head_camera_redacted",
+      "name": "Intel RealSense D435I",
+      "firmware": "5.17.0.10",
+      "usb": "3.2",
+      "depth_scale_m_per_unit": 0.0010000000474974513,
+      "color_intrinsics": {
+        "width": 640,
+        "height": 480,
+        "fx": 608.0960083007812,
+        "fy": 608.2388916015625,
+        "ppx": 317.01715087890625,
+        "ppy": 249.49708557128906,
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "distortion.inverse_brown_conrady"
+      },
+      "native_depth_intrinsics": {
+        "width": 640,
+        "height": 480,
+        "fx": 385.9059753417969,
+        "fy": 385.9059753417969,
+        "ppx": 321.86053466796875,
+        "ppy": 234.95896911621094,
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "distortion.brown_conrady"
+      },
+      "depth_to_color": {
+        "rotation": [
+          0.9998897910118103,
+          -0.014812086708843708,
+          -0.0010241070995107293,
+          0.014812580309808254,
+          0.999890148639679,
+          0.00047540516243316233,
+          0.0010169529123231769,
+          -0.0004905224195681512,
+          0.9999993443489075
+        ],
+        "translation_m": [
+          0.014686491340398788,
+          -5.593394598690793e-05,
+          0.0004378751036711037
+        ]
+      },
+      "aligned_depth_intrinsics": {
+        "width": 640,
+        "height": 480,
+        "fx": 608.0960083007812,
+        "fy": 608.2388916015625,
+        "ppx": 317.01715087890625,
+        "ppy": 249.49708557128906,
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "distortion.inverse_brown_conrady"
+      },
+      "color_shape": [
+        480,
+        640,
+        3
+      ],
+      "depth_shape": [
+        480,
+        640
+      ],
+      "depth_dtype": "uint16",
+      "first_depth_png_bytes": 87660,
+      "first_depth_png_encode_ms": 13.859228999990592,
+      "png_roundtrip_exact": true
+    },
+    "wrist": {
+      "serial": "wrist_camera_redacted",
+      "name": "Intel RealSense D435I",
+      "firmware": "5.17.0.10",
+      "usb": "3.2",
+      "depth_scale_m_per_unit": 0.0010000000474974513,
+      "color_intrinsics": {
+        "width": 640,
+        "height": 480,
+        "fx": 606.759521484375,
+        "fy": 606.7249755859375,
+        "ppx": 318.58453369140625,
+        "ppy": 249.40988159179688,
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "distortion.inverse_brown_conrady"
+      },
+      "native_depth_intrinsics": {
+        "width": 640,
+        "height": 480,
+        "fx": 388.7869873046875,
+        "fy": 388.7869873046875,
+        "ppx": 322.5325012207031,
+        "ppy": 239.9696502685547,
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "distortion.brown_conrady"
+      },
+      "depth_to_color": {
+        "rotation": [
+          0.9999015927314758,
+          -0.012729997746646404,
+          0.005896328948438168,
+          0.012732245959341526,
+          0.9999188780784607,
+          -0.00034391062217764556,
+          -0.005891472566872835,
+          0.0004189502797089517,
+          0.9999825358390808
+        ],
+        "translation_m": [
+          0.014571066945791245,
+          0.00012084312766091898,
+          0.0004699749406427145
+        ]
+      },
+      "aligned_depth_intrinsics": {
+        "width": 640,
+        "height": 480,
+        "fx": 606.759521484375,
+        "fy": 606.7249755859375,
+        "ppx": 318.58453369140625,
+        "ppy": 249.40988159179688,
+        "coeffs": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "distortion.inverse_brown_conrady"
+      },
+      "color_shape": [
+        480,
+        640,
+        3
+      ],
+      "depth_shape": [
+        480,
+        640
+      ],
+      "depth_dtype": "uint16",
+      "first_depth_png_bytes": 22351,
+      "first_depth_png_encode_ms": 2.74881599989385,
+      "png_roundtrip_exact": true
+    }
+  },
+  "samples": [
+    {
+      "index": 0,
+      "head": {
+        "host_receive_time_s": 1791270383.7075279,
+        "color": {
+          "frame_number": 63,
+          "timestamp_ms": 1791270383672.56,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 61,
+          "timestamp_ms": 1791270383672.542,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 61,
+          "timestamp_ms": 1791270383672.542,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 24.066127999958553,
+        "valid_fraction": 0.95017578125,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270383.767388,
+        "color": {
+          "frame_number": 61,
+          "timestamp_ms": 1791270383720.3342,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 59,
+          "timestamp_ms": 1791270383720.3164,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 59,
+          "timestamp_ms": 1791270383720.3164,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 13.729682999837678,
+        "valid_fraction": 0.8085188802083333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 1,
+      "head": {
+        "host_receive_time_s": 1791270383.7903857,
+        "color": {
+          "frame_number": 65,
+          "timestamp_ms": 1791270383739.2554,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 63,
+          "timestamp_ms": 1791270383739.2375,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 63,
+          "timestamp_ms": 1791270383739.2375,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.178957999987688,
+        "valid_fraction": 0.95072265625,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270383.7984905,
+        "color": {
+          "frame_number": 62,
+          "timestamp_ms": 1791270383753.3438,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 60,
+          "timestamp_ms": 1791270383753.3262,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 60,
+          "timestamp_ms": 1791270383753.3262,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.0885600001274724,
+        "valid_fraction": 0.8082682291666666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 2,
+      "head": {
+        "host_receive_time_s": 1791270383.807536,
+        "color": {
+          "frame_number": 66,
+          "timestamp_ms": 1791270383772.6042,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 64,
+          "timestamp_ms": 1791270383772.5862,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 64,
+          "timestamp_ms": 1791270383772.5862,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.893200999958935,
+        "valid_fraction": 0.950498046875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270383.8153923,
+        "color": {
+          "frame_number": 63,
+          "timestamp_ms": 1791270383786.3503,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 61,
+          "timestamp_ms": 1791270383786.3325,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 61,
+          "timestamp_ms": 1791270383786.3325,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.094464999980119,
+        "valid_fraction": 0.8076529947916666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 3,
+      "head": {
+        "host_receive_time_s": 1791270383.8409498,
+        "color": {
+          "frame_number": 67,
+          "timestamp_ms": 1791270383805.9539,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 65,
+          "timestamp_ms": 1791270383805.9358,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 65,
+          "timestamp_ms": 1791270383805.9358,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 14.18099100010295,
+        "valid_fraction": 0.9491178385416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270383.8602254,
+        "color": {
+          "frame_number": 64,
+          "timestamp_ms": 1791270383819.6833,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 62,
+          "timestamp_ms": 1791270383819.6655,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 62,
+          "timestamp_ms": 1791270383819.6655,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.956146999982593,
+        "valid_fraction": 0.8067122395833334,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 4,
+      "head": {
+        "host_receive_time_s": 1791270383.874284,
+        "color": {
+          "frame_number": 68,
+          "timestamp_ms": 1791270383839.3042,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 66,
+          "timestamp_ms": 1791270383839.2861,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 66,
+          "timestamp_ms": 1791270383839.2861,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 12.043552000022828,
+        "valid_fraction": 0.9509016927083334,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270383.8910017,
+        "color": {
+          "frame_number": 65,
+          "timestamp_ms": 1791270383853.0076,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 63,
+          "timestamp_ms": 1791270383852.9897,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 63,
+          "timestamp_ms": 1791270383852.9897,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.374339000103646,
+        "valid_fraction": 0.8067708333333333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 5,
+      "head": {
+        "host_receive_time_s": 1791270383.9077039,
+        "color": {
+          "frame_number": 69,
+          "timestamp_ms": 1791270383872.6553,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 67,
+          "timestamp_ms": 1791270383872.6372,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 67,
+          "timestamp_ms": 1791270383872.6372,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 12.88767000005464,
+        "valid_fraction": 0.9498990885416667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1020000523421913
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270383.9264998,
+        "color": {
+          "frame_number": 66,
+          "timestamp_ms": 1791270383886.323,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 64,
+          "timestamp_ms": 1791270383886.305,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 64,
+          "timestamp_ms": 1791270383886.305,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.4156240000320395,
+        "valid_fraction": 0.8072819010416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 6,
+      "head": {
+        "host_receive_time_s": 1791270383.941111,
+        "color": {
+          "frame_number": 70,
+          "timestamp_ms": 1791270383906.007,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 68,
+          "timestamp_ms": 1791270383905.989,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 68,
+          "timestamp_ms": 1791270383905.989,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.581142999972144,
+        "valid_fraction": 0.9520279947916667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270383.9499967,
+        "color": {
+          "frame_number": 67,
+          "timestamp_ms": 1791270383919.6294,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 65,
+          "timestamp_ms": 1791270383919.6116,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 65,
+          "timestamp_ms": 1791270383919.6116,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.08206299991798,
+        "valid_fraction": 0.808486328125,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 7,
+      "head": {
+        "host_receive_time_s": 1791270383.9743893,
+        "color": {
+          "frame_number": 71,
+          "timestamp_ms": 1791270383939.3596,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 69,
+          "timestamp_ms": 1791270383939.3416,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 69,
+          "timestamp_ms": 1791270383939.3416,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 13.18429599996307,
+        "valid_fraction": 0.951884765625,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270383.9920318,
+        "color": {
+          "frame_number": 68,
+          "timestamp_ms": 1791270383952.927,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 66,
+          "timestamp_ms": 1791270383952.9092,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 66,
+          "timestamp_ms": 1791270383952.9092,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.665165999947931,
+        "valid_fraction": 0.8088118489583334,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 8,
+      "head": {
+        "host_receive_time_s": 1791270384.0078087,
+        "color": {
+          "frame_number": 72,
+          "timestamp_ms": 1791270383972.713,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 70,
+          "timestamp_ms": 1791270383972.695,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 70,
+          "timestamp_ms": 1791270383972.695,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 12.846179000007396,
+        "valid_fraction": 0.950546875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.110000052722171
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.0268006,
+        "color": {
+          "frame_number": 69,
+          "timestamp_ms": 1791270383986.2158,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 67,
+          "timestamp_ms": 1791270383986.198,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 67,
+          "timestamp_ms": 1791270383986.198,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.981234000022596,
+        "valid_fraction": 0.8072981770833333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 9,
+      "head": {
+        "host_receive_time_s": 1791270384.0411153,
+        "color": {
+          "frame_number": 73,
+          "timestamp_ms": 1791270384006.0671,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 71,
+          "timestamp_ms": 1791270384006.049,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 71,
+          "timestamp_ms": 1791270384006.049,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.322153999941293,
+        "valid_fraction": 0.9491080729166667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.04927,
+        "color": {
+          "frame_number": 70,
+          "timestamp_ms": 1791270384019.4958,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 68,
+          "timestamp_ms": 1791270384019.4778,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 68,
+          "timestamp_ms": 1791270384019.4778,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.926798000042254,
+        "valid_fraction": 0.8084375,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 10,
+      "head": {
+        "host_receive_time_s": 1791270384.0745053,
+        "color": {
+          "frame_number": 74,
+          "timestamp_ms": 1791270384039.4219,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 72,
+          "timestamp_ms": 1791270384039.4038,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 72,
+          "timestamp_ms": 1791270384039.4038,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 13.57499400000961,
+        "valid_fraction": 0.951416015625,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.092805,
+        "color": {
+          "frame_number": 71,
+          "timestamp_ms": 1791270384052.7668,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 69,
+          "timestamp_ms": 1791270384052.7488,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 69,
+          "timestamp_ms": 1791270384052.7488,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.407962000139378,
+        "valid_fraction": 0.8072330729166667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 11,
+      "head": {
+        "host_receive_time_s": 1791270384.1078346,
+        "color": {
+          "frame_number": 75,
+          "timestamp_ms": 1791270384072.7776,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 73,
+          "timestamp_ms": 1791270384072.7595,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 73,
+          "timestamp_ms": 1791270384072.7595,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 13.050707000047623,
+        "valid_fraction": 0.9505989583333333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.1262405,
+        "color": {
+          "frame_number": 72,
+          "timestamp_ms": 1791270384086.029,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 70,
+          "timestamp_ms": 1791270384086.011,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 70,
+          "timestamp_ms": 1791270384086.011,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.519302000015159,
+        "valid_fraction": 0.8070638020833333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 12,
+      "head": {
+        "host_receive_time_s": 1791270384.1412296,
+        "color": {
+          "frame_number": 76,
+          "timestamp_ms": 1791270384106.1338,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 74,
+          "timestamp_ms": 1791270384106.116,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 74,
+          "timestamp_ms": 1791270384106.116,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.177733999971679,
+        "valid_fraction": 0.9515755208333333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.1493485,
+        "color": {
+          "frame_number": 73,
+          "timestamp_ms": 1791270384119.2822,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 71,
+          "timestamp_ms": 1791270384119.2644,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 71,
+          "timestamp_ms": 1791270384119.2644,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.875221000020247,
+        "valid_fraction": 0.8085384114583334,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 13,
+      "head": {
+        "host_receive_time_s": 1791270384.1745412,
+        "color": {
+          "frame_number": 77,
+          "timestamp_ms": 1791270384139.491,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 75,
+          "timestamp_ms": 1791270384139.473,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 75,
+          "timestamp_ms": 1791270384139.473,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 13.722594999990179,
+        "valid_fraction": 0.949384765625,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.1926553,
+        "color": {
+          "frame_number": 74,
+          "timestamp_ms": 1791270384152.5269,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 72,
+          "timestamp_ms": 1791270384152.5088,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 72,
+          "timestamp_ms": 1791270384152.5088,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.017554999947606,
+        "valid_fraction": 0.808955078125,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 14,
+      "head": {
+        "host_receive_time_s": 1791270384.207981,
+        "color": {
+          "frame_number": 78,
+          "timestamp_ms": 1791270384172.8489,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 76,
+          "timestamp_ms": 1791270384172.8308,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 76,
+          "timestamp_ms": 1791270384172.8308,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 12.780471999803922,
+        "valid_fraction": 0.9503938802083334,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.2257102,
+        "color": {
+          "frame_number": 75,
+          "timestamp_ms": 1791270384185.7625,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 73,
+          "timestamp_ms": 1791270384185.7444,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 73,
+          "timestamp_ms": 1791270384185.7444,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.622242000048573,
+        "valid_fraction": 0.8071028645833334,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 15,
+      "head": {
+        "host_receive_time_s": 1791270384.2412105,
+        "color": {
+          "frame_number": 79,
+          "timestamp_ms": 1791270384206.2075,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 77,
+          "timestamp_ms": 1791270384206.1895,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 77,
+          "timestamp_ms": 1791270384206.1895,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 10.684242000024824,
+        "valid_fraction": 0.9500944010416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1020000523421913
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.2577384,
+        "color": {
+          "frame_number": 76,
+          "timestamp_ms": 1791270384218.989,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 74,
+          "timestamp_ms": 1791270384218.9712,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 74,
+          "timestamp_ms": 1791270384218.9712,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.171277000021291,
+        "valid_fraction": 0.807861328125,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 16,
+      "head": {
+        "host_receive_time_s": 1791270384.2747402,
+        "color": {
+          "frame_number": 80,
+          "timestamp_ms": 1791270384239.567,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 78,
+          "timestamp_ms": 1791270384239.5488,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 78,
+          "timestamp_ms": 1791270384239.5488,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.110868999963714,
+        "valid_fraction": 0.9509147135416667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.2834842,
+        "color": {
+          "frame_number": 77,
+          "timestamp_ms": 1791270384252.207,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 75,
+          "timestamp_ms": 1791270384252.1892,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 75,
+          "timestamp_ms": 1791270384252.1892,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.355733999977019,
+        "valid_fraction": 0.8074283854166666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 17,
+      "head": {
+        "host_receive_time_s": 1791270384.3079946,
+        "color": {
+          "frame_number": 81,
+          "timestamp_ms": 1791270384272.927,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 79,
+          "timestamp_ms": 1791270384272.909,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 79,
+          "timestamp_ms": 1791270384272.909,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 12.731070000199907,
+        "valid_fraction": 0.950380859375,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.326172,
+        "color": {
+          "frame_number": 78,
+          "timestamp_ms": 1791270384285.416,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 76,
+          "timestamp_ms": 1791270384285.3982,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 76,
+          "timestamp_ms": 1791270384285.3982,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.121243999814396,
+        "valid_fraction": 0.8085319010416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 18,
+      "head": {
+        "host_receive_time_s": 1791270384.341387,
+        "color": {
+          "frame_number": 82,
+          "timestamp_ms": 1791270384306.2878,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 80,
+          "timestamp_ms": 1791270384306.2698,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 80,
+          "timestamp_ms": 1791270384306.2698,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 20.604459000196584,
+        "valid_fraction": 0.949716796875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.3686426,
+        "color": {
+          "frame_number": 79,
+          "timestamp_ms": 1791270384318.6162,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 77,
+          "timestamp_ms": 1791270384318.5984,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 77,
+          "timestamp_ms": 1791270384318.5984,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 11.650358999986565,
+        "valid_fraction": 0.8086490885416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 19,
+      "head": {
+        "host_receive_time_s": 1791270384.383241,
+        "color": {
+          "frame_number": 83,
+          "timestamp_ms": 1791270384339.6494,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 81,
+          "timestamp_ms": 1791270384339.6316,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 81,
+          "timestamp_ms": 1791270384339.6316,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.718772000136596,
+        "valid_fraction": 0.9491276041666666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1120000528171659
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.391625,
+        "color": {
+          "frame_number": 80,
+          "timestamp_ms": 1791270384351.8076,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 78,
+          "timestamp_ms": 1791270384351.7896,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 78,
+          "timestamp_ms": 1791270384351.7896,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 3.9738909999869065,
+        "valid_fraction": 0.808759765625,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 20,
+      "head": {
+        "host_receive_time_s": 1791270384.4081006,
+        "color": {
+          "frame_number": 84,
+          "timestamp_ms": 1791270384373.012,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 82,
+          "timestamp_ms": 1791270384372.994,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 82,
+          "timestamp_ms": 1791270384372.994,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.333099999916158,
+        "valid_fraction": 0.9511002604166666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.4169886,
+        "color": {
+          "frame_number": 81,
+          "timestamp_ms": 1791270384384.99,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 79,
+          "timestamp_ms": 1791270384384.9722,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 79,
+          "timestamp_ms": 1791270384384.9722,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.475384999977905,
+        "valid_fraction": 0.8079069010416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 21,
+      "head": {
+        "host_receive_time_s": 1791270384.4413881,
+        "color": {
+          "frame_number": 85,
+          "timestamp_ms": 1791270384406.375,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 83,
+          "timestamp_ms": 1791270384406.3572,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 83,
+          "timestamp_ms": 1791270384406.3572,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.12120799994409,
+        "valid_fraction": 0.9490885416666667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.4522111,
+        "color": {
+          "frame_number": 82,
+          "timestamp_ms": 1791270384418.1636,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 80,
+          "timestamp_ms": 1791270384418.1458,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 80,
+          "timestamp_ms": 1791270384418.1458,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.772279999926468,
+        "valid_fraction": 0.8083756510416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 22,
+      "head": {
+        "host_receive_time_s": 1791270384.4747798,
+        "color": {
+          "frame_number": 86,
+          "timestamp_ms": 1791270384439.739,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 84,
+          "timestamp_ms": 1791270384439.721,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 84,
+          "timestamp_ms": 1791270384439.721,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.630297999867253,
+        "valid_fraction": 0.9519401041666666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.4892278,
+        "color": {
+          "frame_number": 83,
+          "timestamp_ms": 1791270384451.3284,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 81,
+          "timestamp_ms": 1791270384451.3103,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 81,
+          "timestamp_ms": 1791270384451.3103,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.627264000144351,
+        "valid_fraction": 0.8082454427083333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 23,
+      "head": {
+        "host_receive_time_s": 1791270384.5081072,
+        "color": {
+          "frame_number": 87,
+          "timestamp_ms": 1791270384473.1038,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 85,
+          "timestamp_ms": 1791270384473.0857,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 85,
+          "timestamp_ms": 1791270384473.0857,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.103840999912791,
+        "valid_fraction": 0.9498111979166667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.5181735,
+        "color": {
+          "frame_number": 84,
+          "timestamp_ms": 1791270384484.4841,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 82,
+          "timestamp_ms": 1791270384484.4663,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 82,
+          "timestamp_ms": 1791270384484.4663,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.383851999999024,
+        "valid_fraction": 0.80833984375,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 24,
+      "head": {
+        "host_receive_time_s": 1791270384.5415554,
+        "color": {
+          "frame_number": 88,
+          "timestamp_ms": 1791270384506.469,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 86,
+          "timestamp_ms": 1791270384506.4512,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 86,
+          "timestamp_ms": 1791270384506.4512,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.918057000097178,
+        "valid_fraction": 0.951201171875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.554156,
+        "color": {
+          "frame_number": 85,
+          "timestamp_ms": 1791270384517.631,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 83,
+          "timestamp_ms": 1791270384517.6133,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 83,
+          "timestamp_ms": 1791270384517.6133,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.364531999954124,
+        "valid_fraction": 0.8081608072916666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 25,
+      "head": {
+        "host_receive_time_s": 1791270384.574843,
+        "color": {
+          "frame_number": 89,
+          "timestamp_ms": 1791270384539.8352,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 87,
+          "timestamp_ms": 1791270384539.8171,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 87,
+          "timestamp_ms": 1791270384539.8171,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.254186999967715,
+        "valid_fraction": 0.9490559895833334,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.5849578,
+        "color": {
+          "frame_number": 86,
+          "timestamp_ms": 1791270384550.7693,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 84,
+          "timestamp_ms": 1791270384550.7515,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 84,
+          "timestamp_ms": 1791270384550.7515,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.4881829998503235,
+        "valid_fraction": 0.80736328125,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 26,
+      "head": {
+        "host_receive_time_s": 1791270384.608227,
+        "color": {
+          "frame_number": 90,
+          "timestamp_ms": 1791270384573.2014,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 88,
+          "timestamp_ms": 1791270384573.1833,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 88,
+          "timestamp_ms": 1791270384573.1833,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 8.12913300001128,
+        "valid_fraction": 0.949248046875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.6215541,
+        "color": {
+          "frame_number": 87,
+          "timestamp_ms": 1791270384583.8987,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 85,
+          "timestamp_ms": 1791270384583.8809,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 85,
+          "timestamp_ms": 1791270384583.8809,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.043783000199255,
+        "valid_fraction": 0.8068131510416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 27,
+      "head": {
+        "host_receive_time_s": 1791270384.64163,
+        "color": {
+          "frame_number": 91,
+          "timestamp_ms": 1791270384606.5544,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 89,
+          "timestamp_ms": 1791270384606.5364,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 89,
+          "timestamp_ms": 1791270384606.5364,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 12.721473999818045,
+        "valid_fraction": 0.950869140625,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.6604776,
+        "color": {
+          "frame_number": 88,
+          "timestamp_ms": 1791270384617.019,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 86,
+          "timestamp_ms": 1791270384617.0012,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 86,
+          "timestamp_ms": 1791270384617.0012,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.980561000114903,
+        "valid_fraction": 0.8083430989583333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 28,
+      "head": {
+        "host_receive_time_s": 1791270384.6748655,
+        "color": {
+          "frame_number": 92,
+          "timestamp_ms": 1791270384639.9077,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 90,
+          "timestamp_ms": 1791270384639.8896,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 90,
+          "timestamp_ms": 1791270384639.8896,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.13815599992995,
+        "valid_fraction": 0.9513509114583333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1000000522471964
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.682906,
+        "color": {
+          "frame_number": 89,
+          "timestamp_ms": 1791270384650.1306,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 87,
+          "timestamp_ms": 1791270384650.1128,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 87,
+          "timestamp_ms": 1791270384650.1128,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.431505999922592,
+        "valid_fraction": 0.8081412760416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 29,
+      "head": {
+        "host_receive_time_s": 1791270384.7083507,
+        "color": {
+          "frame_number": 93,
+          "timestamp_ms": 1791270384673.2615,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 91,
+          "timestamp_ms": 1791270384673.2434,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 91,
+          "timestamp_ms": 1791270384673.2434,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 15.976268000031268,
+        "valid_fraction": 0.95130859375,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.7292252,
+        "color": {
+          "frame_number": 90,
+          "timestamp_ms": 1791270384683.2334,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 88,
+          "timestamp_ms": 1791270384683.2156,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 88,
+          "timestamp_ms": 1791270384683.2156,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.357331999879534,
+        "valid_fraction": 0.8074934895833333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 30,
+      "head": {
+        "host_receive_time_s": 1791270384.7416759,
+        "color": {
+          "frame_number": 94,
+          "timestamp_ms": 1791270384706.6155,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 92,
+          "timestamp_ms": 1791270384706.5974,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 92,
+          "timestamp_ms": 1791270384706.5974,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.962492000004204,
+        "valid_fraction": 0.95013671875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.74926,
+        "color": {
+          "frame_number": 91,
+          "timestamp_ms": 1791270384716.3271,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 89,
+          "timestamp_ms": 1791270384716.3093,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 89,
+          "timestamp_ms": 1791270384716.3093,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.406765999874551,
+        "valid_fraction": 0.8081705729166667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 31,
+      "head": {
+        "host_receive_time_s": 1791270384.7750185,
+        "color": {
+          "frame_number": 95,
+          "timestamp_ms": 1791270384739.9697,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 93,
+          "timestamp_ms": 1791270384739.9517,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 93,
+          "timestamp_ms": 1791270384739.9517,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 14.083384000059596,
+        "valid_fraction": 0.9511490885416667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.7961624,
+        "color": {
+          "frame_number": 92,
+          "timestamp_ms": 1791270384749.4124,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 90,
+          "timestamp_ms": 1791270384749.3943,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 90,
+          "timestamp_ms": 1791270384749.3943,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.179338000014468,
+        "valid_fraction": 0.8085123697916666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 32,
+      "head": {
+        "host_receive_time_s": 1791270384.8083415,
+        "color": {
+          "frame_number": 96,
+          "timestamp_ms": 1791270384773.3245,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 94,
+          "timestamp_ms": 1791270384773.3064,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 94,
+          "timestamp_ms": 1791270384773.3064,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.9058330000425485,
+        "valid_fraction": 0.949130859375,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.8171492,
+        "color": {
+          "frame_number": 93,
+          "timestamp_ms": 1791270384782.4976,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 91,
+          "timestamp_ms": 1791270384782.4797,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 91,
+          "timestamp_ms": 1791270384782.4797,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.572934999918289,
+        "valid_fraction": 0.8089713541666667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 33,
+      "head": {
+        "host_receive_time_s": 1791270384.8414888,
+        "color": {
+          "frame_number": 97,
+          "timestamp_ms": 1791270384806.6794,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 95,
+          "timestamp_ms": 1791270384806.6614,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 95,
+          "timestamp_ms": 1791270384806.6614,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 15.320621000000756,
+        "valid_fraction": 0.9507421875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.8617475,
+        "color": {
+          "frame_number": 94,
+          "timestamp_ms": 1791270384815.691,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 92,
+          "timestamp_ms": 1791270384815.673,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 92,
+          "timestamp_ms": 1791270384815.673,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.241869000177758,
+        "valid_fraction": 0.8081998697916667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 34,
+      "head": {
+        "host_receive_time_s": 1791270384.8751404,
+        "color": {
+          "frame_number": 98,
+          "timestamp_ms": 1791270384840.0347,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 96,
+          "timestamp_ms": 1791270384840.0168,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 96,
+          "timestamp_ms": 1791270384840.0168,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.827532000035717,
+        "valid_fraction": 0.9485123697916666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.882691,
+        "color": {
+          "frame_number": 95,
+          "timestamp_ms": 1791270384848.8772,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 93,
+          "timestamp_ms": 1791270384848.8591,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 93,
+          "timestamp_ms": 1791270384848.8591,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 3.992155000105413,
+        "valid_fraction": 0.8081184895833333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 35,
+      "head": {
+        "host_receive_time_s": 1791270384.9085174,
+        "color": {
+          "frame_number": 99,
+          "timestamp_ms": 1791270384873.3904,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 97,
+          "timestamp_ms": 1791270384873.3723,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 97,
+          "timestamp_ms": 1791270384873.3723,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.530835999934425,
+        "valid_fraction": 0.9505013020833334,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.110000052722171
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.917915,
+        "color": {
+          "frame_number": 96,
+          "timestamp_ms": 1791270384882.0562,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 94,
+          "timestamp_ms": 1791270384882.0383,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 94,
+          "timestamp_ms": 1791270384882.0383,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.8465440001546085,
+        "valid_fraction": 0.8078971354166666,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 36,
+      "head": {
+        "host_receive_time_s": 1791270384.9418404,
+        "color": {
+          "frame_number": 100,
+          "timestamp_ms": 1791270384906.7463,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 98,
+          "timestamp_ms": 1791270384906.7285,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 98,
+          "timestamp_ms": 1791270384906.7285,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.963742000152706,
+        "valid_fraction": 0.9504134114583334,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.1020000523421913
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.953833,
+        "color": {
+          "frame_number": 97,
+          "timestamp_ms": 1791270384915.2283,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 95,
+          "timestamp_ms": 1791270384915.2104,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 95,
+          "timestamp_ms": 1791270384915.2104,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.540954000001875,
+        "valid_fraction": 0.808740234375,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 37,
+      "head": {
+        "host_receive_time_s": 1791270384.9751723,
+        "color": {
+          "frame_number": 101,
+          "timestamp_ms": 1791270384940.1028,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 99,
+          "timestamp_ms": 1791270384940.0847,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 99,
+          "timestamp_ms": 1791270384940.0847,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 12.9789919999439,
+        "valid_fraction": 0.9521256510416667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270384.9943628,
+        "color": {
+          "frame_number": 98,
+          "timestamp_ms": 1791270384948.393,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 96,
+          "timestamp_ms": 1791270384948.3752,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 96,
+          "timestamp_ms": 1791270384948.3752,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.957970999816098,
+        "valid_fraction": 0.80849609375,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 38,
+      "head": {
+        "host_receive_time_s": 1791270385.0085158,
+        "color": {
+          "frame_number": 102,
+          "timestamp_ms": 1791270384973.4595,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 100,
+          "timestamp_ms": 1791270384973.4414,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 100,
+          "timestamp_ms": 1791270384973.4414,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.69323800004895,
+        "valid_fraction": 0.9505598958333333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.0172465,
+        "color": {
+          "frame_number": 99,
+          "timestamp_ms": 1791270384981.5508,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 97,
+          "timestamp_ms": 1791270384981.533,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 97,
+          "timestamp_ms": 1791270384981.533,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.337411000027714,
+        "valid_fraction": 0.8082389322916667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 39,
+      "head": {
+        "host_receive_time_s": 1791270385.0419607,
+        "color": {
+          "frame_number": 103,
+          "timestamp_ms": 1791270385006.8167,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 101,
+          "timestamp_ms": 1791270385006.7986,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 101,
+          "timestamp_ms": 1791270385006.7986,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 15.75727299996288,
+        "valid_fraction": 0.9508138020833333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.0624452,
+        "color": {
+          "frame_number": 100,
+          "timestamp_ms": 1791270385014.7014,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 98,
+          "timestamp_ms": 1791270385014.6836,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 98,
+          "timestamp_ms": 1791270385014.6836,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.600859999934983,
+        "valid_fraction": 0.8092415364583333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 40,
+      "head": {
+        "host_receive_time_s": 1791270385.075244,
+        "color": {
+          "frame_number": 104,
+          "timestamp_ms": 1791270385040.1738,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 102,
+          "timestamp_ms": 1791270385040.156,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 102,
+          "timestamp_ms": 1791270385040.156,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.993789999844012,
+        "valid_fraction": 0.9494010416666666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.082873,
+        "color": {
+          "frame_number": 101,
+          "timestamp_ms": 1791270385047.845,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 99,
+          "timestamp_ms": 1791270385047.8271,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 99,
+          "timestamp_ms": 1791270385047.8271,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.771528999981456,
+        "valid_fraction": 0.8091341145833333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 41,
+      "head": {
+        "host_receive_time_s": 1791270385.1085944,
+        "color": {
+          "frame_number": 105,
+          "timestamp_ms": 1791270385073.5315,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 103,
+          "timestamp_ms": 1791270385073.5137,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 103,
+          "timestamp_ms": 1791270385073.5137,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 17.561236000119607,
+        "valid_fraction": 0.95201171875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.130973,
+        "color": {
+          "frame_number": 102,
+          "timestamp_ms": 1791270385080.9814,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 100,
+          "timestamp_ms": 1791270385080.9636,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 100,
+          "timestamp_ms": 1791270385080.9636,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 8.315821999985928,
+        "valid_fraction": 0.8078548177083333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 42,
+      "head": {
+        "host_receive_time_s": 1791270385.1422489,
+        "color": {
+          "frame_number": 106,
+          "timestamp_ms": 1791270385106.8896,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 104,
+          "timestamp_ms": 1791270385106.8716,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 104,
+          "timestamp_ms": 1791270385106.8716,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.708875999971497,
+        "valid_fraction": 0.9506673177083333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1020000523421913
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.1503816,
+        "color": {
+          "frame_number": 103,
+          "timestamp_ms": 1791270385114.1108,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 101,
+          "timestamp_ms": 1791270385114.093,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 101,
+          "timestamp_ms": 1791270385114.093,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.505927000058364,
+        "valid_fraction": 0.8075520833333333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 43,
+      "head": {
+        "host_receive_time_s": 1791270385.1753564,
+        "color": {
+          "frame_number": 107,
+          "timestamp_ms": 1791270385140.248,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 105,
+          "timestamp_ms": 1791270385140.23,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 105,
+          "timestamp_ms": 1791270385140.23,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.291823999845292,
+        "valid_fraction": 0.9503092447916667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.186004,
+        "color": {
+          "frame_number": 104,
+          "timestamp_ms": 1791270385147.2332,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 102,
+          "timestamp_ms": 1791270385147.215,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 102,
+          "timestamp_ms": 1791270385147.215,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.872278999935588,
+        "valid_fraction": 0.8082389322916667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 44,
+      "head": {
+        "host_receive_time_s": 1791270385.2087526,
+        "color": {
+          "frame_number": 108,
+          "timestamp_ms": 1791270385173.6067,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 106,
+          "timestamp_ms": 1791270385173.5889,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 106,
+          "timestamp_ms": 1791270385173.5889,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 13.759899999968184,
+        "valid_fraction": 0.950234375,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.2294495,
+        "color": {
+          "frame_number": 105,
+          "timestamp_ms": 1791270385180.3481,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 103,
+          "timestamp_ms": 1791270385180.3303,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 103,
+          "timestamp_ms": 1791270385180.3303,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.387690999872575,
+        "valid_fraction": 0.8090364583333334,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 45,
+      "head": {
+        "host_receive_time_s": 1791270385.2420928,
+        "color": {
+          "frame_number": 109,
+          "timestamp_ms": 1791270385206.9658,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 107,
+          "timestamp_ms": 1791270385206.9478,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 107,
+          "timestamp_ms": 1791270385206.9478,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.091690999961429,
+        "valid_fraction": 0.952041015625,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.2497587,
+        "color": {
+          "frame_number": 106,
+          "timestamp_ms": 1791270385213.456,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 104,
+          "timestamp_ms": 1791270385213.4382,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 104,
+          "timestamp_ms": 1791270385213.4382,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.619360999844503,
+        "valid_fraction": 0.8089388020833334,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 46,
+      "head": {
+        "host_receive_time_s": 1791270385.2754898,
+        "color": {
+          "frame_number": 110,
+          "timestamp_ms": 1791270385240.3252,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 108,
+          "timestamp_ms": 1791270385240.3071,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 108,
+          "timestamp_ms": 1791270385240.3071,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 15.227234999883876,
+        "valid_fraction": 0.95015625,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.1020000523421913
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.295699,
+        "color": {
+          "frame_number": 107,
+          "timestamp_ms": 1791270385246.5571,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 105,
+          "timestamp_ms": 1791270385246.5393,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 105,
+          "timestamp_ms": 1791270385246.5393,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.709519999934855,
+        "valid_fraction": 0.8085514322916667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 47,
+      "head": {
+        "host_receive_time_s": 1791270385.3088405,
+        "color": {
+          "frame_number": 111,
+          "timestamp_ms": 1791270385273.685,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 109,
+          "timestamp_ms": 1791270385273.667,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 109,
+          "timestamp_ms": 1791270385273.667,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 10.374143000035474,
+        "valid_fraction": 0.9503059895833333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.3237176,
+        "color": {
+          "frame_number": 108,
+          "timestamp_ms": 1791270385279.651,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 106,
+          "timestamp_ms": 1791270385279.633,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 106,
+          "timestamp_ms": 1791270385279.633,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.276896999906967,
+        "valid_fraction": 0.809091796875,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 48,
+      "head": {
+        "host_receive_time_s": 1791270385.3421578,
+        "color": {
+          "frame_number": 112,
+          "timestamp_ms": 1791270385307.045,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 110,
+          "timestamp_ms": 1791270385307.027,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 110,
+          "timestamp_ms": 1791270385307.027,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.790566000063336,
+        "valid_fraction": 0.9495052083333333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.3528914,
+        "color": {
+          "frame_number": 109,
+          "timestamp_ms": 1791270385312.7375,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 107,
+          "timestamp_ms": 1791270385312.7197,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 107,
+          "timestamp_ms": 1791270385312.7197,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.911549000074956,
+        "valid_fraction": 0.8083463541666667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 49,
+      "head": {
+        "host_receive_time_s": 1791270385.3755953,
+        "color": {
+          "frame_number": 113,
+          "timestamp_ms": 1791270385340.4055,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 111,
+          "timestamp_ms": 1791270385340.3875,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 111,
+          "timestamp_ms": 1791270385340.3875,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.321074999936172,
+        "valid_fraction": 0.9515397135416667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.3876448,
+        "color": {
+          "frame_number": 110,
+          "timestamp_ms": 1791270385345.8171,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 108,
+          "timestamp_ms": 1791270385345.7993,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 108,
+          "timestamp_ms": 1791270385345.7993,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.743939000012688,
+        "valid_fraction": 0.8074837239583333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 50,
+      "head": {
+        "host_receive_time_s": 1791270385.408825,
+        "color": {
+          "frame_number": 114,
+          "timestamp_ms": 1791270385373.766,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 112,
+          "timestamp_ms": 1791270385373.7483,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 112,
+          "timestamp_ms": 1791270385373.7483,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.704204000016034,
+        "valid_fraction": 0.9514225260416667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.4195848,
+        "color": {
+          "frame_number": 111,
+          "timestamp_ms": 1791270385378.8894,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 109,
+          "timestamp_ms": 1791270385378.8716,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 109,
+          "timestamp_ms": 1791270385378.8716,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.4633790000716544,
+        "valid_fraction": 0.8082259114583333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 51,
+      "head": {
+        "host_receive_time_s": 1791270385.4422362,
+        "color": {
+          "frame_number": 115,
+          "timestamp_ms": 1791270385407.1272,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 113,
+          "timestamp_ms": 1791270385407.1094,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 113,
+          "timestamp_ms": 1791270385407.1094,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.0092000001077395,
+        "valid_fraction": 0.950126953125,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.4517248,
+        "color": {
+          "frame_number": 112,
+          "timestamp_ms": 1791270385411.9548,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 110,
+          "timestamp_ms": 1791270385411.937,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 110,
+          "timestamp_ms": 1791270385411.937,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.31857900000432,
+        "valid_fraction": 0.8077962239583333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 52,
+      "head": {
+        "host_receive_time_s": 1791270385.475602,
+        "color": {
+          "frame_number": 116,
+          "timestamp_ms": 1791270385440.4888,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 114,
+          "timestamp_ms": 1791270385440.4707,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 114,
+          "timestamp_ms": 1791270385440.4707,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.568833000073937,
+        "valid_fraction": 0.9512565104166667,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.4864686,
+        "color": {
+          "frame_number": 113,
+          "timestamp_ms": 1791270385445.0132,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 111,
+          "timestamp_ms": 1791270385444.9954,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 111,
+          "timestamp_ms": 1791270385444.9954,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.498599999986254,
+        "valid_fraction": 0.8079915364583333,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 53,
+      "head": {
+        "host_receive_time_s": 1791270385.5089457,
+        "color": {
+          "frame_number": 117,
+          "timestamp_ms": 1791270385473.8506,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 115,
+          "timestamp_ms": 1791270385473.8325,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 115,
+          "timestamp_ms": 1791270385473.8325,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.537594000041281,
+        "valid_fraction": 0.948359375,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.521044,
+        "color": {
+          "frame_number": 114,
+          "timestamp_ms": 1791270385478.0642,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 112,
+          "timestamp_ms": 1791270385478.0464,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 112,
+          "timestamp_ms": 1791270385478.0464,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.203203000064605,
+        "valid_fraction": 0.8080729166666667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 54,
+      "head": {
+        "host_receive_time_s": 1791270385.5422797,
+        "color": {
+          "frame_number": 118,
+          "timestamp_ms": 1791270385507.2126,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 116,
+          "timestamp_ms": 1791270385507.1946,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 116,
+          "timestamp_ms": 1791270385507.1946,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.493228000157615,
+        "valid_fraction": 0.951083984375,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.55374,
+        "color": {
+          "frame_number": 115,
+          "timestamp_ms": 1791270385511.1082,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 113,
+          "timestamp_ms": 1791270385511.0903,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 113,
+          "timestamp_ms": 1791270385511.0903,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.183320000014646,
+        "valid_fraction": 0.8078125,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 55,
+      "head": {
+        "host_receive_time_s": 1791270385.5756838,
+        "color": {
+          "frame_number": 119,
+          "timestamp_ms": 1791270385540.575,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 117,
+          "timestamp_ms": 1791270385540.557,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 117,
+          "timestamp_ms": 1791270385540.557,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.195255999955407,
+        "valid_fraction": 0.9504524739583333,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1040000524371862
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.5857792,
+        "color": {
+          "frame_number": 116,
+          "timestamp_ms": 1791270385544.145,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 114,
+          "timestamp_ms": 1791270385544.1272,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 114,
+          "timestamp_ms": 1791270385544.1272,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.347124000058102,
+        "valid_fraction": 0.8082194010416667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 56,
+      "head": {
+        "host_receive_time_s": 1791270385.6090503,
+        "color": {
+          "frame_number": 120,
+          "timestamp_ms": 1791270385573.9373,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 118,
+          "timestamp_ms": 1791270385573.9192,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 118,
+          "timestamp_ms": 1791270385573.9192,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 8.290624999972351,
+        "valid_fraction": 0.9513151041666666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1020000523421913
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.6224833,
+        "color": {
+          "frame_number": 117,
+          "timestamp_ms": 1791270385577.1748,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 115,
+          "timestamp_ms": 1791270385577.157,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 115,
+          "timestamp_ms": 1791270385577.157,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.386937000139369,
+        "valid_fraction": 0.8079361979166667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 57,
+      "head": {
+        "host_receive_time_s": 1791270385.6423168,
+        "color": {
+          "frame_number": 121,
+          "timestamp_ms": 1791270385607.2964,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 119,
+          "timestamp_ms": 1791270385607.2783,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 119,
+          "timestamp_ms": 1791270385607.2783,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 6.430620000173803,
+        "valid_fraction": 0.9520865885416666,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.49600002355873585,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.6520839,
+        "color": {
+          "frame_number": 118,
+          "timestamp_ms": 1791270385610.1975,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 116,
+          "timestamp_ms": 1791270385610.1797,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 116,
+          "timestamp_ms": 1791270385610.1797,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.5059589999709715,
+        "valid_fraction": 0.808603515625,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 58,
+      "head": {
+        "host_receive_time_s": 1791270385.6757889,
+        "color": {
+          "frame_number": 122,
+          "timestamp_ms": 1791270385640.6558,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 120,
+          "timestamp_ms": 1791270385640.6377,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 120,
+          "timestamp_ms": 1791270385640.6377,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 13.851098000031925,
+        "valid_fraction": 0.9488671875,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.108000052627176
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.696373,
+        "color": {
+          "frame_number": 119,
+          "timestamp_ms": 1791270385643.2131,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 117,
+          "timestamp_ms": 1791270385643.1953,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 117,
+          "timestamp_ms": 1791270385643.1953,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 7.531393000135722,
+        "valid_fraction": 0.8081022135416667,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    },
+    {
+      "index": 59,
+      "head": {
+        "host_receive_time_s": 1791270385.7091115,
+        "color": {
+          "frame_number": 123,
+          "timestamp_ms": 1791270385674.0154,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 121,
+          "timestamp_ms": 1791270385673.9976,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 121,
+          "timestamp_ms": 1791270385673.9976,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 5.548846000010599,
+        "valid_fraction": 0.9504036458333334,
+        "valid_depth_m_p05_p50_p95": [
+          0.3220000152941793,
+          0.4950000235112384,
+          1.1060000525321811
+        ]
+      },
+      "wrist": {
+        "host_receive_time_s": 1791270385.71761,
+        "color": {
+          "frame_number": 120,
+          "timestamp_ms": 1791270385676.2217,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "native_depth": {
+          "frame_number": 118,
+          "timestamp_ms": 1791270385676.2039,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "aligned_depth": {
+          "frame_number": 118,
+          "timestamp_ms": 1791270385676.2039,
+          "timestamp_domain": "timestamp_domain.global_time"
+        },
+        "align_ms": 4.324863999954687,
+        "valid_fraction": 0.806787109375,
+        "valid_depth_m_p05_p50_p95": [
+          0.308000014629215,
+          0.31300001486670226,
+          0.3180000151041895
+        ]
+      }
+    }
+  ],
+  "status": "passed",
+  "pair_loop_ms_p50_p95_max": [
+    33.962906999931874,
+    48.85141104994091,
+    85.36373499987349
+  ],
+  "finished_at": "2026-10-06T07:06:26.793480+00:00"
+}

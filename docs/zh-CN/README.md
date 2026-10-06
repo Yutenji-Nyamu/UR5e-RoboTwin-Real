@@ -9,6 +9,7 @@
 - [RTDE读写链路](RTDE_STACK.md)
 - [Diffusion Policy 真机实施上下文](DIFFUSION_POLICY_PLAN.md)
 - [RoboTwin 原生 π0.5 关节空间真机规划（当前主线）](../plans/pi05/README.md)
+- [MetisWAM4D Action 首版与可选深度采集](../plans/metiswam4d/README.md)
 - [π0.5 方块真机成功记录](../plans/pi05/PHYSICAL_RESULT_20260910.md)
 - [方块 RLT 分阶段接入规划（当前，已实施未正式训练）](../plans/pi05-rlt/CUBE_PLAN.md)
 - [RLT命令、阶段复核与日志](../plans/pi05-rlt/USAGE.md)

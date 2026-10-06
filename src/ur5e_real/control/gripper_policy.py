@@ -11,25 +11,27 @@ class GripperCommandConfig:
     open_threshold: float = 0.40
     stable_count: int = 3
     minimum_command_interval_s: float = 2.0
-    maximum_cycles: int = 1
+    maximum_cycles: int | None = 1
 
 
 class GripperPolicy:
     """Turn continuous 0=open/1=closed predictions into sparse serial commands."""
 
-    def __init__(self, gripper: Any, config: GripperCommandConfig) -> None:
+    def __init__(self, gripper: Any, config: GripperCommandConfig, *, initial_state: int = 0) -> None:
+        if initial_state not in (0, 1):
+            raise ValueError("initial commanded gripper state must be 0 or 1")
         self.gripper = gripper
         self.config = config
-        self.state = "wait_close"
+        self.state = "wait_open" if initial_state else "wait_close"
         self.close_streak = 0
         self.open_streak = 0
         self.last_command_at = 0.0
         self.cycles = 0
-        self.estimated = 0.0
+        self.estimated = float(initial_state)
 
     def step(self, predicted: float, now: float | None = None) -> None:
         now = time.monotonic() if now is None else now
-        if self.cycles >= self.config.maximum_cycles:
+        if self.config.maximum_cycles is not None and self.cycles >= self.config.maximum_cycles:
             return
         interval_ok = now - self.last_command_at >= self.config.minimum_command_interval_s
         if self.state == "wait_close":
@@ -47,5 +49,6 @@ class GripperPolicy:
                 self.last_command_at = now
                 self.estimated = 0.0
                 self.cycles += 1
-                self.state = "done" if self.cycles >= self.config.maximum_cycles else "wait_close"
+                done = self.config.maximum_cycles is not None and self.cycles >= self.config.maximum_cycles
+                self.state = "done" if done else "wait_close"
                 self.close_streak = 0

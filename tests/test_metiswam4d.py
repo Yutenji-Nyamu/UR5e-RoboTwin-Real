@@ -48,24 +48,28 @@ def test_reject_bad_physical_vectors(values):
         to_unified(values)
 
 
-def episode(root):
-    run = "20261005_120000"
+def episode(root, run="20261005_120000"):
+    import cv2
+
     action = root / "raw" / "action"
-    action.mkdir(parents=True)
+    action.mkdir(parents=True, exist_ok=True)
     camera = root / "raw" / "camera" / f"cam_dual_{run}"
     for role in ("head", "wrist"):
         (camera / role).mkdir(parents=True)
         for i in range(4):
-            (camera / role / f"frame_{i+1:05d}.png").touch()
+            cv2.imwrite(str(camera / role / f"frame_{i+1:05d}.png"), np.full((8, 12, 3), i, np.uint8))
     meta = {"run_id": run, "schema_version": 3, "task": "drawer", "outcome": "success",
             "recording_status": "completed", "state_recording": {"joint_source": "actual_q",
-            "joint_position_unit": "rad", "joint_order": ["base", "shoulder", "elbow", "wrist_1", "wrist_2", "wrist_3"]}}
+            "joint_position_unit": "rad", "joint_order": ["base", "shoulder", "elbow", "wrist_1", "wrist_2", "wrist_3"]},
+            "initial_robot_state": {"actual_q": [0] * 6, "tcp_offset": [0] * 6, "tcp_pose": [0] * 6},
+            "collection": {"initial_gripper_state": "open"}}
     manifest = action / f"session_{run}.json"
     manifest.write_text(json.dumps(meta))
     with (action / f"rtde_tcp_gripper_{run}.csv").open("w") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["controller_time_s", *[f"actual_q_{i}" for i in range(6)], "gripper_state"])
-        writer.writerows([[i / 10, *[i / 100] * 6, grip] for i, grip in enumerate([0, 1, 0, 1])])
+        writer.writerow(["controller_time_s", *[f"actual_q_{i}" for i in range(6)], "gripper_state",
+                         "tcp_x", "tcp_y", "tcp_z"])
+        writer.writerows([[i / 10, *[i / 100] * 6, grip, 0, 0, 0] for i, grip in enumerate([0, 1, 0, 1])])
     with (action / f"sync_action_cam_{run}.csv").open("w") as handle:
         writer = csv.writer(handle)
         writer.writerow(["controller_time_s", "frame_idx", "head_image", "wrist_image"])

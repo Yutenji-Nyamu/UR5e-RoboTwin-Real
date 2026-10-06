@@ -1,29 +1,39 @@
 # 本轮审查与后续步骤
 
-更新：2026-10-06。用户调整优先级：先完成重播的毫秒参数及RTDE默认，模型接入保持明确待办，暂不扩展。
+更新：2026-10-06。重播优先项已交付，用户要求继续模型接入；本轮补齐Metis服务与真机客户端入口。
 
 ## 已核实状态
 
 | 环节 | 状态 | 尚缺 |
 | --- | --- | --- |
 | 深度采集 | `--depth` 已实现，双相机600组落盘/1200张深度回读通过 | 现场完整RGB-D示教验证 |
-| Metis数据转换 | 两条成功轨迹生成562个窗口，10Hz/H50，保留close/open/close | 图像索引搬迁、训练/验证划分；真机初始姿态及运动边界契约 |
+| Metis数据转换 | 562窗口，318训练/244验证；相对图像索引、整轨迹划分、home/初始夹爪/TCP/关节范围/数据身份均已实现 | 更多成功示教与泛化评估 |
 | Metis训练 | Action/proprio首版循环；原生tiny训练/采样/重载已测 | 正式Alpha与Wan VAE权重；正式加载、单轨迹过拟合、留出评估；定期checkpoint/resume |
-| Metis离线推理 | 图像+q/g→50步joint7，兼容joint14 | 正式权重的误差、延迟、显存测试；VAE资产身份校验 |
-| Metis真机推理 | **尚未实现端到端入口**，当前infer只写NPZ | server/client、live observation、offline/shadow/execute、初始化/停止契约 |
+| Metis离线推理 | 图像+q/g→50步joint7；支持RPC与NPZ；VAE资产哈希随checkpoint校验 | 正式权重误差/延迟/显存测试 |
+| Metis真机推理 | **软件入口已实现**：serve/run/home；offline/shadow/execute、live RGB和joint执行器；中间open不停车 | 正式模型的硬件shadow及现场运动验收，尚未执行 |
 
 不需要重新研究整体架构，沿用π0.5分层即可。复用相机/RTDE观测、joint chunk和500Hz执行器；
 新的模型服务负责图像编码、状态归一化和Action采样。不能直接把Metis输出文件传给现有π0.5命令，
 其握手、数据集和checkpoint验证包含π0.5专属字段。
 
-继续接真机的顺序：
+剩余顺序：
 
-1. 由数据与lab配置生成一致的home_q、initial_gripper、TCP offset、joint/TCP边界、dataset identity。
-2. 加Metis独立服务、客户端握手和有界请求超时，接入offline/shadow；此阶段不发送动作。
-3. 复用joint执行器，支持执行chunk前K步再观测；用显式结束条件，不因中途open结束。
-4. 正式权重完成离线拟合/留出评估与shadow延迟测试后，再进行现场执行验收。
+1. 下载已核对形状的官方Alpha（24.81GB）及Wan VAE（2.82GB），或使用用户提供的本地资产。
+   当前Alpha loader不接受Metis stage2/stage3 DCP；如果用户提供这种格式再补loader。
+2. 正式权重加载、单轨迹过拟合、完整留出评估；跑长任务前补定期checkpoint/resume。
+3. 现场shadow测端到端耗时。超过1.5秒不能直接沿用同步执行；先降低采样轮数/优化或设计异步执行，再验证。
+4. 回到示教home，现场小chunk执行验收。自动成功判断后续单独做；目前明确按chunk数停止。
+
+操作命令及下载来源见 [OPERATIONS](OPERATIONS.md)。
 
 ## 本轮修正
+
+- 新增 `ur5e-metis` 命令（已注册到RoboTwinSimReal环境）；客户端复用π0.5有界传输，独立joint7契约与请求ID。
+  1.5秒超时含发送和接收；错误/过期回复断开。服务预热后监听localhost:8006；tiny不能通过production加载入口。
+- home默认只打印计划；run默认offline。shadow读取RGB/RTDE、不打开串口和运动控制器；execute先做live请求验证及home校验。
+  夹爪支持无限周期，但动作循环以用户指定的有限chunk数结束，默认1；不在首次open后停车或强制结束时开爪。
+- 官方Alpha权重头部259272字节与meta-device模型比对：Video825、Action824、proprio2个张量全部同名同形；
+  [记录](evidence/production_weight_shapes_20261006.json)。这是形状兼容证据，尚未下载权重正文、加载训练或测完整模型速度。
 
 - 原首版把Action参数及AdamW状态也设成BF16。数值复现：1e-5更新可被BF16舍入掉。
   已修为可训练参数/优化器状态FP32、冻结Video BF16、计算autocast BF16；checkpoint保存/重载保留混合精度。
@@ -52,4 +62,6 @@ bash scripts/bootstrap_robotwin.sh
 ```
 
 本轮没有运行模型驱动真机，也未把tiny测试误记为正式模型训练完成。
-当前项目回归205 passed、3个需显式开启的RPC测试跳过；π0.5原生模型和配置导入通过。
+回归结果与范围见 [本轮验证记录](evidence/runtime_validation_20261006.json)。
+新增测试包含真实WebSocket RGB传输、原生tiny Action经RPC输出、契约拒绝、超时、响应ID/形状错误、
+可搬迁数据、验证集统计隔离、mock执行保留末次close、异常停止，以及客户端无Torch/JAX导入。

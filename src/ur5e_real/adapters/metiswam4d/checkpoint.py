@@ -23,13 +23,37 @@ def frozen_digest(model):
     return parameter_digest(model, trainable=False)
 
 
+def vae_identity(path):
+    path = Path(path)
+    files = sorted([*path.glob("*.json"), *path.glob("*.safetensors")])
+    if not (path / "config.json").is_file() or not any(p.suffix == ".safetensors" for p in files):
+        raise ValueError("VAE directory requires config.json and safetensors weights")
+    identity = {}
+    for file in files:
+        h = hashlib.sha256()
+        with file.open("rb") as handle:
+            for block in iter(lambda: handle.read(8 * 1024 * 1024), b""):
+                h.update(block)
+        identity[file.name] = h.hexdigest()
+    return identity
+
+
+def verify_vae(saved, override=None):
+    path = Path(override or saved["vae_path"])
+    if saved.get("vae_sha256") != vae_identity(path):
+        raise ValueError("VAE assets differ from the training checkpoint")
+    return path
+
+
 def save(path, model, config, contract, source_sha256, *, vae_path=None):
     trainable_dtype = {p.dtype for p in model.parameters() if p.requires_grad}
     if len(trainable_dtype) != 1:
         raise ValueError("trainable parameters must use one consistent dtype")
+    vae_sha256 = vae_identity(vae_path) if vae_path else None
     with Path(path).open("xb") as handle:
         torch.save({"format": VERSION, "config": config, "contract": contract,
                     "source_sha256": source_sha256, "vae_path": str(vae_path) if vae_path else None,
+                    "vae_sha256": vae_sha256,
                     "dtype": str(next(model.parameters()).dtype).removeprefix("torch."),
                     "trainable_dtype": str(trainable_dtype.pop()).removeprefix("torch."),
                     "model": {k: v.detach().cpu() for k, v in model.state_dict().items()}}, handle)

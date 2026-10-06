@@ -1,0 +1,94 @@
+{
+  "date": "2026-10-06",
+  "scope": "software contracts, native tiny model, loopback RPC and mock execution; no physical robot run",
+  "dataset_id": "192f5bbb04502fcef1125dffa578f3cc2867936532e29cb8f31434a2fc963bd1",
+  "run_ids": [
+    "20261005_172729",
+    "20261005_173119"
+  ],
+  "training_windows": 318,
+  "validation_windows": 244,
+  "validation_runs": [
+    "20261005_173119"
+  ],
+  "image_index": "relative to raw data root; relocatable with --data-root",
+  "runtime_contract_version": 1,
+  "rpc_deadline_s": 1.5,
+  "robot_command_deadline_s": 2,
+  "wire_action_shape": [
+    50,
+    7
+  ],
+  "default_action_steps": 20,
+  "default_chunks": 1,
+  "stop": "bounded chunks, interrupt or error; never first gripper release",
+  "robot_connected": false,
+  "formal_weights_loaded": false,
+  "formal_training_completed": false,
+  "tiny_cpu": {
+    "status": "passed",
+    "scope": "native tiny Video + Action; diagnostic pixel pooling, NOT a pretrained VAE",
+    "uses_real_episode": true,
+    "device": "cpu",
+    "dtype": "float32",
+    "trainable_dtype": "float32",
+    "learning_rate": 1e-05,
+    "gradient_checkpointing": true,
+    "torch": "2.4.1+cu121",
+    "source_sha256": "8d5b4cce0ef1ef594f1728914b83afc04e58f59866c0a0497fcde57f31129be3",
+    "steps": 8,
+    "losses": [
+      1.8904446363449097,
+      1.9305574893951416,
+      1.8111122846603394,
+      1.8129205703735352,
+      1.72031569480896,
+      1.5360937118530273,
+      2.0629210472106934,
+      1.7568047046661377
+    ],
+    "frozen_before_sha256": "941d037ae61f66dac196d43f2254a85e06b806d3db546cadf0655339927710ca",
+    "frozen_after_sha256": "941d037ae61f66dac196d43f2254a85e06b806d3db546cadf0655339927710ca",
+    "updated_parameters": 70,
+    "trainable_groups": [
+      "action",
+      "proprio"
+    ],
+    "image_perturbation_max_action_change": 0.0019881725311279297,
+    "save_reload_exact": true,
+    "physical_action_shape": [
+      1,
+      50,
+      7
+    ],
+    "pi05_action_shape": [
+      1,
+      50,
+      14
+    ],
+    "elapsed_s": 0.46903472500071075,
+    "robot_connected": false
+  },
+  "tests": {
+    "command": "UR5E_TEST_LOCAL_RPC=1 python -m pytest -q",
+    "passed": 223,
+    "skipped": 0,
+    "elapsed_s": 8.88,
+    "environment": "RoboTwinSimReal, Python 3.10, torch 2.4.1+cu121, websockets 15.0.1",
+    "checks": [
+      "RGB WebSocket round trip",
+      "native tiny Action model over RPC with image sensitivity",
+      "contract mismatch rejection",
+      "end-to-end timeout closes connection",
+      "wrong response shape or request ID closes connection",
+      "portable relative image indices",
+      "held-out episodes excluded from normalization and training sampling",
+      "no actuators opened for offline or shadow",
+      "warmup failure prevents actuators",
+      "close/open/close survives execution",
+      "bounded execution and exception cleanup",
+      "robot-side imports exclude Torch/JAX",
+      "VAE relocation content identity"
+    ]
+  }
+}

@@ -48,6 +48,7 @@ dev = [
 ]
 
 [project.scripts]
+ur5e-metis = "ur5e_real.adapters.metiswam4d.__main__:main"
 ur5e-pi05 = "ur5e_real.adapters.robotwin_pi05.__main__:main"
 ur5e-real = "ur5e_real.cli:main"
 ur5e-collect-init = "ur5e_real.operator:collect_init"

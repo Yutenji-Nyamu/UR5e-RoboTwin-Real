@@ -36,7 +36,8 @@ python -m ur5e_real.adapters.metiswam4d prepare \
   --data-root /data/robotics/ur5e-real \
   --runs 20261005_172729 20261005_173119 \
   --task block_drawer_close \
-  --output outputs/metiswam4d/block_drawer_close_v1
+  --validation-runs 20261005_173119 \
+  --output outputs/metiswam4d/block_drawer_close_runtime_v1
 ```
 
 该目录已在本机生成，重跑须换一个不存在的输出目录。
@@ -49,8 +50,12 @@ python -m ur5e_real.adapters.metiswam4d prepare \
 - 时刻 t 的 action 是 t+0.1 秒开始的未来实测状态；末帧只作 next-state 标签。
   episode 尾部重复末个目标补 H50，并用 valid mask 排除 padding loss 和统计。
 - 数据集保存 `actions.npz`（state/action/valid）、`images.json`（原始图像引用）、`contract.json`
-  （动作/图像/归一化约定）、`audit.json`。原始数据和图像不改写、不复制。
-  图像引用在本机是绝对路径，搬到别的主机需重新生成索引。
+  （动作/图像/归一化约定、home、初始夹爪、TCP offset、关节/TCP监测范围、数据集身份）、`audit.json`。
+  原始数据和图像不改写、不复制。图像引用相对原始data root，`location.json`仅记录本机位置；
+  搬迁后通过 `--data-root` 覆盖，不改变训练契约。首次旧版绝对索引需重新prepare后才能使用在线入口。
+- `--validation-runs`以完整episode留出；默认不留出，用于首轮过拟合。
+  统计与随机训练抽样只使用train窗口。home必须在各轨迹间相差不超过0.03rad，TCP offset/初始夹爪必须一致。
+  joint范围为所有选中轨迹与初始姿态的min/max±0.10rad；TCP位置min/max±0.05m，仅作运行监测，不是避障模型。
 
 实际两条轨迹的网格分别 319/245 点，产生 318/244 = **562** 个窗口。
 窗口数与原 RGB 帧数不同来自显式重采样，最大图像偏移 100 ms，见
@@ -60,7 +65,7 @@ python -m ur5e_real.adapters.metiswam4d prepare \
 
 ```bash
 python -m ur5e_real.adapters.metiswam4d smoke \
-  --dataset outputs/metiswam4d/block_drawer_close_v1 \
+  --dataset outputs/metiswam4d/block_drawer_close_runtime_v1 \
   --device cuda --dtype bfloat16 --output outputs/metiswam4d/new_smoke
 ```
 
@@ -78,7 +83,7 @@ BF16 autocast计算；已用默认1e-5学习率重新验证更新及精度保持
 
 ```bash
 python -m ur5e_real.adapters.metiswam4d train \
-  --dataset outputs/metiswam4d/block_drawer_close_v1 \
+  --dataset outputs/metiswam4d/block_drawer_close_runtime_v1 \
   --alpha-checkpoint /path/to/checkpoint_step_N.safetensors \
   --vae /path/to/Wan2.2-TI2V-5B/vae \
   --steps 1000 --lr 1e-5 --device cuda \
@@ -101,21 +106,24 @@ NumPy/OpenCV；Alpha 加载另需 safetensors。未导入上游依赖 pyarrow �
 
 训练是单任务、batch=1 的首版循环，保存完整模型、源码 SHA256、配置、数据契约及统计；
 冻结哈希训练前后对比。离线推理复用同一编码/归一化/解码，检查本地源码与 checkpoint 的哈希一致。
-VAE 目录由 checkpoint 记录，搬迁需保留该资产；暂未做通用 resume、分布式训练或服务化。
+VAE配置/权重SHA256写入checkpoint，服务/离线推理加载时验证，支持 `--vae` 搬迁。
+训练目前仍只在结束时保存完整模型，定期checkpoint/resume、自动全验证集评估和分布式训练尚未实现。
 
 ## 真机边界
 
-此版本 `infer` 只产生 `.npz`，不发送运动。之后按现有 π0.5 分层接入：
+`infer`只产生 `.npz`；`serve / run / home` 已按现有π0.5分层接入，命令见 [操作说明](OPERATIONS.md)：
 
 ```text
 双 RGB + actual_q/g → Metis 独立策略进程 → 50×joint7
     → 关节/速度/TCP 边界检查 → 执行前 K 步 → 新观测重规划
 ```
 
-外部 joint14 包装已具备；机器人应复用现有 joint chunk / 500 Hz executor，
-不从模型模块直接调用硬件。K、每次观测到 chunk 的延迟、允许过期时间要实测。
+外部 joint14 仅用于兼容导出；Metis在线协议直接使用joint7，复用现有joint chunk / 500 Hz executor。
+客户端不导入Torch/JAX，模型服务不调用硬件。K默认20，H保持50；默认只运行1个chunk。
+RPC默认且最大1.5秒（含图像发送），小于2秒命令watchdog；真实延迟仍需实测。
 “每个时间步”仍是关节目标序列，模型按 chunk 滚动预测，不是 500 Hz 每拍跑一次大模型。
 
 `close → open → close` 没有额外训练障碍；旧 π0.5 的周期校验和 open 后自动结束属于应用规则，
-首版转换已解除该裁剪假设。未来新 executor 需明确人工/超时/任务判定结束，不能在中途 open 时结束。
-未完成正式权重评估、shadow 延迟测试、服务协议与现场执行之前，不宣称已接通真机策略。
+首版转换已解除该裁剪假设；新执行入口不使用抓放周期数停止，以显式chunk数、异常或Ctrl+C结束。
+夹爪采用0.6/0.4滞回、连续2点、最短0.5秒命令间隔，支持反复close/open和闭爪结束。
+正式权重评估、shadow延迟测试和现场执行仍未完成；已验证的是软件通信与mock执行边界。

@@ -11,6 +11,7 @@ fi
 python -m pip install --no-build-isolation --no-deps --editable "${PROJECT_ROOT}"
 
 commands=(
+  ur5e-metis
   ur5e-real
   ur5e-collect-init
   ur5e-collect

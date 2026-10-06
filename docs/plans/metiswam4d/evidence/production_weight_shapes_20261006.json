@@ -1,0 +1,38 @@
+{
+  "scope": "Production shapes versus official safetensors header; no tensor weights loaded",
+  "source_sha256": "8d5b4cce0ef1ef594f1728914b83afc04e58f59866c0a0497fcde57f31129be3",
+  "alpha_repo": "OpenWAM/OpenWAM-Alpha-Pretrain-Foundation-Model",
+  "alpha_revision": "52df4e66c82c5c8b480adcc8d01f4db7415dfb56",
+  "alpha_file": "checkpoint_step_154000.safetensors",
+  "alpha_file_bytes": 24813767464,
+  "header_bytes": 259272,
+  "vae_repo": "Wan-AI/Wan2.2-TI2V-5B-Diffusers",
+  "vae_revision": "b8fff7315c768468a5333511427288870b2e9635",
+  "vae_file": "vae/diffusion_pytorch_model.safetensors",
+  "vae_file_bytes": 2818777808,
+  "groups": {
+    "video": {
+      "tensors": 825,
+      "parameters": 4999787712,
+      "missing": [],
+      "mismatched": {},
+      "checkpoint_bytes": 9999575424
+    },
+    "action": {
+      "tensors": 824,
+      "parameters": 1021035600,
+      "missing": [],
+      "mismatched": {},
+      "checkpoint_bytes": 2042071200
+    },
+    "proprio": {
+      "tensors": 2,
+      "parameters": 331776,
+      "missing": [],
+      "mismatched": {},
+      "checkpoint_bytes": 663552
+    }
+  },
+  "robot_connected": false,
+  "compatible": true
+}

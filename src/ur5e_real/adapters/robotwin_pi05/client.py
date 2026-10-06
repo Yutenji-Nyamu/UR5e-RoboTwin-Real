@@ -14,6 +14,10 @@ from .native import add_native_paths
 
 
 class PolicyClient:
+    contract_key = "ur5e_contract"
+    check_contract = staticmethod(require_same_contract)
+    check_actions = staticmethod(decode_actions)
+
     def __init__(self, contract: dict, *, port=8005, timeout_s=1.5):
         if not np.isfinite(timeout_s) or not 0 < timeout_s <= 1.5:
             raise ValueError("RPC timeout must be in (0, 1.5] seconds, below the robot command deadline")
@@ -37,7 +41,7 @@ class PolicyClient:
         )
         try:
             self.metadata = self._receive()
-            require_same_contract(contract, self.metadata.get("ur5e_contract", {}))
+            self.check_contract(contract, self.metadata.get(self.contract_key, {}))
         except BaseException:
             self.close()
             raise
@@ -78,7 +82,7 @@ class PolicyClient:
             if "error" in reply:
                 raise reply["error"]
             result = reply["result"]
-            decode_actions(result["actions"])
+            self.check_actions(result["actions"])
             result["client_elapsed_s"] = time.monotonic() - started
             if result["client_elapsed_s"] > self.timeout_s:
                 raise TimeoutError("policy result exceeded its end-to-end deadline")

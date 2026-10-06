@@ -88,6 +88,11 @@ for all options.
 
 ## Data and documentation
 
+The [Metis RGB → Action baseline](docs/plans/metiswam4d/README.md) includes portable data conversion,
+Action training code, and `ur5e-metis serve / run / home` interfaces. RPC and mock execution pass;
+full-weight training and physical inference remain unvalidated. [Usage and current status](docs/plans/metiswam4d/OPERATIONS.md).
+Metis and RoboTwin source snapshots are tracked in Git; bulk weights and datasets stay external.
+
 The [native π0.5 joint-space path](docs/plans/pi05/README.md) now covers dual
 recording, SFT, checkpoint reload and physical cube execution. The existing TCP
 DP path is unchanged. [Cube RLT](docs/plans/pi05-rlt/CUBE_PLAN.md) now has offline token/BC learners,

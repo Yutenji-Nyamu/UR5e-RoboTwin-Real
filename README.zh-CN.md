@@ -80,6 +80,10 @@ ur5e-infer 20260905_150221:600 --shadow --chunks 10
 
 ## 数据与文档
 
+[Metis RGB → Action 首版](docs/plans/metiswam4d/README.md)已实现可搬迁数据转换、Action训练代码及
+`ur5e-metis serve / run / home`接口；通信和mock执行验证通过，正式权重训练与现场推理尚未验收。
+见[操作命令与状态](docs/plans/metiswam4d/OPERATIONS.md)。Metis与RoboTwin源码均随Git跟踪，大权重和数据单独存放。
+
 [原生π0.5关节链](docs/plans/pi05/README.md)已完成双记录、SFT、重载与方块真机执行。
 原TCP DP链不变。[方块 RLT](docs/plans/pi05-rlt/CUBE_PLAN.md)已实现离线Token/BC、A/C更新与真机每轮4局的交互接口；
 尚未开始正式RLT训练或真机验收。短命令 `ur5e-rlt`、阶段复核与日志见[操作说明](docs/plans/pi05-rlt/USAGE.md)。

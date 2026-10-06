@@ -1,0 +1,97 @@
+# Memory / Open track model (2026-10-04): Video / Track uvd / Action experts initialised from InternW0-Delta (Video, Action,
+# proprio) and RoboDojo v6 (Track, reader, progress heads); sparse episode memory in the Video expert (frame 0 + the first
+# frames of the previous four 32-step chunk windows); InternW0's 14-D joint actions and 384x256 canvas.
+#   tmux new-session -d -s iw0_train "bash metiswam4d_inspired_by_internw0/scripts/run_train_local.sh metiswam4d_inspired_by_internw0/configs/iw0_memopen_v1.yaml"
+name: iw0_memopen_v1
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/iw0_memopen_v1
+notes: >
+  Data: official demos of the six Memory tasks + InternW0-Delta teacher rollouts of cover_blocks, match_and_pick_from_conveyor,
+  general_pickup and stack_blocks_by_language on official layout seeds 1 / 2 (protocol seed 0 layouts never enter training),
+  with ground-truth head depth / instance ids / object poses -> robot / gripper / object uvd Track.  The Action expert reads the
+  clean world only (memory + current video frames, Track conditions); future Video and Track are co-trained targets.
+iw0:
+  internw0_checkpoint: /ytech_milm_intern/danglingwei/model_zoos/InternW0-Delta/InternW0-Delta-RoboDojo/robodojo.pt
+  alpha_checkpoint: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboDojo
+  v6_weights: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_robodojo_v6_focus_r2/simeval_focus/checkpoint/model_bf16_tail3.pt
+  memory_drop: 0.15
+model:
+  experts: [video, track, action]
+  action_read: none
+  read_action_horizon: 0
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: false,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: [0, 8, 0, 8]}    # head view = top 8x8 token block of the 12x8 canvas grid
+  gradient_checkpointing: true
+init:
+  track: {mode: fresh}     # weights come from the iw0 section (first launch) / resume_from (restarts)
+  start_step: 0
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.5, action: 0.5}
+  shift: {video: 5.0, track: 5.0, action: 1.0}     # action: InternW0's action scheduler (shift 1)
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.2, clean_all_but_slowest: 0.0}
+  inference_rounds: 10
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 24, video_width: 16, track_channels: 48, track_frames: 3,
+         track_height: 16, track_width: 20, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 512}
+  robodojo:
+    source: iw0
+    root: /ytech_milm_intern/danglingwei/datas/IW0_MemOpen4D/dataset_v1
+    index_file: index.jsonl
+    split: train
+    samples_per_episode: 4
+    layout_height: 384
+    layout_width: 256
+    embodiment: 1            # robodojo_arx_x5
+    val_split: val
+    val_batches: 4
+  robodojo_encoder:
+    vae_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers
+    depth_stats: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/datas/RDJ_MetisWAM4D/depth_stats.json
+    dtype: bf16
+    unknown_role: false      # per sample: robot-only episodes flag role 0 as unknown, ground-truth 4D episodes do not
+  batch_size: 4
+  num_workers: 12
+training:
+  max_steps: 6000
+  groups:
+    video:   {lr: 2.0e-6, ramp_steps: 300}
+    track:   {lr: 5.0e-6, ramp_steps: 300}
+    action:  {lr: 2.0e-5, ramp_steps: 300}
+    focus:   {lr: 5.0e-5}
+    proprio: {lr: 2.0e-6, ramp_steps: 300}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 4       # 8 GPUs x batch 4 x 4 = 128 windows per step
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 60
+  keep_last: 6
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 10
+  eval_every: 1000
+  gpu_filler: true
+  seed: 42
+  loss: {video: 0.5, track: 0.2, camera: 0.1, progress: 0.05, action: 1.0, unfold: 0.1, role: 0.1, condition: 0.01,
+         read_action: 0.0}
+  track_regions: {body: 1.0, object: 1.0, background: 0.2}
+  dropout: {video_only: 0.0, track_only: 0.0, both: 0.0, action_text: 0.10, action_proprio: 0.10}

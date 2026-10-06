@@ -1,0 +1,5 @@
+model,manip. object lift,objects lift,interaction vs rest,contact vs arm,norm. entropy,corr |dc|
+OpenWAM-Alpha,1.52,0.97,1.77,1.11,0.958,0.15
+X-WAM,1.13,0.76,1.20,0.88,0.881,0.03
+FlowWAM,2.06,1.20,2.90,1.30,0.918,0.24
+Efficient-WAM,1.42,1.11,1.92,1.15,0.963,0.24

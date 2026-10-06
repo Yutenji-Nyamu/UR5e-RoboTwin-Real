@@ -26,8 +26,8 @@ cp configs/lab.example.yaml configs/lab.yaml
 
 Edit the untracked `configs/lab.yaml` with the robot address, stable gripper
 `/dev/serial/by-id/...` path, camera serials, home TCP, and data root. RoboTwin
-is checked out at the revision in `robotwin.lock` under ignored
-`.third_party/RoboTwin`; do not copy it manually.
+source is tracked under `.third_party/RoboTwin`, based on `robotwin.lock`.
+The bootstrap command verifies the included patched snapshot without cloning.
 
 To update an existing environment:
 

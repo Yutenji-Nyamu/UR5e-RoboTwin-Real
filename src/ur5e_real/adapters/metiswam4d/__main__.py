@@ -8,10 +8,10 @@ import time
 import numpy as np
 import torch
 
-from .checkpoint import frozen_digest, load, save
+from .checkpoint import frozen_digest, load, parameter_digest, save
 from .contract import FPS, HORIZON, VERSION, fit_stats, to_pi05
 from .data import prepare, read_rgb
-from .native import build_model, load_source, model_config
+from .native import build_model, load_source, model_config, training_precision
 from .policy import ActionPolicy, WanRgbEncoder
 
 
@@ -29,7 +29,7 @@ def smoke(args, source):
     torch.set_num_threads(2)
     args.output.mkdir(parents=True, exist_ok=False)
     cfg = model_config(tiny=True)
-    model = build_model(cfg).to(device=args.device, dtype=getattr(torch, args.dtype))
+    model = training_precision(build_model(cfg), device=args.device, dtype=getattr(torch, args.dtype))
     model.config.gradient_checkpointing = True
     state = np.zeros((1, 7), dtype=np.float32)
     action = np.zeros((1, HORIZON, 7), dtype=np.float32)
@@ -49,7 +49,7 @@ def smoke(args, source):
     policy = ActionPolicy(model, stats)
     before = frozen_digest(model)
     initial_action = {n: p.detach().clone() for n, p in model.named_parameters() if p.requires_grad}
-    optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=1e-3)
+    optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=1e-5)
     losses, start = [], time.monotonic()
     for _ in range(8):
         optimizer.zero_grad(set_to_none=True)
@@ -74,6 +74,7 @@ def smoke(args, source):
     np.testing.assert_array_equal(prediction, restored.predict(latent, state, rounds=4))
     report = {"status": "passed", "scope": "native tiny Video + Action; diagnostic pixel pooling, NOT a pretrained VAE",
               "uses_real_episode": bool(args.dataset), "device": args.device, "dtype": args.dtype,
+              "trainable_dtype": "float32", "learning_rate": 1e-5,
               "gradient_checkpointing": True, "torch": str(torch.__version__),
               "source_sha256": source, "steps": 8, "losses": losses,
               "frozen_before_sha256": before, "frozen_after_sha256": frozen_digest(model),
@@ -104,13 +105,14 @@ def train(args, source):
     args.output.mkdir(parents=True, exist_ok=False)
     torch.manual_seed(7)
     cfg = model_config()
-    model = build_model(cfg).to(device=args.device, dtype=torch.bfloat16)
+    model = training_precision(build_model(cfg), device=args.device, dtype=torch.bfloat16)
     init = {"video": load_alpha_video(model.video, checkpoint), "action": load_alpha_action(model.action, checkpoint),
             "proprio": load_alpha_proprio(model.proprio_encoder, checkpoint)}
     encoder = WanRgbEncoder(args.vae, device=args.device)
     policy = ActionPolicy(model, contract["stats"])
     optimizer = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=args.lr)
     frozen = frozen_digest(model)
+    trainable_before = parameter_digest(model, trainable=True)
     cache, losses, rng = {}, [], np.random.default_rng(7)
     model.train()
     for step in range(args.steps):
@@ -131,9 +133,12 @@ def train(args, source):
             print(json.dumps({"step": step + 1, "loss": losses[-1]}), flush=True)
     if frozen != frozen_digest(model):
         raise RuntimeError("frozen parameters changed")
+    if trainable_before == parameter_digest(model, trainable=True):
+        raise RuntimeError("Action/proprio parameters did not update")
     save(args.output / "policy.pt", model, cfg, contract, source, vae_path=args.vae.resolve())
     report = {"status": "trained", "steps": args.steps, "losses": losses, "initialization": init,
               "trainable_groups": sorted(model.trainable_groups()), "frozen_unchanged": True,
+              "trainable_changed": True, "trainable_dtype": "float32", "compute_dtype": "bfloat16",
               "task": contract["task"], "source_sha256": source, "robot_connected": False}
     (args.output / "report.json").write_text(json.dumps(report, indent=2) + "\n")
     return report

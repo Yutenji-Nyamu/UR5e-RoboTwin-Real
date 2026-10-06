@@ -1,0 +1,58 @@
+# Production-shape smoke on synthetic data: real Alpha weights (RoboDojo ckpt, available locally),
+# interpolated Track, three experts with compact reading, FSDP2 over all visible GPUs.
+# Purpose: memory / throughput / multi-node NCCL / DCP checkpoint at full scale. Not a training recipe.
+name: smoke_production_synthetic
+output_dir: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/outputs/MetisWAM4D_260921/smoke_production_synthetic
+model:
+  experts: [video, track, action]
+  action_read: compact
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 4, kappa: 4, read_layers: track_upper_half, feedback_to_track: false, spatial_kernel: adaptive, temporal_window: adaptive, gamma_init: 0.3, detach_world_hidden: false, video_window: [0, 8, 0, 10]}
+  gradient_checkpointing: true
+init:
+  alpha_checkpoint: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboDojo
+  load_action_from_alpha: true
+  track: {mode: interpolate_from_video}
+  resume_from: null
+schedule:
+  completion: {video: 1.0, track: 0.75, action: 0.25}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.15, clean_all_but_slowest: 0.05}
+  inference_rounds: 16
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 24, video_width: 20, track_channels: 48, track_frames: 3,
+         track_height: 16, track_width: 20, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 512}
+  components:
+    - {name: robot_synthetic, weight: 0.7, synthetic_length: 256, modalities: [video, track, action], embodiment: robodojo_arx_x5}
+    - {name: human_synthetic, weight: 0.3, synthetic_length: 256, modalities: [video, track], embodiment: human_ego}
+  batch_size: 1
+  num_workers: 2
+training:
+  max_steps: 20
+  groups:
+    video:   {lr: 3.0e-7, freeze_steps: 5, ramp_steps: 5}
+    track:   {lr: 2.0e-6}
+    action:  {lr: 1.0e-6, freeze_steps: 5, ramp_steps: 5}
+    focus:   {lr: 1.0e-5}
+    proprio: {lr: 1.0e-6}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  log_every: 1
+  checkpoint_every: 20
+  keep_last: 1
+  seed: 42
+  loss: {video: 1.0, track: 0.2, camera: 0.1, action: 1.0, unfold: 0.1, role: 0.1, condition: 0.01}
+  dropout: {video_only: 0.15, track_only: 0.10, both: 0.05}

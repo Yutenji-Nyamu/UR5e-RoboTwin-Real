@@ -1,0 +1,58 @@
+# Shared production settings (OpenWAM-Alpha sizes). Stage configs copy these
+# blocks explicitly; this file documents the defaults in one place.
+#
+# Video  : Wan2.2-TI2V-5B DiT  3072-d, 30 layers, 24 heads x 128, ffn 14336
+# Action : Alpha separate DiT   1024-d, 30 layers, same attention space, ffn 4096
+# Track  : MetisExpert          1024-d, 20 layers (mapped on 30 macro layers), ffn 4096
+# Window : 33 source frames @ stride 4 -> latent F = 3 (1 clean + 2 future), kappa = 4, N_f = 8, H = 32
+# Action : 80-D unified space, per-arm EEF10 in slots 0-9 / 34-43
+model:
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus:
+    d_read: 512
+    num_queries: 4
+    kappa: 4
+    kernel_size: 5
+    kernel_sigma: 1.0
+    w_min: 0.02
+    w_max: 0.5
+    spatial_kernel: adaptive    # gaussian | learned | adaptive
+    temporal_window: adaptive   # gaussian | adaptive
+    gamma_init: 0.3
+    detach_world_hidden: false
+    read_layers: track_upper_half
+    feedback_to_track: false
+    # Alpha multi-view T layout is 384x320 -> 12x10 video tokens; head view occupies the top 8x10 block.
+    # Track (head view 256x320) -> 8x10 tokens. Set the window to the head-view block of the video grid.
+    video_window: [0, 8, 0, 10]
+  gradient_checkpointing: true
+data:
+  spec:
+    video_channels: 48
+    video_frames: 3
+    video_height: 24
+    video_width: 20
+    track_channels: 48
+    track_frames: 3
+    track_height: 16
+    track_width: 20
+    kappa: 4
+    token_patch: [2, 2]
+    action_horizon: 32
+    action_dim: 80
+    proprio_dim: 80
+    text_dim: 4096
+    max_text_len: 512
+paths:
+  alpha_foundation: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Pretrain-Foundation-Model
+  alpha_robodojo: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboDojo
+  alpha_robotwin: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboTwin-Full
+  latents_root: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/datas/MetisWAM4D/latents
+  outputs_root: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/outputs/MetisWAM4D_260921

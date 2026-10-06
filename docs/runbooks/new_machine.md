@@ -146,8 +146,8 @@ this driver has no measured width/force feedback.
    use c/o/q, then s/f/a. Inspect `ur5e-real sessions --config configs/lab.yaml`:
    schema v3, q/qd columns, both cameras and gripper events must be present.
 3. Preview `ur5e-replay RUN_ID --chunks 1`; prepare home/scene, then add
-   `--execute`. Socket remains the manual default. Separately preview/test
-   `ur5e-replay RUN_ID --backend rtde --chunks 1` for the500Hz TCP chain; it is not
+   `--execute`. RTDE is the default; use `--inference-ms 250` for a 250 ms hold.
+   This checks the 500Hz TCP chain; it is not
    a joint-policy test.
 4. Follow [DP training](train.md)/[inference](infer.md) or the π0.5 section below.
    A new workcell starts with five clean joint demonstrations, retaining at

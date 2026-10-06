@@ -1,4 +1,8 @@
-.third_party/
+# Source snapshots below are ordinary files tracked by this repository.
+.third_party/*
+!.third_party/RoboTwin/
+!.third_party/MetisWAM4D/
+.third_party/MetisWAM4D/UNRESOLVED_EXTERNAL_LINKS.json
 .venv/
 *.egg-info/
 __pycache__/
@@ -32,6 +36,7 @@ RoboTwin_like_data/
 *.pt
 *.pth
 *.ckpt
+*.safetensors
 
 # Small diagnostic arrays and archived source paths can match generic rules above.
 # Size is checked separately by the evidence exporter and repository hygiene test.

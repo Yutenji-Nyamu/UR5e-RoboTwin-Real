@@ -1,0 +1,100 @@
+# RoboTwin 2.0 three-expert training, continued from rt2_direct_v2_uvd step 30804 with two changes (2026-09-29):
+#   1. Track-Action coupled clock: r_T = r_A = 0.5 (one shared noise level), r_V = 1.  Action denoises while Track
+#      is denoised to the same level; u in [0.5, 1] is video generation conditioned on the clean action + clean Track.
+#      Inference: 20 rounds, Track and Action final after round 10 (stop_after="action" for control).
+#   2. Interface safety: the dense future world keys stay in Action's joint softmax (dense_read_floor 0 = the plain
+#      triple expert), the compact CSIA/TAA read is an additive residual on top; ReadActionHead probes the compact
+#      tokens for the clean action (loss read_action 0.1) so the interface cannot go dead.
+# First launch (full state incl. optimizer from the old run; new params start fresh):
+#   NODES="t1" bash scripts/launch_rt2_2node.sh configs/rt2_direct_v3_coupled.yaml -- \
+#     --set init.resume_from=/ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/rt2_direct_v2_uvd/checkpoints/step_0030804
+# Later restarts: plain (resume_from auto finds the newest checkpoint here).
+name: rt2_direct_v3_coupled
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/rt2_direct_v3_coupled
+notes: >
+  Clean sim depth, clean rigid-body Track4D (robot links + task objects + moving clutter) encoded as pixel-frame
+  (du/W, dv/W, dd) with soft-shrink (0.5 px, 0.5 px, 2 mm), scales (1/6 W, 1/6 W, 0.10 m), mu 31; 3-view L layout
+  384x320, EEF20 -> unified 80-D (slots 0-9 / 34-43), prompts from the RoboTwin instruction pools via the UMT5 cache.
+model:
+  experts: [video, track, action]
+  action_read: compact
+  dense_read_floor: 0.0        # dense future keys always visible to Action (>= plain triple expert)
+  read_action_horizon: 32      # interface probe head on the compact tokens
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: false,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: [0, 8, 0, 10]}   # head view = top 8x10 token block of the 12x10 video grid
+  gradient_checkpointing: false
+init:
+  track: {mode: fresh}     # every weight comes from initialize_from / resume_from
+  # Fallback when no checkpoint exists here yet (weights only, fresh optimizer); the first launch passes
+  # init.resume_from explicitly to also carry the optimizer state over.
+  initialize_from: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/rt2_direct_v2_uvd/checkpoints/step_0030804
+  start_step: 30804
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.5, action: 0.5}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.2, clean_all_but_slowest: 0.0}
+  inference_rounds: 20
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 24, video_width: 20, track_channels: 48, track_frames: 3,
+         track_height: 16, track_width: 20, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 512}
+  rt2:
+    root: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/datas/RT2_MetisWAM4D
+    index_file: index.jsonl
+    variants: [demo_clean_4d, demo_randomized_4d]
+    samples_per_episode: 4
+    alpha_stats: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboTwin-Full/normalization_stats.npy
+    embodiment: 2
+  rt2_encoder:
+    vae_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers
+    depth_stats: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/datas/RT2_MetisWAM4D/depth_stats.json
+    dtype: bf16
+  batch_size: 8
+  num_workers: 12
+training:
+  max_steps: 60000
+  # The objective changed for Track and Action (shared clock, dense keys back in Action's softmax): both get a
+  # higher lr than the v2 run, ramped over the first 500 steps after the resume point (freeze_steps = start_step).
+  # Alpha's own finetunes run the whole model at 1e-4; 2e-5 on the Action expert stays 5x below that, and the
+  # old Janus runs learned the track-to-action mapping at 1e-6, so the risk here is under-adaptation, not blow-up
+  # (grad_clip 1.0 remains the safety).
+  groups:
+    video:   {lr: 5.0e-6, freeze_steps: 30804, ramp_steps: 500}
+    track:   {lr: 1.0e-5, freeze_steps: 30804, ramp_steps: 500}
+    action:  {lr: 2.0e-5, freeze_steps: 30804, ramp_steps: 500}
+    focus:   {lr: 1.0e-4}
+    proprio: {lr: 3.0e-6, freeze_steps: 30804, ramp_steps: 500}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 2   # 8 GPUs: 128 windows per step
+  dense_to_compact_steps: 0        # no annealing: the dense path stays open (dense_read_floor)
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 60   # ~hourly DCP checkpoint + visualisation
+  keep_last: 5
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 20
+  seed: 42
+  loss: {video: 1.0, track: 0.2, camera: 0.1, progress: 0.05, action: 1.0, unfold: 0.1, role: 0.1, condition: 0.01,
+         read_action: 0.1}
+  dropout: {video_only: 0.15, track_only: 0.10, both: 0.05, action_text: 0.30, action_proprio: 0.30}

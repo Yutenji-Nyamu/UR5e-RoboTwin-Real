@@ -1,0 +1,5 @@
+model,frame-2 share: no event,event in frame 1,event in frame 2
+OpenWAM-Alpha,0.499 (n=300),0.478 (n=151),0.486 (n=149)
+X-WAM,0.373 (n=300),0.389 (n=151),0.377 (n=149)
+FlowWAM,0.425 (n=299),0.388 (n=151),0.404 (n=149)
+Efficient-WAM,0.489 (n=300),0.459 (n=151),0.468 (n=149)

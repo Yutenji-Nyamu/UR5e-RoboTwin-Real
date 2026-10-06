@@ -1,0 +1,93 @@
+# Stage 3 RoboDojo, self-play round 1 (2026-10-01): official demonstrations + our policy's successful rollouts on official
+# layouts >= 10. Weights from the newest stage3_robodojo_v3_anneal checkpoint (weights only, fresh optimizer, constant lr);
+# dense checkpoints (30 min, keep 12) for tail weight averaging.
+#   NODE=t4 SESSION=rdj_train bash scripts/robodojo/launch_t2.sh configs/stage3_robodojo_v4_selfplay.yaml
+name: stage3_robodojo_v4_selfplay
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_robodojo_v4_selfplay
+notes: >
+  Self-play post-training: the 3,298 official training episodes plus our own successful closed-loop rollouts on
+  official layouts >= 10 (RDJ_selfplay/dataset_v1, built by scripts/data_prep/robodojo/rdj_rollout_dataset.py; the
+  protocol layouts 0-9 never enter training). Same window contract, losses and unknown-role handling as v2 / v3.
+model:
+  experts: [video, track, action]
+  action_read: compact
+  dense_read_floor: 0.0        # dense future keys always visible to Action (>= plain triple expert)
+  read_action_horizon: 32      # interface probe head on the compact tokens
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: false,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: [0, 8, 0, 10]}   # head view = top 8x10 token block of the 12x10 video grid
+  gradient_checkpointing: false
+init:
+  track: {mode: fresh}     # every weight comes from initialize_from / resume_from
+  # Fallback when no checkpoint exists here yet (weights only, fresh optimizer); the first launch passes
+  # init.resume_from explicitly to also carry the optimizer state over.
+  initialize_from: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_robodojo_v3_anneal/checkpoints/latest
+  start_step: 0
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.5, action: 0.5}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.2, clean_all_but_slowest: 0.0}
+  inference_rounds: 20
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 24, video_width: 20, track_channels: 48, track_frames: 3,
+         track_height: 16, track_width: 20, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 512}
+  robodojo:
+    root: /ytech_milm_intern/danglingwei/datas/RDJ_selfplay/dataset_v1
+    index_file: index.jsonl
+    split: train
+    samples_per_episode: 4
+    alpha_stats: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboDojo/normalization_stats.npy
+    embodiment: 1            # robodojo_arx_x5
+    val_split: val
+    val_batches: 4           # x 8 ranks x batch 8 = 256 fixed held-out windows per evaluation
+  robodojo_encoder:
+    vae_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers
+    depth_stats: /ytech_milm_intern/danglingwei/datas/RDJ_selfplay/dataset_v1/depth_stats.json
+    dtype: bf16
+    unknown_role: true
+  batch_size: 8
+  num_workers: 12
+training:
+  max_steps: 10000
+  groups:
+    video:   {lr: 2.0e-6, ramp_steps: 300}
+    track:   {lr: 5.0e-6, ramp_steps: 300}
+    action:  {lr: 1.0e-5, ramp_steps: 300}
+    focus:   {lr: 5.0e-5}
+    proprio: {lr: 2.0e-6, ramp_steps: 300}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 2       # 8 GPUs x batch 8 x 2 = 128 windows per step
+  dense_to_compact_steps: 0        # no annealing: the dense path stays open (dense_read_floor)
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 30     # dense checkpoints for tail averaging
+  keep_last: 12
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 20
+  eval_every: 1000
+  seed: 42
+  loss: {video: 1.0, track: 0.2, camera: 0.1, progress: 0.05, action: 1.0, unfold: 0.1, role: 0.1, condition: 0.01,
+         read_action: 0.1}
+  track_regions: {body: 1.0, object: 0.0, background: 0.0}   # role 0 = unknown, not background
+  dropout: {video_only: 0.15, track_only: 0.10, both: 0.05, action_text: 0.10, action_proprio: 0.10}

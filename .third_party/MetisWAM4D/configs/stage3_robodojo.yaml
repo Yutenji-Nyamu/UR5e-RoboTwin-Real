@@ -1,0 +1,95 @@
+# Stage 3 - RoboDojo (ARX X5) post-training on RDJ_MetisWAM4D: robot-only pixel-frame Track4D (FK), EEF20 actions
+# in Alpha RoboDojo's per-arm base frame, raw episodes with online Wan-VAE encoding.
+# Video / Action / proprio <- OpenWAM-Alpha-Sim-RoboDojo (step 60000, in-domain video + action prior);
+# Track + reader + focus + progress heads + camera tokens <- rt2_direct_v2_uvd step 25003 (same uvd codec, trained
+# Metis interface; only the RT2 -> RoboDojo domain shift remains).
+# Single node, 8 GPUs (t2):  bash scripts/robodojo/launch_t2.sh configs/stage3_robodojo.yaml
+name: stage3_robodojo
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_robodojo
+notes: >
+  3,298 train / 102 val episodes (34 tasks, stack_bowls excluded). Track targets exist on robot pixels only
+  (role 1); role 0 is unknown (objects + background) and enters no Track / role / unfold loss
+  (track_regions body-only, role target -1). Depth condition = rendered robot-only depth (mm).
+model:
+  experts: [video, track, action]
+  action_read: compact
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: false,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: [0, 8, 0, 10]}   # head view = top 8x10 token block of the 12x10 video grid
+  gradient_checkpointing: false
+init:
+  alpha_checkpoint: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboDojo
+  load_video_from_alpha: true
+  load_action_from_alpha: true
+  track: {mode: fresh}     # overwritten by initialize_from
+  initialize_from: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/rt2_direct_v2_uvd/checkpoints/step_0025003
+  initialize_from_exclude: [video., action., proprio_encoder.]   # these three keep Alpha RoboDojo
+  start_step: 0
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.75, action: 0.25}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.15, clean_all_but_slowest: 0.05}
+  inference_rounds: 16
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 24, video_width: 20, track_channels: 48, track_frames: 3,
+         track_height: 16, track_width: 20, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 512}
+  robodojo:
+    root: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/datas/RDJ_MetisWAM4D
+    index_file: index.jsonl
+    split: train
+    samples_per_episode: 4
+    alpha_stats: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboDojo/normalization_stats.npy
+    embodiment: 1            # robodojo_arx_x5
+    val_split: val
+    val_batches: 4           # x 8 ranks x batch 8 = 256 fixed held-out windows per evaluation
+  robodojo_encoder:
+    vae_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers
+    depth_stats: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/datas/RDJ_MetisWAM4D/depth_stats.json
+    dtype: bf16
+    unknown_role: true
+  batch_size: 8
+  num_workers: 12            # 116-core node; RT2 at 6 workers left time/data ~1 s/step
+training:
+  max_steps: 50000
+  groups:
+    video:   {lr: 3.0e-7, freeze_steps: 500, ramp_steps: 1000}
+    track:   {lr: 3.0e-6, freeze_steps: 0, ramp_steps: 500}
+    action:  {lr: 3.0e-6, freeze_steps: 500, ramp_steps: 1000}   # frozen while the reader aligns to Alpha's action expert
+    focus:   {lr: 3.0e-5}                                        # interface already trained on RT2
+    proprio: {lr: 1.0e-6, freeze_steps: 500, ramp_steps: 1000}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 2       # 8 GPUs x batch 8 x 2 = 128 windows per step (RT2's 16-GPU step size; 76 GB / GPU)
+  dense_to_compact_steps: 3000
+  dense_to_compact_max_bias: 6.0   # Alpha's action expert starts with dense mutual reading; attenuate, do not close
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 60     # ~hourly DCP checkpoint + visualisation
+  keep_last: 5
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 16
+  eval_every: 1000
+  seed: 42
+  loss: {video: 1.0, track: 0.2, camera: 0.1, progress: 0.05, action: 1.0, unfold: 0.1, role: 0.1, condition: 0.01}
+  track_regions: {body: 1.0, object: 0.0, background: 0.0}   # role 0 = unknown, not background
+  dropout: {video_only: 0.15, track_only: 0.10, both: 0.05, action_text: 0.30, action_proprio: 0.30}

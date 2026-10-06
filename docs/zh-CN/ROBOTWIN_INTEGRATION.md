@@ -4,20 +4,20 @@
 
 ## 位置与归属
 
-`scripts/bootstrap_robotwin.sh` 根据 `robotwin.lock`，把 RoboTwin 克隆到被 Git
-忽略的 `.third_party/RoboTwin`，并固定在提交
-`210720340637cb4619283b295dde4cdd807c9e66`。
+RoboTwin源码直接跟踪在 `.third_party/RoboTwin`，上游基线为
+`210720340637cb4619283b295dde4cdd807c9e66`，包含四个集成补丁。
+`scripts/bootstrap_robotwin.sh` 校验 `integrations/vendor_sources.lock.json`，不再嵌套克隆。
 
 ```text
 UR5e_RoboTwin_Real（本仓库跟踪、维护）
 ├── hardware / control / collection / data
 ├── adapters/robotwin_act 与 adapters/robotwin_dp
 ├── integrations/robotwin（版本信息与小补丁）
-└── .third_party/RoboTwin（忽略、可复现的上游工作树）
+└── .third_party/RoboTwin（跟踪、已含补丁的源码快照）
 ```
 
 依赖只能单向：本仓库适配层可以调用 RoboTwin；RoboTwin 不导入真机硬件模块，
-底层硬件也不导入 RoboTwin。第三方工作树和模型本体不提交；训练日志、配置和checkpoint
+底层硬件也不导入 RoboTwin。第三方源码提交，权重和生成数据不提交；训练日志、配置和checkpoint
 小型元信息通过[实验资料归档](../experiments/README.md)保存Git副本，运行目录仍被忽略。
 
 ## 现有 ACT 真机链路
@@ -53,7 +53,7 @@ RTDE寄存器/servoJ实验；当前DP适配层的RTDE servoJ已完成平滑实�
 |---|---|---|---|
 | socket `speedl` | 基于第一次成功ACT执行；无需PolyScope RTDE程序 | chunk边界有明显刹车 | 保留作对照 |
 | RTDE输入 + servoJ | 500 Hz设点和机器人端lookahead；实机平滑 | 推理/模拟空档期间保持末设点 | DP默认后端和显式记录动作对照 |
-| socket + 批量 `movel` | 已由录制轨迹重播验证 | 开环分段计时 | 默认手动重播 |
+| socket + 批量 `movel` | 已由录制轨迹重播验证 | 开环分段计时 | 显式旧版重播 |
 
 DP的6步chunk可通过任一策略后端执行，不改变模型输出。用 `--backend socket` 或
 `--backend rtde` 明确选择；两者不自动切换。`ur5e-replay --backend rtde` 从策略边界

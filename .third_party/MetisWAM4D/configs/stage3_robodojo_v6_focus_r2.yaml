@@ -1,0 +1,96 @@
+# Stage 3 RoboDojo, focus-task self-play round 2 (2026-10-02). Two changes against v5:
+#   1. the Action expert never reads the Track branch (dropout track_only = 1.0): in RoboDojo the Track carries only the
+#      robot FK, i.e. a pixel copy of the action itself; v5 trained with Track visible 85% of the time but only the
+#      hide_track inference mode worked (30/120 vs 2/120), and base rollouts swung the arms across the table.
+#   2. dataset_v3 = nine focus tasks' official demos + every successful self-play rollout so far (v1 focus subset,
+#      v2, v2b, round-2 seeds 1/2/0), repeat 3.  Fresh weights from the newest anneal checkpoint, as v5.
+#   tmux new-session -d -s rdj_train "bash scripts/robodojo/run_focus_train_local.sh configs/stage3_robodojo_v6_focus_r2.yaml"
+name: stage3_robodojo_v6_focus_r2
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_robodojo_v6_focus_r2
+notes: >
+  Self-play round 2: nine focus tasks' official demos + all successful closed-loop rollouts so far (RDJ_selfplay/dataset_v3,
+  built by scripts/data_prep/robodojo/rdj_rollout_dataset.py; protocol layouts 0-9 of seed 0 never enter training).
+  The Action expert reads the future Video only; the Track branch is still trained (robot FK) and still conditions
+  the Video through the joint attention. Same window contract, losses and unknown-role handling as v2 / v3.
+model:
+  experts: [video, track, action]
+  action_read: compact
+  dense_read_floor: 0.0        # dense future keys always visible to Action (>= plain triple expert)
+  read_action_horizon: 32      # interface probe head on the compact tokens
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: false,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: [0, 8, 0, 10]}   # head view = top 8x10 token block of the 12x10 video grid
+  gradient_checkpointing: false
+init:
+  track: {mode: fresh}     # every weight comes from initialize_from / resume_from
+  # First launch loads weights only; later restarts resume this run with optimizer state.
+  initialize_from: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_robodojo_v3_anneal/checkpoints/step_0037951
+  start_step: 0
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.5, action: 0.5}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.2, clean_all_but_slowest: 0.0}
+  inference_rounds: 20
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 24, video_width: 20, track_channels: 48, track_frames: 3,
+         track_height: 16, track_width: 20, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 512}
+  robodojo:
+    root: /ytech_milm_intern/danglingwei/datas/RDJ_selfplay/dataset_v3
+    index_file: index.jsonl
+    split: train
+    samples_per_episode: 4
+    alpha_stats: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboDojo/normalization_stats.npy
+    embodiment: 1            # robodojo_arx_x5
+    val_split: val
+    val_batches: 4           # x 8 ranks x batch 8 = 256 fixed held-out windows per evaluation
+  robodojo_encoder:
+    vae_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers
+    depth_stats: /ytech_milm_intern/danglingwei/datas/RDJ_selfplay/dataset_v3/depth_stats.json
+    dtype: bf16
+    unknown_role: true
+  batch_size: 8
+  num_workers: 12
+training:
+  max_steps: 5000
+  groups:
+    video:   {lr: 2.0e-6, ramp_steps: 300}
+    track:   {lr: 5.0e-6, ramp_steps: 300}
+    action:  {lr: 1.0e-5, ramp_steps: 300}
+    focus:   {lr: 5.0e-5}
+    proprio: {lr: 2.0e-6, ramp_steps: 300}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 2       # 8 GPUs x batch 8 x 2 = 128 windows per step
+  dense_to_compact_steps: 0        # no annealing: the dense path stays open (dense_read_floor)
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 30     # dense checkpoints for tail averaging
+  keep_last: 12
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 20
+  eval_every: 1000
+  seed: 42
+  loss: {video: 1.0, track: 0.2, camera: 0.1, progress: 0.05, action: 1.0, unfold: 0.1, role: 0.1, condition: 0.01,
+         read_action: 0.1}
+  track_regions: {body: 1.0, object: 0.0, background: 0.0}   # role 0 = unknown, not background
+  dropout: {video_only: 0.0, track_only: 1.0, both: 0.0, action_text: 0.10, action_proprio: 0.10}   # Action never reads the robot-only Track (= hide_track at inference)

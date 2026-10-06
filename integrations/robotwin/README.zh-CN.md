@@ -3,7 +3,8 @@
 [English](README.md)
 
 `RoboTwin` 是第三方上游代码。版本固定在 `robotwin.lock`，由
-`scripts/bootstrap_robotwin.sh` 克隆到 `.third_party/RoboTwin`。
+主仓库直接跟踪 `.third_party/RoboTwin`（含四个补丁）。
+`scripts/bootstrap_robotwin.sh` 根据 `integrations/vendor_sources.lock.json` 校验，无需网络克隆。
 
 当前适配代码位于 `src/ur5e_real/adapters/robotwin_act` 和
 `src/ur5e_real/adapters/robotwin_dp`，提供：
@@ -18,7 +19,7 @@
 小型vendor补丁修复配置导入、锁定Orbax的asset回调和下载异常传播；模型和loss仍是原生实现。
 当前进度和验证边界见 [π0.5实施记录](../../docs/plans/pi05/IMPLEMENTATION.md)。
 
-不要提交 `.third_party/RoboTwin` 或模型权重。小型实验日志/配置和checkpoint元信息通过
+跟踪 `.third_party/RoboTwin` 源码，不提交模型权重和生成数据。小型实验日志/配置和checkpoint元信息通过
 [实验资料归档](../../docs/experiments/README.md)提交副本，不直接跟踪第三方目录下的生成文件。
 升级上游时，应分别更新lock并重新验证补丁和完整真机
 runbook。

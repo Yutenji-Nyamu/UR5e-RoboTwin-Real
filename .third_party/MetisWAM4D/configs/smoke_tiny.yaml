@@ -1,0 +1,44 @@
+# Tiny end-to-end smoke: three experts, compact reading, synthetic data (CPU or 1 GPU).
+name: smoke_tiny
+output_dir: /tmp/metiswam4d_smoke
+model:
+  experts: [video, track, action]
+  action_read: compact
+  video:  {dim: 48, ffn_dim: 96, layers: 6, heads: 2, head_dim: 8, freq_dim: 32}
+  track:  {dim: 32, ffn_dim: 64, layers: 4, heads: 2, head_dim: 8, freq_dim: 32}
+  action: {dim: 24, ffn_dim: 48, layers: 6, heads: 2, head_dim: 8, freq_dim: 32}
+  latent_channels: 4
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 16
+  focus: {d_read: 32, num_queries: 3, kappa: 4, read_layers: track_upper_half, feedback_to_track: false}
+  gradient_checkpointing: false
+init:
+  alpha_checkpoint: null
+  track: {mode: interpolate_from_video}
+schedule:
+  completion: {video: 1.0, track: 0.75, action: 0.25}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  inference_rounds: 8
+data:
+  spec: {video_channels: 4, video_frames: 3, video_height: 8, video_width: 6, track_channels: 4, track_frames: 3,
+         track_height: 8, track_width: 6, kappa: 4, action_horizon: 8, action_dim: 80, proprio_dim: 80, text_dim: 16, max_text_len: 32}
+  components:
+    - {name: robot_synthetic, weight: 0.7, synthetic_length: 32, modalities: [video, track, action], embodiment: robodojo_arx_x5}
+    - {name: human_synthetic, weight: 0.3, synthetic_length: 32, modalities: [video, track], embodiment: human_ego}
+  batch_size: 2
+  num_workers: 0
+training:
+  max_steps: 6
+  groups:
+    video:   {lr: 1.0e-4, freeze_steps: 2, ramp_steps: 2}
+    track:   {lr: 1.0e-4}
+    action:  {lr: 1.0e-4, freeze_steps: 1, ramp_steps: 1}
+    focus:   {lr: 5.0e-4}
+    proprio: {lr: 1.0e-4}
+  dtype: fp32
+  fsdp: false
+  log_every: 2
+  checkpoint_every: 3
+  keep_last: 2

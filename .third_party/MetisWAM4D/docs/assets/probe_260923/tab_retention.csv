@@ -1,0 +1,16 @@
+model,selection rule,20%,5%,1%
+OpenWAM-Alpha,random,6.80,8.60,9.38
+OpenWAM-Alpha,interaction zone (GT),6.41,8.01,9.13
+OpenWAM-Alpha,coupling transition |Δc| (GT),6.90,8.21,9.11
+OpenWAM-Alpha,motion magnitude (GT),6.73,8.02,8.90
+OpenWAM-Alpha,object tokens (GT),7.56,9.12,9.54
+X-WAM,random,1.79,3.13,3.79
+X-WAM,interaction zone (GT),1.61,2.69,3.52
+X-WAM,coupling transition |Δc| (GT),1.62,2.52,3.41
+X-WAM,motion magnitude (GT),1.52,2.17,3.02
+X-WAM,object tokens (GT),2.03,3.48,3.88
+Efficient-WAM,random,3.15,6.24,8.61
+Efficient-WAM,interaction zone (GT),2.84,5.56,7.83
+Efficient-WAM,coupling transition |Δc| (GT),2.82,5.26,7.54
+Efficient-WAM,motion magnitude (GT),2.61,4.66,6.67
+Efficient-WAM,object tokens (GT),3.69,6.98,8.83

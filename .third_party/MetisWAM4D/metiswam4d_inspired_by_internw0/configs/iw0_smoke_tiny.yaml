@@ -1,0 +1,188 @@
+name: iw0_smoke_tiny
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/_smoke/iw0_smoke_tiny
+notes: 'Data: official demos of the six Memory tasks + InternW0-Delta teacher rollouts
+  of cover_blocks, match_and_pick_from_conveyor, general_pickup and stack_blocks_by_language
+  on official layout seeds 1 / 2 (protocol seed 0 layouts never enter training), with
+  ground-truth head depth / instance ids / object poses -> robot / gripper / object
+  uvd Track.  The Action expert reads the clean world only (memory + current video
+  frames, Track conditions); future Video and Track are co-trained targets.
+
+  '
+iw0:
+  internw0_checkpoint: null
+  alpha_checkpoint: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Sim-RoboDojo
+  v6_weights: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_robodojo_v6_focus_r2/simeval_focus/checkpoint/model_bf16_tail3.pt
+  memory_drop: 0.15
+model:
+  experts:
+  - video
+  - track
+  - action
+  action_read: none
+  read_action_horizon: 0
+  video:
+    dim: 128
+    ffn_dim: 256
+    layers: 2
+    heads: 1
+    head_dim: 128
+    freq_dim: 256
+  track:
+    dim: 128
+    ffn_dim: 256
+    layers: 2
+    heads: 1
+    head_dim: 128
+    freq_dim: 256
+  action:
+    dim: 128
+    ffn_dim: 256
+    layers: 2
+    heads: 1
+    head_dim: 128
+    freq_dim: 256
+  latent_channels: 48
+  patch:
+  - 1
+  - 2
+  - 2
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus:
+    d_read: 64
+    num_queries: 8
+    kappa: 4
+    read_layers: track_upper_half
+    feedback_to_track: false
+    spatial_kernel: gaussian
+    temporal_window: gaussian
+    anchor_refine: false
+    anchor_width: 0.15
+    gamma_init: 0.3
+    detach_world_hidden: false
+    progress_dim: 3
+    video_window:
+    - 0
+    - 8
+    - 0
+    - 8
+  gradient_checkpointing: true
+init:
+  track:
+    mode: fresh
+  start_step: 0
+  resume_from: auto
+schedule:
+  completion:
+    video: 1.0
+    track: 0.5
+    action: 0.5
+  shift:
+    video: 5.0
+    track: 5.0
+    action: 1.0
+  mixture:
+    trajectory: 0.4
+    ordered_independent: 0.4
+    independent: 0.0
+    clean_fastest: 0.2
+    clean_all_but_slowest: 0.0
+  inference_rounds: 10
+data:
+  spec:
+    video_channels: 48
+    video_frames: 3
+    video_height: 24
+    video_width: 16
+    track_channels: 48
+    track_frames: 3
+    track_height: 16
+    track_width: 20
+    kappa: 4
+    token_patch:
+    - 2
+    - 2
+    action_horizon: 32
+    action_dim: 80
+    proprio_dim: 80
+    text_dim: 4096
+    max_text_len: 512
+  robodojo:
+    source: iw0
+    root: /ytech_milm_intern/danglingwei/datas/IW0_MemOpen4D/dataset_v1
+    index_file: index.jsonl
+    split: train
+    samples_per_episode: 4
+    layout_height: 384
+    layout_width: 256
+    embodiment: 1
+    val_split: val
+    val_batches: 1
+  robodojo_encoder:
+    vae_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers
+    depth_stats: /m2v_intern_v3/danglingwei/ytech_milm_intern_danglingwei/datas/RDJ_MetisWAM4D/depth_stats.json
+    dtype: bf16
+    unknown_role: false
+  batch_size: 2
+  num_workers: 2
+training:
+  max_steps: 4
+  groups:
+    video:
+      lr: 2.0e-06
+      ramp_steps: 300
+    track:
+      lr: 5.0e-06
+      ramp_steps: 300
+    action:
+      lr: 2.0e-05
+      ramp_steps: 300
+    focus:
+      lr: 5.0e-05
+    proprio:
+      lr: 2.0e-06
+      ramp_steps: 300
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.95
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: false
+  fsdp_granularity: block
+  fsdp_hybrid: true
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 1
+  log_every: 1
+  checkpoint_every: 3
+  checkpoint_every_minutes: 0
+  keep_last: 6
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 3
+  eval_every: 2
+  gpu_filler: false
+  seed: 42
+  loss:
+    video: 0.5
+    track: 0.2
+    camera: 0.1
+    progress: 0.05
+    action: 1.0
+    unfold: 0.1
+    role: 0.1
+    condition: 0.01
+    read_action: 0.0
+  track_regions:
+    body: 1.0
+    object: 1.0
+    background: 0.2
+  dropout:
+    video_only: 0.0
+    track_only: 0.0
+    both: 0.0
+    action_text: 0.1
+    action_proprio: 0.1

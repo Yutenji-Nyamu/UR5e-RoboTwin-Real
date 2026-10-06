@@ -35,10 +35,12 @@ Track4D 和未来视频生成暂不启用。手动重播、现有 π0.5 流程�
 归档另有 24 个指向作者服务器 RoboTwin 仿真资产的绝对软链接，本机无法解析，未创建；
 清单保存在本地 `UNRESOLVED_EXTERNAL_LINKS.json`。本轮采用的 `metiswam4d/` 模型源码不依赖它们。
 未使用另一个 `metiswam4d_inspired_by_internw0/` 实现，也未修改上游源码。
-私有源码、权重、原始图像、转换产物留在忽略目录，提交的是本项目新增实现、测试和文档。
+用户已明确要求两套源码公开跟踪：`.third_party/MetisWAM4D` 和 `.third_party/RoboTwin`
+均作为主仓库普通文件提交；权重、原始图像、转换产物和ZIP仍忽略。
+最新范围与待办见 [本轮审查与后续步骤](STATUS_AND_NEXT.md)。
 
 本轮验证：项目测试 **189 passed, 3 skipped**；其中 Metis/采集/RGB-D 定向测试 25 passed。
-跳过的是已有可选依赖测试，详见测试运行输出；这些数字不表示 production 模型或真机推理已经验收。
+跳过的是需显式开启的本地RPC测试，详见测试运行输出；这些数字不表示 production 模型或真机推理已经验收。
 
 ## 接下来缺什么
 

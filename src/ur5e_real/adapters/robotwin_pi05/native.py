@@ -3,9 +3,9 @@ from __future__ import annotations
 import importlib.util
 import os
 from pathlib import Path
-import subprocess
 import sys
 
+from ...vendor import verify_source
 from .contract import ROBOTWIN_COMMIT
 
 REPOSITORY = Path(__file__).resolve().parents[4]
@@ -14,35 +14,9 @@ CHECKPOINT_COMPAT = "ur5e_orbax_0111_callback_v1"
 
 def native_root(robotwin_root: Path | None = None) -> Path:
     root = (robotwin_root or REPOSITORY / ".third_party" / "RoboTwin").resolve()
-    result = subprocess.run(["git", "-C", str(root), "rev-parse", "HEAD"], text=True, capture_output=True, check=True)
-    if result.stdout.strip() != ROBOTWIN_COMMIT:
+    verified = verify_source("RoboTwin", root=root, prefix="policy/pi05")
+    if verified["upstream_commit"] != ROBOTWIN_COMMIT:
         raise RuntimeError("RoboTwin commit differs from the pi05 integration lock")
-    dirty = subprocess.run(
-        ["git", "-C", str(root), "status", "--porcelain", "--", "policy/pi05"],
-        text=True,
-        capture_output=True,
-        check=True,
-    )
-    patch_dir = REPOSITORY / "integrations/pi05/patches"
-    expected_diff = "".join(
-        (patch_dir / name).read_text()
-        for name in ("0003-propagate-download-errors.patch", "0002-orbax-callback.patch", "0001-config-import.patch")
-    )
-    diff = subprocess.run(
-        ["git", "-C", str(root), "diff", "--no-color", "--no-ext-diff", "HEAD", "--", "policy/pi05"],
-        text=True,
-        capture_output=True,
-        check=True,
-    )
-    expected_status = (
-        " M policy/pi05/src/openpi/shared/download.py\n"
-        " M policy/pi05/src/openpi/training/checkpoints.py\n M policy/pi05/src/openpi/training/config.py\n"
-    )
-    if dirty.stdout != expected_status or diff.stdout != expected_diff:
-        raise RuntimeError(
-            "native pi05 must match the locked runtime-compatibility patches exactly; "
-            "preserve other changes and inspect scripts/bootstrap_robotwin.sh"
-        )
     return root / "policy" / "pi05"
 
 

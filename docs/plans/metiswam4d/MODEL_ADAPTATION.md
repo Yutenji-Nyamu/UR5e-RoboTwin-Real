@@ -1,8 +1,7 @@
 # MetisWAM4D：单臂 RGB → Action 首版
 
 更新：2026-10-06。采用用户确认的 π0.5 关节约定。实现位于
-[adapter](../../../src/ur5e_real/adapters/metiswam4d/__main__.py)，使用本地私有 `metiswam4d/` 原生模型类，
-不修改或镜像上游仓库到公开 Git。
+[adapter](../../../src/ur5e_real/adapters/metiswam4d/__main__.py)，使用本项目跟踪的 `metiswam4d/` 原生模型源码。
 
 ## 当前输入、输出和更新范围
 
@@ -67,7 +66,8 @@ python -m ur5e_real.adapters.metiswam4d smoke \
 
 CPU 默认也可跑。使用**原生 tiny Video/Action**，对真实首个训练窗口做 8 次更新、4 轮采样，
 检查冻结哈希相同、Action/proprio 更新、图像扰动改变输出、保存重载逐元素相同、输出 joint7/joint14。
-CUDA 测试启用 gradient checkpointing。已执行 CPU FP32 和 RTX A6000 BF16 两种测试。
+CUDA 测试启用 gradient checkpointing。审查后改为 Action/proprio 参数及优化器状态保持FP32，
+BF16 autocast计算；已用默认1e-5学习率重新验证更新及精度保持的保存重载。已执行 CPU FP32 和 RTX A6000 BF16 两种测试。
 
 测试图像编码是明确标记的像素池化，仅验证计算链路，**不是预训练 VAE 或正式模型效果**。
 `infer` 默认拒绝 tiny checkpoint。loss 波动和一次窗口 smoke 不作为收敛/成功率结论。

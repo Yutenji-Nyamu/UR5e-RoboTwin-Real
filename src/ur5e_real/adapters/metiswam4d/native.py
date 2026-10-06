@@ -55,3 +55,11 @@ def build_model(config):
     for name, parameter in model.named_parameters():
         parameter.requires_grad_(name.startswith(("action.", "proprio_encoder.")))
     return model
+
+
+def training_precision(model, *, device, dtype):
+    """Frozen weights may use BF16; AdamW must accumulate small updates in FP32."""
+    model.to(device=device, dtype=dtype)
+    model.action.float()
+    model.proprio_encoder.float()
+    return model

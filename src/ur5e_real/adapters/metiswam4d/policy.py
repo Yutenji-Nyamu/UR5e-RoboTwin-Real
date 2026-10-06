@@ -31,6 +31,14 @@ class ActionPolicy:
             action=noisy, action_sigma=sigma, proprio=proprio, proprio_mask=mask,
         )
 
+    def velocity(self, latent, state, noisy, sigma):
+        parameter = next(self.model.parameters())
+        # Trainable parameters stay FP32. Autocast supplies BF16 matmuls without
+        # rounding away small AdamW updates in the parameters/optimizer state.
+        with torch.autocast(device_type=parameter.device.type, dtype=torch.bfloat16,
+                            enabled=parameter.dtype == torch.bfloat16):
+            return self.model(self.inputs(latent, state, noisy, sigma)).action_velocity
+
     def loss(self, latent, state, actions, valid):
         target7 = normalize(delta_actions(state, actions), self.stats, "action")
         if target7.shape != (len(state), HORIZON, 7):
@@ -45,7 +53,7 @@ class ActionPolicy:
         noise = torch.randn_like(target) * active
         sigma = torch.rand(len(state), device=target.device, dtype=target.dtype)
         noisy = (1 - sigma[:, None, None]) * target + sigma[:, None, None] * noise
-        velocity = self.model(self.inputs(latent, state, noisy, sigma)).action_velocity
+        velocity = self.velocity(latent, state, noisy, sigma)
         # d[(1-sigma)*data + sigma*noise]/d sigma = noise-data.
         # Neither the 73 unused slots nor padded tail steps enter the loss.
         error = (velocity.float() - (noise - target).float()).square()
@@ -65,7 +73,7 @@ class ActionPolicy:
         action *= active
         for step in range(rounds):
             sigma = action.new_full((len(state),), 1 - step / rounds)
-            velocity = self.model(self.inputs(latent, state, action, sigma)).action_velocity
+            velocity = self.velocity(latent, state, action, sigma)
             action = (action - velocity / rounds) * active
         delta = normalize(action[..., list(SLOTS)].float().cpu().numpy(), self.stats, "action", inverse=True)
         return absolute_actions(state, delta)

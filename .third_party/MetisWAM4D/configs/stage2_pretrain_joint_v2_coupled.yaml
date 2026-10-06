@@ -1,0 +1,123 @@
+# Stage 2 joint pretraining, continued from stage2_pretrain_joint (step 8434) with the same two changes as
+# rt2_direct_v3_coupled (2026-09-29):
+#   1. Track-Action coupled clock: r_T = r_A = 0.5 (one shared noise level), r_V = 1.  Track and Action are denoised
+#      together in u in [0, 0.5]; u in [0.5, 1] is video generation conditioned on the clean Track (+ clean action
+#      on robot batches).  Human batches (video + track) follow the same clock with Track finishing at 0.5.
+#      Inference: 20 rounds, Track and Action final after round 10 (stop_after="action" for control).
+#   2. Interface safety: the dense future world keys stay in Action's joint softmax (dense_read_floor 0 = the plain
+#      triple expert), the compact CSIA/TAA read is an additive residual on top; ReadActionHead probes the compact
+#      tokens for the clean action (loss read_action 0.1) so the interface cannot go dead.
+# Learning rates: Video keeps the 1e-5 set at step 8434 (it never adapted to human ego video at 3e-7 / 1e-6),
+# Track 1e-5, Action 1e-5 -> 2e-5 (its objective changed: shared clock, dense keys back), proprio 1e-6 -> 3e-6;
+# all ramped over 500 steps from the resume point (freeze_steps = start_step).
+# Data, model sizes, mixture, encoders: identical to stage2_pretrain_joint.yaml.
+# First launch (full state incl. optimizer from the old run; new params start fresh):
+#   PROJECT=<frozen copy> NODES="t3 t4" bash scripts/human_pretrain/launch_2node.sh configs/stage2_pretrain_joint_v2_coupled.yaml -- \
+#     --set init.resume_from=/ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage2_pretrain_joint/checkpoints/step_0008434
+# Later restarts: plain (resume_from auto finds the newest checkpoint here).
+name: stage2_pretrain_joint_v2_coupled
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage2_pretrain_joint_v2_coupled
+notes: >
+  Roles: hands / forearms / robot arms = body (1), manipulated objects = 2 (IG-10K human + robot), else black.
+  Track4D (du/W, dv/W, dd) with soft-shrink 0.5 px / 0.5 px / (8 mm IG-10K, 2 mm Kling), scales (1/6 W, 1/6 W, 0.10 m), mu 31.
+  Actions: IG-10K Realman eepos+gripper (Euler xyz -> rot6d) -> Alpha EEF20 -> unified 80-D slots 0-9 / 34-43,
+  min-max with robot/action_stats_eef20.json; proprio = state at the window start, action = next 32 states;
+  gripper labels are +-2-step linear ramps (ig10k_action.ramp_gripper_steps).
+  Camera tokens: Kling rotation-supervised (translation weight 0), IG-10K human / robot identity code (fixed ZED2i).
+  Progress heads (video / body / action) are supervised on IG-10K episodes only (Kling clips have no task phase).
+model:
+  experts: [video, track, action]
+  action_read: compact
+  dense_read_floor: 0.0        # dense future keys always visible to Action (>= plain triple expert)
+  read_action_horizon: 32      # interface probe head on the compact tokens
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: true,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: null}        # single view: Video and Track share the 9x16 grid
+  gradient_checkpointing: true
+init:
+  alpha_checkpoint: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Pretrain-Foundation-Model
+  load_video_from_alpha: false
+  load_action_from_alpha: true
+  track: {mode: fresh}
+  # Fallback when no checkpoint exists here yet (weights only, fresh optimizer); the first launch passes
+  # init.resume_from explicitly to also carry the optimizer state over.
+  initialize_from: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage2_pretrain_joint/checkpoints/step_0008434
+  start_step: 8434
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.5, action: 0.5}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.2, clean_all_but_slowest: 0.0}
+  inference_rounds: 20
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 18, video_width: 32, track_channels: 48, track_frames: 3,
+         track_height: 18, track_width: 32, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 256}
+  human:
+    components:
+      - name: kling_hand
+        kind: kling
+        weight: 0.28
+        kling: {mode: track, parquet: /ytech_milm_intern/danglingwei/datas/KlingHumanEgo20M/KlingHumanEgo20M_30fps_hi_handtrack_subset.parquet,
+                min_pairs: 4, camera_world_to_cam: true, camera_compensate: true, camera_use_translation: false}
+      - name: kling_video
+        kind: kling
+        weight: 0.12
+        kling: {mode: video, parquet: /ytech_milm_intern/danglingwei/datas/KlingHumanEgo20M/KlingHumanEgo20M_30fps_hi_with_hands.parquet}
+      - name: ig10k_human
+        kind: ig10k
+        weight: 0.24
+        ig10k: {profile: human, split: train, val_episodes_per_task: 2, samples_per_episode: 4}
+      - name: ig10k_robot
+        kind: ig10k
+        weight: 0.36
+        ig10k: {profile: robot, split: train, val_episodes_per_task: 2, samples_per_episode: 4}
+    val:       {profile: human, split: val, val_episodes_per_task: 2, samples_per_episode: 1}
+    val_robot: {profile: robot, split: val, val_episodes_per_task: 2, samples_per_episode: 1}
+    val_batches: 4                 # 16 ranks x 4 x 16 = 1024 held-out windows per split
+  human_encoder: {wan_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers, depth_min_m: 0.2, depth_max_m: 1.6,
+                  token_patch: 2, max_text_len: 256, dtype: bf16}
+  batch_size: 16                     # 16 GPUs x 16 = 256 windows per step
+  num_workers: 8
+training:
+  max_steps: 30000
+  groups:
+    video:   {lr: 1.0e-5, freeze_steps: 8434, ramp_steps: 500}
+    track:   {lr: 1.0e-5, freeze_steps: 8434, ramp_steps: 500}
+    action:  {lr: 2.0e-5, freeze_steps: 8434, ramp_steps: 500}
+    focus:   {lr: 1.0e-4}                                          # reader, compact reads, progress + read_action heads, embodiment token
+    proprio: {lr: 3.0e-6, freeze_steps: 8434, ramp_steps: 500}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true                  # shard inside a node, replicate across nodes (TCP inter-node links)
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 1
+  dense_to_compact_steps: 0          # no annealing: the dense path stays open (dense_read_floor)
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 60
+  keep_last: 5
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 20
+  eval_every: 1000
+  seed: 42
+  loss: {video: 1.0, track: 1.0, camera: 0.1,   # track 1.0 (not 0.2): with a near-frozen Video its loss otherwise dominates the Track expert's gradient (stage 1)
+         camera_translation: 0.0, progress: 0.05, action: 1.0, unfold: 0.1, role: 0.1,
+         condition: 0.01, read_action: 0.1}
+  dropout: {video_only: 0.15, track_only: 0.10, both: 0.05, action_text: 0.30, action_proprio: 0.30}

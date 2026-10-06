@@ -1,0 +1,93 @@
+# Stage 3 VLABench v2 fine-tune (2026-10-04): continue from the v1 avg5 weights (step 4923-6656 mean) on gen4d_v2.
+#   gen4d_v2 = gen4d with select_chemistry_tube / select_book regenerated in the March-2025 scene heights of the
+#   official evaluation tracks (tube stand / shelf z 0.76, tubes seated at the stand; generate_4d.py --layout official).
+#   v1 learned the current-code heights (+4 cm stand / shelf, +9 cm tubes) and scored 4-8 % on the tube task (Alpha 82 %).
+#   Same model, recipe and losses as v1; lr warms up in 100 steps, then cosine to 1/10 over 2500 steps.
+#   tmux new-session -d -s vlab_ft "bash scripts/vlabench/run_train_local.sh configs/stage3_vlabench_v2_ft.yaml"
+name: stage3_vlabench_v2_ft
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_vlabench_v2_ft
+notes: >
+  Fine-tune of the v1 avg5 weights on gen4d_v2 (tube / book scenes in the evaluation-track heights), cosine to 1/10.
+model:
+  experts: [video, track, action]
+  action_read: compact
+  dense_read_floor: 0.0
+  read_action_horizon: 32
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  num_embodiments: 9
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: false,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: [0, 8, 0, 10]}   # head view = top 8x10 token block of the 12x10 video grid
+  gradient_checkpointing: false
+init:
+  track: {mode: fresh}     # every weight comes from initialize_from
+  initialize_from: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage3_vlabench_v1/simeval/checkpoint/model_bf16_avg4923_6656.pt
+  start_step: 0
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.5, action: 0.5}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.2, clean_all_but_slowest: 0.0}
+  inference_rounds: 20
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 24, video_width: 20, track_channels: 48, track_frames: 3,
+         track_height: 16, track_width: 20, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 512}
+  robodojo:
+    source: vlabench
+    root: /ytech_milm_intern/danglingwei/datas/VLABench/gen4d_v2
+    split: train
+    samples_per_episode: 4
+    alpha_stats: /ytech_milm_intern/danglingwei/datas/VLABench/OpenWAM-Alpha-Sim-VLABench/normalization_stats.npy
+    embodiment: 8            # vlabench_franka
+    val_split: val
+    val_batches: 4           # x 8 ranks x batch 8 = 256 fixed held-out windows per evaluation
+  robodojo_encoder:
+    vae_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers
+    depth_stats: /ytech_milm_intern/danglingwei/datas/VLABench/gen4d_v2/depth_stats.json
+    dtype: bf16
+    unknown_role: false
+  batch_size: 8
+  num_workers: 10
+training:
+  max_steps: 2500
+  groups:
+    video:   {lr: 5.0e-6, ramp_steps: 100}
+    track:   {lr: 1.0e-5, ramp_steps: 100}
+    action:  {lr: 2.0e-5, ramp_steps: 100}
+    focus:   {lr: 1.0e-4, ramp_steps: 100}
+    proprio: {lr: 3.0e-6, ramp_steps: 100}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: cosine
+  lr_schedule_start: 0
+  min_lr_ratio: 0.1
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 2       # 8 GPUs x batch 8 x 2 = 128 windows per step
+  dense_to_compact_steps: 0
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 30
+  keep_last: 8
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 20
+  eval_every: 500
+  seed: 42
+  loss: {video: 1.0, track: 0.2, camera: 0.1, progress: 0.05, action: 1.0, unfold: 0.1, role: 0.1, condition: 0.01,
+         read_action: 0.1}
+  dropout: {video_only: 0.15, track_only: 0.10, both: 0.05, action_text: 0.10, action_proprio: 0.10}

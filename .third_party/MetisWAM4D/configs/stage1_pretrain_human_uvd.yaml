@@ -1,0 +1,95 @@
+# Stage 1 - human egocentric pretraining: Video + Track4D (no Action expert), raw windows encoded online, pixel-frame
+# Track4D (u = du/W, v = dv/W, d = dd m; codec.py, 2026-09-26).  Continues the stage1_pretrain_human curriculum from its
+# last checkpoint (step 14872, trained on the camera-frame xyz codec): all weights loaded shape-tolerantly, fresh optimizer.
+# Data: KlingHumanEgo-2.5M-5000H hand-track subset (video + hand Track4D, camera trajectory), IG-10K human (video + object/hand
+# Track4D, DA3 depth, static camera), Kling video-only.  Window 33 frames / stride 4 at 512x288 (latent 18x32, tokens 9x16).
+# One node (8 GPUs, bs 16 = 128 windows/step): NODES="t3" bash scripts/human_pretrain/launch_2node.sh configs/stage1_pretrain_human_uvd.yaml
+name: stage1_pretrain_human_uvd
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage1_pretrain_human_uvd
+notes: >
+  Body = hands / forearms (role 1), objects = manipulated objects (role 2, IG-10K only), everything else black.
+  Track4D channels (du/W, dv/W, dd) with soft-shrink 0.5 px / 0.5 px / (8 mm IG-10K, 2 mm Kling), scales (1/6 W, 1/6 W, 0.10 m), mu 31.
+  Kling hand displacement is head-rotation compensated with the clip's camera trajectory; camera tokens are supervised
+  on Kling (rotation; translation weight 0 until its metric scale is verified) and with the identity code on IG-10K.
+  Depth condition is missing for Kling (learned stand-in token).  Progress heads are supervised on IG-10K episodes only.
+model:
+  experts: [video, track]
+  action_read: none
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: true,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: null}        # single view: Video and Track share the 9x16 grid
+  gradient_checkpointing: true       # bs 8 without recompute OOMs at 8-way sharding (bs 4 without it is slower per window)
+init:
+  track: {mode: fresh}     # every weight comes from initialize_from
+  initialize_from: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage1_pretrain_human/checkpoints/step_0014872
+  start_step: 14872
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.75}
+  shift: {video: 5.0, track: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.2, clean_all_but_slowest: 0.0}
+  inference_rounds: 16
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 18, video_width: 32, track_channels: 48, track_frames: 3,
+         track_height: 18, track_width: 32, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 256}
+  human:
+    components:
+      - name: kling_hand
+        kind: kling
+        weight: 0.5
+        kling: {mode: track, parquet: /ytech_milm_intern/danglingwei/datas/KlingHumanEgo20M/KlingHumanEgo20M_30fps_hi_handtrack_subset.parquet,
+                min_pairs: 4, camera_world_to_cam: true, camera_compensate: true, camera_use_translation: false}
+      - name: ig10k_human
+        kind: ig10k
+        weight: 0.3
+        ig10k: {split: train, val_episodes_per_task: 2, samples_per_episode: 4}
+      - name: kling_video
+        kind: kling
+        weight: 0.2
+        kling: {mode: video, parquet: /ytech_milm_intern/danglingwei/datas/KlingHumanEgo20M/KlingHumanEgo20M_30fps_hi_with_hands.parquet}
+    val: {split: val, val_episodes_per_task: 2, samples_per_episode: 1}
+    val_batches: 8                 # 8 ranks x 8 x 16 = the same 1024 held-out windows as 16 ranks x 8 x 8
+  human_encoder: {wan_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers, depth_min_m: 0.2, depth_max_m: 1.6,
+                  token_patch: 2, max_text_len: 256, dtype: bf16}
+  batch_size: 16                     # 8 GPUs x 16 = 128 windows per step (t3 only from step 13533; 2 x 8 x 8 before)
+  num_workers: 8
+training:
+  max_steps: 50000
+  groups:
+    video:   {lr: 3.0e-7, freeze_steps: 2000, ramp_steps: 2000}   # Track / reader re-align to the Foundation Video first
+    track:   {lr: 3.0e-6, freeze_steps: 0, ramp_steps: 500}
+    focus:   {lr: 1.0e-4}
+    proprio: {lr: 0.0}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 1
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 60
+  keep_last: 5
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 16
+  eval_every: 1000
+  seed: 42
+  loss: {video: 1.0, track: 1.0, camera: 0.1, camera_translation: 0.0, progress: 0.05, action: 0.0, unfold: 0.1, role: 0.1,   # track 0.2 -> 1.0 at step 20540 (2026-09-27): Video is near-frozen (3e-7), its loss was 75% of the gradient reaching the Track expert
+         condition: 0.01}
+  dropout: null                      # modality dropout only acts on Action reads; no Action expert in stage 1

@@ -1,0 +1,89 @@
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+.installed.cfg
+build/
+dist/
+develop-eggs/
+.eggs/
+
+# ===== Model weights / checkpoints =====
+*.safetensors
+*.pth
+*.ckpt
+*.bin
+
+# ===== Videos =====
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.webm
+
+# ===== Data files =====
+*.npy
+*.npz
+*.pkl
+*.pickle
+*.h5
+*.hdf5
+*.zarr
+*.zip
+
+# ===== Logs =====
+swanlog/
+wandb/
+*.log
+logs/
+runs/
+wandb/
+tensorboard/
+preprocess/dataset_run*/logs/
+preprocess/dataset_run*/*.pid
+
+# ===== OS / IDE =====
+.DS_Store
+.vscode/
+.idea/
+.codeflicker/
+.cursor/
+.codex/
+
+
+# ===== Environments =====
+.env
+.venv
+env/
+venv/
+*-venv/
+pip_cache/
+
+# ===== Model / output directories =====
+training/models/
+inference/models/
+inference/robotwin_policy/eval_result/
+
+temp/
+test*
+test*/
+tests/*
+test*.py
+*/tests/*
+# # MetisWAM4D unit tests are part of the repository.
+# !/tests/
+# !/tests/*.py
+
+# Keep Fusion-v3 evaluator regression tests reviewable.  The broad legacy
+# patterns above otherwise hide every new file below this tracked test suite.
+!fusion_v3/tests/
+!fusion_v3/tests/test_*.py
+!robodojo_v3/tests/
+!robodojo_v3/tests/__init__.py
+!robodojo_v3/tests/test_*.py
+logs*
+*.log
+.pytest_cache/

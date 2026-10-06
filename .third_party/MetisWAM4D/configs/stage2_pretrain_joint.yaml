@@ -1,0 +1,113 @@
+# Stage 2 - joint human + robot pretraining with all three experts (Video / Track4D-uvd / Action), raw windows
+# encoded online.  Data: KlingHumanEgo-2.5M-5000H (hand Track4D 0.28, video-only 0.12) : IG-10K (human 0.24, robot 0.36 with
+# Realman EEF actions) = 0.4 : 0.6.  Batches are homogeneous per source: Kling / IG-10K human -> video + track,
+# Kling video-only -> video, IG-10K robot -> video + track + action.
+# Video + Track + reader + progress heads <- stage1_pretrain_human_uvd step 21609; Action + proprio encoder <-
+# OpenWAM-Alpha-Pretrain-Foundation-Model.  New this stage: embodiment token (human_ego / ig10k_realman) in every
+# expert's context, p_action progress head, compact CSIA+TAA reading annealed from Alpha's dense reading,
+# action-shortcut dropout.  Window 33 frames / stride 4 at 512x288 (latent 18x32, tokens 9x16).
+# Two nodes (16 GPUs, HSDP, bs 16 = 256 windows/step, no accumulation):
+#   PROJECT=<frozen copy> NODES="t3 t4" bash scripts/human_pretrain/launch_2node.sh configs/stage2_pretrain_joint.yaml
+name: stage2_pretrain_joint
+output_dir: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage2_pretrain_joint
+notes: >
+  Roles: hands / forearms / robot arms = body (1), manipulated objects = 2 (IG-10K human + robot), else black.
+  Track4D (du/W, dv/W, dd) with soft-shrink 0.5 px / 0.5 px / (8 mm IG-10K, 2 mm Kling), scales (1/6 W, 1/6 W, 0.10 m), mu 31.
+  Actions: IG-10K Realman eepos+gripper (Euler xyz -> rot6d) -> Alpha EEF20 -> unified 80-D slots 0-9 / 34-43,
+  min-max with robot/action_stats_eef20.json; proprio = state at the window start, action = next 32 states.
+  Camera tokens: Kling rotation-supervised (translation weight 0), IG-10K human / robot identity code (fixed ZED2i).
+  Progress heads (video / body / action) are supervised on IG-10K episodes only (Kling clips have no task phase).
+model:
+  experts: [video, track, action]
+  action_read: compact
+  video:  {dim: 3072, ffn_dim: 14336, layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  track:  {dim: 1024, ffn_dim: 4096,  layers: 20, heads: 24, head_dim: 128, freq_dim: 256}
+  action: {dim: 1024, ffn_dim: 4096,  layers: 30, heads: 24, head_dim: 128, freq_dim: 256}
+  latent_channels: 48
+  patch: [1, 2, 2]
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus: {d_read: 512, num_queries: 32, kappa: 4, read_layers: track_upper_half, feedback_to_track: true,
+          spatial_kernel: gaussian, temporal_window: gaussian, anchor_refine: false, anchor_width: 0.15,
+          gamma_init: 0.3, detach_world_hidden: false, progress_dim: 3,
+          video_window: null}        # single view: Video and Track share the 9x16 grid
+  gradient_checkpointing: true       # stage 1: bs 16 + recompute 0.054 s/window (45 GB/GPU) vs bs 8 0.082 s/window; bs 8 without recompute OOMs
+init:
+  alpha_checkpoint: /m2v_intern_v3/danglingwei/ytech_m2v8_hdd_intern_dataset_danglingwei/model_zoos/OpenWAM/OpenWAM-Alpha-Pretrain-Foundation-Model
+  load_video_from_alpha: false       # Alpha contributes only the Action expert + proprio encoder ...
+  load_action_from_alpha: true
+  track: {mode: fresh}
+  initialize_from: /ytech_milm_intern/danglingwei/outputs/MetisWAM4D_260921/stage1_pretrain_human_uvd/checkpoints/step_0021609
+  initialize_from_exclude: [action., proprio_encoder.]   # ... and stage 1 everything else (its proprio encoder was untrained, lr 0)
+  start_step: 0
+  resume_from: auto
+schedule:
+  completion: {video: 1.0, track: 0.75, action: 0.25}
+  shift: {video: 5.0, track: 5.0, action: 5.0}
+  mixture: {trajectory: 0.4, ordered_independent: 0.4, independent: 0.0, clean_fastest: 0.15, clean_all_but_slowest: 0.05}
+  inference_rounds: 16
+data:
+  spec: {video_channels: 48, video_frames: 3, video_height: 18, video_width: 32, track_channels: 48, track_frames: 3,
+         track_height: 18, track_width: 32, kappa: 4, token_patch: [2, 2], action_horizon: 32, action_dim: 80,
+         proprio_dim: 80, text_dim: 4096, max_text_len: 256}
+  human:
+    components:
+      - name: kling_hand
+        kind: kling
+        weight: 0.28
+        kling: {mode: track, parquet: /ytech_milm_intern/danglingwei/datas/KlingHumanEgo20M/KlingHumanEgo20M_30fps_hi_handtrack_subset.parquet,
+                min_pairs: 4, camera_world_to_cam: true, camera_compensate: true, camera_use_translation: false}
+      - name: kling_video
+        kind: kling
+        weight: 0.12
+        kling: {mode: video, parquet: /ytech_milm_intern/danglingwei/datas/KlingHumanEgo20M/KlingHumanEgo20M_30fps_hi_with_hands.parquet}
+      - name: ig10k_human
+        kind: ig10k
+        weight: 0.24
+        ig10k: {profile: human, split: train, val_episodes_per_task: 2, samples_per_episode: 4}
+      - name: ig10k_robot
+        kind: ig10k
+        weight: 0.36
+        ig10k: {profile: robot, split: train, val_episodes_per_task: 2, samples_per_episode: 4}
+    val:       {profile: human, split: val, val_episodes_per_task: 2, samples_per_episode: 1}
+    val_robot: {profile: robot, split: val, val_episodes_per_task: 2, samples_per_episode: 1}
+    val_batches: 4                 # 16 ranks x 4 x 16 = 1024 held-out windows per split
+  human_encoder: {wan_path: /m2v_intern/_public_models/Wan-AI/Wan2.2-TI2V-5B-Diffusers, depth_min_m: 0.2, depth_max_m: 1.6,
+                  token_patch: 2, max_text_len: 256, dtype: bf16}
+  batch_size: 16                     # 16 GPUs x 16 = 256 windows per step
+  num_workers: 8
+training:
+  max_steps: 30000                   # 7.7M windows; ~14 s/step -> ~5 days
+  groups:
+    video:   {lr: 1.0e-5, freeze_steps: 1000, ramp_steps: 2000}   # frozen while the Action / reader / embodiment token settle; 3e-7 -> 1e-6 at step 2008 (= Alpha's cosine floor lr_min 0.01 x 1e-4); 1e-6 -> 1e-5 at step 8434 (2026-09-29): the Video expert never adapted to human ego video (Kling PSNR 12-14 since step 0, sampled futures = first frame)
+    track:   {lr: 1.0e-5, freeze_steps: 0, ramp_steps: 500}    # 3e-6 -> 1e-5 at step 2008 (2026-09-28): val/track sat at 0.40 vs 0.38 at the end of stage 1
+    action:  {lr: 1.0e-5, freeze_steps: 500, ramp_steps: 1500}    # 3e-6 -> 1e-5 at step 2008: the Foundation action prior did not transfer to Realman (initial loss 1.9), it learns a new embodiment
+    focus:   {lr: 1.0e-4}                                          # reader, compact reads, progress heads, embodiment token
+    proprio: {lr: 1.0e-6, freeze_steps: 500, ramp_steps: 1500}
+  weight_decay: 0.01
+  betas: [0.9, 0.95]
+  grad_clip: 1.0
+  lr_schedule: constant
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: true                  # shard inside a node, replicate across nodes (TCP inter-node links)
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 1               # per-GPU batch is the cheaper way to 256 windows/step (all-gather amortised)
+  dense_to_compact_steps: 6000       # Action starts with Alpha's dense future reading, annealed to compact
+  dense_to_compact_max_bias: 6.0
+  log_every: 10
+  checkpoint_every: 0
+  checkpoint_every_minutes: 60
+  keep_last: 5
+  visualize: true
+  visualize_samples: 2
+  visualize_rounds: 16
+  eval_every: 1000
+  seed: 42
+  loss: {video: 1.0, track: 1.0, camera: 0.1,   # track 1.0 (not 0.2): with Video at 3e-7 its loss otherwise dominates the Track expert's gradient (stage 1)
+         camera_translation: 0.0, progress: 0.05, action: 1.0, unfold: 0.1, role: 0.1,
+         condition: 0.01}
+  dropout: {video_only: 0.15, track_only: 0.10, both: 0.05, action_text: 0.30, action_proprio: 0.30}

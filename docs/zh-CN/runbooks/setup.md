@@ -22,8 +22,8 @@ cp configs/lab.example.yaml configs/lab.yaml
 ```
 
 编辑不提交的 `configs/lab.yaml`：填写机器人地址、夹爪 `/dev/serial/by-id/...`、两台
-相机序列号、home TCP和数据根目录。RoboTwin由 `robotwin.lock` 固定版本并下载到被
-忽略的 `.third_party/RoboTwin`，不需要手工复制。
+相机序列号、home TCP和数据根目录。RoboTwin源码已经随主仓库跟踪在
+`.third_party/RoboTwin`，上游基线固定于 `robotwin.lock`；bootstrap校验已含补丁的源码，不再另行克隆。
 
 已有环境更新：
 

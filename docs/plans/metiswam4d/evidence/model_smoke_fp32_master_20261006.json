@@ -1,0 +1,44 @@
+{
+  "status": "passed",
+  "scope": "native tiny Video + Action; diagnostic pixel pooling, NOT a pretrained VAE",
+  "uses_real_episode": true,
+  "device": "cuda",
+  "dtype": "bfloat16",
+  "trainable_dtype": "float32",
+  "learning_rate": 1e-05,
+  "gradient_checkpointing": true,
+  "torch": "2.4.1+cu121",
+  "source_sha256": "8d5b4cce0ef1ef594f1728914b83afc04e58f59866c0a0497fcde57f31129be3",
+  "steps": 8,
+  "losses": [
+    1.775494933128357,
+    1.676268458366394,
+    1.7443294525146484,
+    1.9125659465789795,
+    1.90834641456604,
+    1.7085602283477783,
+    1.9463794231414795,
+    1.7816475629806519
+  ],
+  "frozen_before_sha256": "634ae81c0e6952489782e00eddfe0d7f3734ade61bfedeac8d0107b1fc987fba",
+  "frozen_after_sha256": "634ae81c0e6952489782e00eddfe0d7f3734ade61bfedeac8d0107b1fc987fba",
+  "updated_parameters": 70,
+  "trainable_groups": [
+    "action",
+    "proprio"
+  ],
+  "image_perturbation_max_action_change": 0.003789663314819336,
+  "save_reload_exact": true,
+  "physical_action_shape": [
+    1,
+    50,
+    7
+  ],
+  "pi05_action_shape": [
+    1,
+    50,
+    14
+  ],
+  "elapsed_s": 1.4477428519994646,
+  "robot_connected": false
+}

@@ -2,50 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# shellcheck disable=SC1091
-source "${PROJECT_ROOT}/robotwin.lock"
-
-VENDOR_ROOT="${PROJECT_ROOT}/.third_party"
-ROBOTWIN_ROOT="${VENDOR_ROOT}/RoboTwin"
-PATCH_FILE="${PROJECT_ROOT}/integrations/robotwin/patches/0001-act-normalize-num-queries.patch"
-PI05_PATCH_FILE="${PROJECT_ROOT}/integrations/pi05/patches/0001-config-import.patch"
-PI05_IO_PATCH_FILE="${PROJECT_ROOT}/integrations/pi05/patches/0002-orbax-callback.patch"
-PI05_DOWNLOAD_PATCH_FILE="${PROJECT_ROOT}/integrations/pi05/patches/0003-propagate-download-errors.patch"
-
-mkdir -p "${VENDOR_ROOT}"
-fresh_clone=false
-if [[ ! -d "${ROBOTWIN_ROOT}/.git" ]]; then
-  git clone --filter=blob:none "${ROBOTWIN_REPOSITORY}" "${ROBOTWIN_ROOT}"
-  fresh_clone=true
-fi
-
-if [[ "${fresh_clone}" == false && -n "$(git -C "${ROBOTWIN_ROOT}" status --porcelain)" ]]; then
-  if ! git -C "${ROBOTWIN_ROOT}" apply --reverse --check "${PATCH_FILE}" >/dev/null 2>&1; then
-    echo "Refusing to replace a modified RoboTwin checkout: ${ROBOTWIN_ROOT}" >&2
-    exit 1
-  fi
-fi
-
-git -C "${ROBOTWIN_ROOT}" fetch origin "${ROBOTWIN_COMMIT}"
-git -C "${ROBOTWIN_ROOT}" checkout --detach "${ROBOTWIN_COMMIT}"
-
-if git -C "${ROBOTWIN_ROOT}" apply --check "${PATCH_FILE}" >/dev/null 2>&1; then
-  git -C "${ROBOTWIN_ROOT}" apply "${PATCH_FILE}"
-fi
-for pi05_patch in "${PI05_PATCH_FILE}" "${PI05_IO_PATCH_FILE}" "${PI05_DOWNLOAD_PATCH_FILE}"; do
-  if git -C "${ROBOTWIN_ROOT}" apply --check "${pi05_patch}" >/dev/null 2>&1; then
-    git -C "${ROBOTWIN_ROOT}" apply "${pi05_patch}"
-  elif ! git -C "${ROBOTWIN_ROOT}" apply --reverse --check "${pi05_patch}" >/dev/null 2>&1; then
-    echo "pi05 compatibility patch conflicts; preserve local changes and inspect the checkout." >&2
-    exit 1
-  fi
-done
-
-actual_commit="$(git -C "${ROBOTWIN_ROOT}" rev-parse HEAD)"
-if [[ "${actual_commit}" != "${ROBOTWIN_COMMIT}" ]]; then
-  echo "RoboTwin commit mismatch: expected ${ROBOTWIN_COMMIT}, got ${actual_commit}" >&2
-  exit 1
-fi
-
-echo "RoboTwin ready: ${ROBOTWIN_ROOT} @ ${actual_commit}"
-echo "Local adapter patch applied; upstream checkout remains ignored by this repository."
+# The patched upstream source now ships in this repository, not a nested clone.
+# Run directly from src so this check needs only Python's standard library.
+PYTHONPATH="${PROJECT_ROOT}/src${PYTHONPATH:+:${PYTHONPATH}}" \
+  "${PYTHON_BIN:-python3}" -m ur5e_real.vendor RoboTwin

@@ -103,7 +103,7 @@ def test_native_mask_loss_and_checkpoint_guard(tmp_path):
     from pathlib import Path
     from ur5e_real.adapters.metiswam4d.checkpoint import load, save
     from ur5e_real.adapters.metiswam4d.contract import VERSION
-    from ur5e_real.adapters.metiswam4d.native import build_model, load_source, model_config
+    from ur5e_real.adapters.metiswam4d.native import build_model, load_source, model_config, training_precision
     from ur5e_real.adapters.metiswam4d.policy import ActionPolicy
 
     source_path = Path(__file__).resolve().parents[1] / ".third_party/MetisWAM4D"
@@ -112,7 +112,18 @@ def test_native_mask_loss_and_checkpoint_guard(tmp_path):
     source = load_source(source_path)
     torch.set_num_threads(2)
     config = model_config(tiny=True)
-    model = build_model(config)
+    model = training_precision(build_model(config), device="cpu", dtype=torch.bfloat16)
+    parameter = next(p for p in model.parameters() if p.requires_grad)
+    assert parameter.dtype == torch.float32
+    assert next(model.video.parameters()).dtype == torch.bfloat16
+    with torch.no_grad():
+        parameter.view(-1)[0] = 0.1
+    optimizer = torch.optim.AdamW([parameter], lr=1e-5)
+    parameter.grad = torch.ones_like(parameter)
+    optimizer.step()
+    optimizer.zero_grad(set_to_none=True)
+    assert parameter.view(-1)[0].item() < 0.1 - 5e-6
+    assert optimizer.state[parameter]["exp_avg"].dtype == torch.float32
     state, action = np.zeros((1, 7), np.float32), np.zeros((1, 50, 7), np.float32)
     valid = np.zeros((1, 50), bool)
     valid[:, :2] = True
@@ -127,6 +138,11 @@ def test_native_mask_loss_and_checkpoint_guard(tmp_path):
     contract = {"version": VERSION, "fps": 10, "horizon": 50, "slots": list(SLOTS), "stats": stats}
     path = tmp_path / "tiny.pt"
     save(path, model, config, contract, source)
+    restored, metadata = load(path, source, allow_tiny=True)
+    assert metadata["trainable_dtype"] == "float32"
+    for before, after in zip(model.parameters(), restored.model.parameters()):
+        assert before.dtype == after.dtype
+        torch.testing.assert_close(before, after, rtol=0, atol=0)
     with pytest.raises(ValueError, match="diagnostic"):
         load(path, source)
     with pytest.raises(ValueError, match="source differs"):

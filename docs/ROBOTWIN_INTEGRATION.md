@@ -4,21 +4,22 @@
 
 ## Location and ownership
 
-`scripts/bootstrap_robotwin.sh` clones the repository named in `robotwin.lock`
-into the ignored `.third_party/RoboTwin` directory and checks out commit
-`210720340637cb4619283b295dde4cdd807c9e66`.
+RoboTwin source is tracked directly in `.third_party/RoboTwin`, based on
+`210720340637cb4619283b295dde4cdd807c9e66` plus the four integration patches.
+`scripts/bootstrap_robotwin.sh` verifies `integrations/vendor_sources.lock.json`;
+it no longer clones a nested repository.
 
 ```text
 UR5e_RoboTwin_Real (tracked, owned here)
 ├── hardware / control / collection / data
 ├── adapters/robotwin_act and adapters/robotwin_dp
 ├── integrations/robotwin (lock metadata and narrow patches)
-└── .third_party/RoboTwin (ignored, reproducible upstream checkout)
+└── .third_party/RoboTwin (tracked, patched source snapshot)
 ```
 
 Dependency direction is one-way: this repository's adapters may call RoboTwin;
 RoboTwin does not import hardware modules, and core hardware never imports
-RoboTwin. The upstream worktree and model payloads stay outside Git. Small training logs,
+RoboTwin. Upstream source is tracked; model weights and generated data stay outside Git. Small training logs,
 configs and checkpoint metadata are versioned through the [evidence archive](experiments/README.md);
 live runtime directories remain ignored.
 
@@ -61,7 +62,7 @@ and later decisions.
 |---|---|---|---|
 | socket `speedl` | Based on the first successful ACT execution; no PolyScope RTDE program | Clear braking at chunk boundaries | Retained for comparison |
 | RTDE input + servoJ | Smooth live motion with 500 Hz setpoints and robot-side lookahead | Holds the final setpoint during inference/gap | Default DP backend and explicit recorded-action comparison |
-| socket + batched `movel` | Proven for recorded trajectories | Open-loop segment timing | Default manual replay |
+| socket + batched `movel` | Proven for recorded trajectories | Open-loop segment timing | Explicit legacy replay |
 
 A six-step DP chunk can use either learned-policy backend without changing the
 policy output. Select `--backend socket` or `--backend rtde`; the executor never

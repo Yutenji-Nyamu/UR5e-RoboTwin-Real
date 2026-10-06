@@ -3,8 +3,9 @@
 [简体中文](README.zh-CN.md)
 
 `RoboTwin` is third-party upstream code. It is pinned to the exact historical
-version in `robotwin.lock` and cloned into `.third_party/RoboTwin` by
-`scripts/bootstrap_robotwin.sh`.
+version in `robotwin.lock` and tracked in `.third_party/RoboTwin`, including
+the four documented patches. `scripts/bootstrap_robotwin.sh` verifies the
+source hashes in `integrations/vendor_sources.lock.json` without network access.
 
 Our adapters live in `src/ur5e_real/adapters/robotwin_act` and
 `src/ur5e_real/adapters/robotwin_dp`. They add:
@@ -20,7 +21,7 @@ training/serving, and a separate joint servoJ driver. Its small vendor patches f
 config import, the pinned Orbax asset callback, and download error propagation;
 the model/loss remain native. See [pi05 implementation](../../docs/plans/pi05/IMPLEMENTATION.md).
 
-Do not commit `.third_party/RoboTwin` or model weights. Version small experiment logs,
+Track `.third_party/RoboTwin` source; keep model weights and generated data out of Git. Version small experiment logs,
 configs and checkpoint metadata through the [evidence archive](../../docs/experiments/README.md),
 not by tracking generated files inside the upstream tree. If upstream is upgraded, update the lock and revalidate
 the patch and the complete hardware runbook separately.

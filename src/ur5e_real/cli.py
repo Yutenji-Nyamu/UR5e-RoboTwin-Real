@@ -63,11 +63,15 @@ def _parser() -> argparse.ArgumentParser:
     replay.add_argument("source", help="session JSON, or an action CSV for legacy data")
     replay.add_argument("--gripper-events")
     replay.add_argument("--row-stride", type=int, default=5)
-    replay.add_argument("--backend", choices=("socket", "rtde"), default="socket")
+    replay.add_argument("--backend", choices=("socket", "rtde"), default="rtde")
     replay.add_argument("--max-segments", type=int)
     replay.add_argument("--chunks", type=int, default=0, help="RTDE chunks; 0 means the complete recording")
     replay.add_argument("--chunk-size", type=int, default=6)
-    replay.add_argument("--chunk-gap", type=float, default=0.08)
+    gap = replay.add_mutually_exclusive_group()
+    gap.add_argument("--inference-ms", dest="chunk_gap", type=lambda value: float(value) / 1000, default=0.08,
+                     help="simulated inference hold between RTDE chunks, in ms (default: 80; 0 disables)")
+    gap.add_argument("--chunk-gap", dest="chunk_gap", type=float, default=argparse.SUPPRESS,
+                     help="same RTDE hold in seconds; cannot combine with --inference-ms")
     replay.add_argument("--max-linear-speed", type=float, default=0.40)
     replay.add_argument("--servoj-lookahead", type=float, default=0.1)
     replay.add_argument("--servoj-gain", type=int, default=300)

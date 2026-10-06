@@ -2,8 +2,8 @@
 
 [English](../../runbooks/replay.md)
 
-这是独立的验机/物理回归链路。默认仍使用已经验证的socket批量 `movel`；新增的
-RTDE分支可把同一条记录作为6步chunk，送入DP推理完全相同的servoJ执行层。
+这是独立的验机/物理回归链路。默认使用 RTDE，把同一条记录作为6步chunk，
+送入DP推理共用的servoJ执行层。旧socket批量 `movel` 用 `--backend socket` 选择。
 
 ## 日常固定流程
 
@@ -41,11 +41,11 @@ ur5e-replay 20260903_123456 --execute
 ur5e-replay 20260903_123456
 ```
 
-然后初始化，并只执行第一个分段：
+然后初始化，并只执行第一个chunk：
 
 ```bash
 ur5e-replay-init
-ur5e-replay 20260903_123456 --max-segments 1 --execute
+ur5e-replay 20260903_123456 --chunks 1 --execute
 ```
 
 确认没有位姿跳变、错误旋转分支、碰撞风险或意外夹爪事件后，该轨迹以后才使用上面
@@ -53,26 +53,26 @@ ur5e-replay 20260903_123456 --max-segments 1 --execute
 
 ## RTDE chunk对照重播
 
-现有socket重播没有变化；只有显式传入 `--backend rtde` 才进入新分支。先看摘要：
+不传 `--backend` 即为 RTDE；旧 `--backend rtde` 写法仍可用。先看摘要：
 
 ```bash
-ur5e-replay latest --backend rtde
+ur5e-replay latest
 ```
 
 第一次只执行1个chunk：
 
 ```bash
 ur5e-replay-init
-ur5e-replay latest --backend rtde --chunks 1 --execute
+ur5e-replay latest --chunks 1 --execute
 ```
 
 确认后完整执行：
 
 ```bash
-ur5e-replay latest --backend rtde --execute
+ur5e-replay latest --inference-ms 250 --execute
 ```
 
-与默认重播一样，正式进入记录动作前仍用低速socket `moveL`对齐第一帧；从第2帧目标
+正式进入记录动作前仍用低速socket `moveL`对齐第一帧；从第2帧目标
 开始才进入共用RTDE执行层。
 
 默认配置与当前DP推理执行层一致：记录的10 Hz TCP从第2帧开始作为动作，每6步一组，
@@ -85,15 +85,19 @@ ur5e-replay latest --backend rtde --execute
 研究不同chunk边界时可显式覆盖：
 
 ```bash
-ur5e-replay latest --backend rtde \
-  --chunk-size 6 --chunk-gap 0.08 --max-linear-speed 0.40 --execute
+ur5e-replay latest --inference-ms 250 --execute
 ```
 
-例如 `--chunk-gap 0` 表示记录动作连续衔接、不模拟推理；`--chunk-gap 0.8` 可模拟较慢
-推理。除上述起点对齐外，该分支不加载模型或相机；在动作执行边界下，它与在线推理
+`--inference-ms` 单位是毫秒，默认 **80**；250 表示每两个chunk之间保持末设点250毫秒，
+0表示不添加模拟推理等待。不是每个动作点都等待，首个chunk之前和最后一个之后也不额外等待。
+等待时后台RTDE流继续发送末设点。这仅模拟耗时，不模拟模型输出。
+旧秒单位参数 `--chunk-gap 0.25` 等价于 `--inference-ms 250`，两者不能同时传；数值必须有限且非负。
+
+旧socket分段重播使用 `--backend socket`；`--max-segments` 仅属于socket，RTDE限次数用 `--chunks`。
+除上述起点对齐外，该分支不加载模型或相机；在动作执行边界下，它与在线推理
 的区别就是“动作来自记录还是模型”。
 
 ## 边界
 
-默认重播验证RTDE录制、socket运动、旋转向量连续性和夹爪事件。RTDE对照分支另外
-验证与策略共用的servoJ执行层及chunk时序，但不加载或评价策略模型。
+默认重播验证录制TCP动作、共用RTDE servoJ执行层、旋转向量连续性、chunk时序和夹爪事件，
+不加载或评价策略模型。本次参数改动已做dry-run和mock执行验证，未重新运行实体重播。

@@ -230,16 +230,18 @@ def replay() -> int:
 
     parser = argparse.ArgumentParser(prog="ur5e-replay", description="preview or replay one recorded trajectory")
     parser.add_argument("session", help="run ID, session JSON path, or 'latest'")
-    parser.add_argument("--backend", choices=("socket", "rtde"), default="socket")
+    parser.add_argument("--backend", choices=("socket", "rtde"), default="rtde")
     parser.add_argument("--max-segments", type=int)
     parser.add_argument("--chunks", type=int, default=0, help="RTDE chunks to run; 0 means the complete recording")
     parser.add_argument("--chunk-size", type=int, default=6)
-    parser.add_argument(
-        "--chunk-gap",
-        type=float,
+    gap = parser.add_mutually_exclusive_group()
+    gap.add_argument(
+        "--inference-ms", dest="chunk_gap", type=lambda value: float(value) / 1000,
         default=0.08,
-        help="RTDE hold between chunks, simulating DP inference time in seconds (default: 0.08)",
+        help="simulated inference hold between RTDE chunks, in milliseconds (default: 80; 0 disables)",
     )
+    gap.add_argument("--chunk-gap", dest="chunk_gap", type=float, default=argparse.SUPPRESS,
+                     help="same RTDE hold in seconds; cannot combine with --inference-ms")
     parser.add_argument("--max-linear-speed", type=float, default=0.40)
     parser.add_argument("--servoj-lookahead", type=float, default=0.1)
     parser.add_argument("--servoj-gain", type=int, default=300)

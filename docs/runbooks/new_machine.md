@@ -145,7 +145,7 @@ this driver has no measured width/force feedback.
 2. Record a short `ur5e-collect pick_place_cube --preview --note "new cell commissioning"`;
    use c/o/q, then s/f/a. Inspect `ur5e-real sessions --config configs/lab.yaml`:
    schema v3, q/qd columns, both cameras and gripper events must be present.
-3. Preview `ur5e-replay RUN_ID --max-segments 1`; prepare home/scene, then add
+3. Preview `ur5e-replay RUN_ID --chunks 1`; prepare home/scene, then add
    `--execute`. Socket remains the manual default. Separately preview/test
    `ur5e-replay RUN_ID --backend rtde --chunks 1` for the500Hz TCP chain; it is not
    a joint-policy test.

@@ -60,13 +60,13 @@ path and gripper events. For an unvalidated trajectory, first omit `--execute`
 to inspect its summary; see the [replay runbook](replay.md) for segmented testing.
 
 For a comparison through the same RTDE servoJ executor as DP inference, run
-`ur5e-replay latest --backend rtde --execute` explicitly. Socket remains the
-default. The [replay runbook](replay.md) gives the one-chunk first test and
+`ur5e-replay latest --execute`. RTDE is now the default; add
+`--inference-ms 250` to simulate a 250 ms inference gap. The [replay runbook](replay.md) gives the one-chunk first test and
 timing overrides.
 
 ## Boundary
 
 Collection and manual replay form an independent commissioning loop. Routine
-replay defaults to socket `movel`. RTDE comparison replay and Diffusion Policy
+replay defaults to RTDE. Recorded replay and Diffusion Policy
 inference share the same servoJ action executor; one receives recorded actions
 and the other receives model actions.

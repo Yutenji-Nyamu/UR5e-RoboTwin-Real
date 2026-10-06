@@ -3,7 +3,7 @@
 [简体中文](../zh-CN/runbooks/replay.md)
 
 This is an independent commissioning and physical-regression path. The verified
-grouped socket `movel` route remains the default. An explicit RTDE branch can
+RTDE chunk route is the default. It can
 feed the same recording as six-action chunks into the exact servoJ execution
 layer used by DP inference.
 
@@ -52,7 +52,7 @@ Then initialize and execute only the first segment:
 
 ```bash
 ur5e-replay-init
-ur5e-replay 20260903_123456 --max-segments 1 --execute
+ur5e-replay 20260903_123456 --chunks 1 --execute
 ```
 
 Use the routine full replay only after confirming no pose jump, wrong rotation
@@ -60,27 +60,26 @@ branch, collision risk, or unexpected gripper event.
 
 ## RTDE chunk comparison replay
 
-The existing socket replay is unchanged. Only `--backend rtde` selects the new
-branch. Preview its plan first:
+RTDE is selected when `--backend` is omitted. Preview its plan first:
 
 ```bash
-ur5e-replay latest --backend rtde
+ur5e-replay latest
 ```
 
 Execute one chunk for the first live check:
 
 ```bash
 ur5e-replay-init
-ur5e-replay latest --backend rtde --chunks 1 --execute
+ur5e-replay latest --chunks 1 --execute
 ```
 
 Then run the complete recording:
 
 ```bash
-ur5e-replay latest --backend rtde --execute
+ur5e-replay latest --inference-ms 250 --execute
 ```
 
-As in default replay, a low-speed socket `moveL` aligns the first recorded frame
+A low-speed socket `moveL` aligns the first recorded frame
 before trajectory execution. The shared RTDE executor begins with the second
 frame target.
 
@@ -97,19 +96,25 @@ inference `GripperPolicy`.
 Override the chunk boundary explicitly for experiments:
 
 ```bash
-ur5e-replay latest --backend rtde \
-  --chunk-size 6 --chunk-gap 0.08 --max-linear-speed 0.40 --execute
+ur5e-replay latest --inference-ms 250 --execute
 ```
 
-For example, `--chunk-gap 0` joins recorded actions continuously, while
-`--chunk-gap 0.8` imitates slower inference. Apart from the start alignment,
+`--inference-ms` specifies the hold **between chunks**, not per action: default
+80 ms, 250 for a 250 ms model, or 0 for continuous replay. There is no extra hold
+before the first or after the last chunk. The background RTDE stream keeps the
+last setpoint throughout the hold. This simulates elapsed time, not model output.
+The old seconds option `--chunk-gap 0.25` is equivalent to `--inference-ms 250`;
+the two cannot be combined. Values must be finite and nonnegative.
+
+Use `--backend socket` for the previous grouped `movel` path; `--max-segments`
+belongs to that backend, while `--chunks` limits RTDE replay. Apart from the start alignment,
 this branch loads neither model nor cameras. Below the action boundary, its
 difference from online inference is whether actions come from the recording or
 the model.
 
 ## Boundary
 
-Default replay validates RTDE recording, socket motion, rotation-vector
-continuity, and gripper events. The RTDE comparison branch additionally checks
-the policy-shared servoJ executor and chunk timing, but it does not load or
-evaluate a policy model.
+Default replay validates recorded TCP actions, the shared RTDE servoJ executor,
+rotation-vector continuity, chunk timing, and gripper events. It does not load
+or evaluate a policy model. The new options were checked with dry runs and mock
+execution; no new physical replay was performed for this change.

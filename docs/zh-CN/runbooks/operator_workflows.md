@@ -71,11 +71,11 @@
 程序会低速对齐轨迹起点，然后完整执行机械臂路径和夹爪事件。第一次重播未知轨迹
 时，可先去掉 `--execute` 查看摘要；更完整的分段验证方法见[重播流程](replay.md)。
 
-需要用与DP推理相同的RTDE servoJ执行层对照时，显式运行
-`ur5e-replay latest --backend rtde --execute`；默认socket流程不变。首次只跑一个chunk
+默认使用与DP推理相同的RTDE servoJ执行层：
+`ur5e-replay latest --execute`；加 `--inference-ms 250` 模拟250毫秒推理。首次只跑一个chunk
 的方法和可调时序参数见[重播流程](replay.md)。
 
 ## 两条流程的边界
 
-采集与手动重播已经形成独立闭环。日常默认重播使用socket `movel`；RTDE对照重播和
+采集与手动重播已经形成独立闭环。日常默认重播使用RTDE；记录动作重播和
 Diffusion Policy推理复用同一个servoJ动作执行层，但前者的动作来自记录、后者来自模型。

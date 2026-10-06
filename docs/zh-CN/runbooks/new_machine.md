@@ -125,8 +125,8 @@ python examples/smoke/freedrive.py stop --config configs/lab.yaml --execute
 2. `ur5e-collect pick_place_cube --preview --note "new cell commissioning"`，先短录一条，
    `c/o/q`操作，结束后`s/f/a`标注。查`ur5e-real sessions --config configs/lab.yaml`；
    CSV须有`actual_q_0..5`/`actual_qd_0..5`，manifest为v3，有双图与夹爪事件。
-3. `ur5e-replay RUN_ID --max-segments 1`先预览；准备原位与场景后才加`--execute`。
-   socket是手动重播默认。独立500Hz TCP链可用`ur5e-replay RUN_ID --backend rtde --chunks 1`
+3. `ur5e-replay RUN_ID --chunks 1`先预览；准备原位与场景后才加`--execute`。
+   RTDE是手动重播默认。独立500Hz TCP链可用`ur5e-replay RUN_ID --backend rtde --chunks 1`
    预览，再单独执行；这仍不是π0.5的joint策略验证。
 4. DP路径按[训练](train.md)/[推理](infer.md)；π0.5路径按下一节及[π0.5操作](../../plans/pi05/USAGE.md)。
    新现场先选择干净5条joint示教，尾部至少保留最后open后1秒；不能把旧TCP-only数据改名当joint。

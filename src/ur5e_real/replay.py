@@ -30,7 +30,7 @@ class ReplayConfig:
     row_stride: int = 5
     max_segments: int | None = None
     execute: bool = False
-    backend: str = "socket"
+    backend: str = "rtde"
     enable_gripper: bool = True
     go_to_start: bool = True
     acceleration: float = 0.4
@@ -327,8 +327,10 @@ def _run_socket_replay(cfg: ReplayConfig) -> None:
 def _run_rtde_replay(cfg: ReplayConfig) -> None:
     if cfg.policy_hz <= 0:
         raise ValueError("policy_hz must be positive")
-    if cfg.chunk_gap_s < 0:
-        raise ValueError("chunk_gap_s must be non-negative")
+    if not math.isfinite(cfg.chunk_gap_s) or cfg.chunk_gap_s < 0:
+        raise ValueError("inference delay must be finite and non-negative (--inference-ms / --chunk-gap)")
+    if cfg.max_segments is not None:
+        raise ValueError("--max-segments is for --backend socket; use --chunks to limit RTDE replay")
     if cfg.rtde_max_linear_velocity <= 0:
         raise ValueError("rtde_max_linear_velocity must be positive")
 
@@ -359,7 +361,7 @@ def _run_rtde_replay(cfg: ReplayConfig) -> None:
     )
     print(
         f"backend: rtde; chunks: {len(chunks)} (size={cfg.chunk_size}); "
-        f"action_dt={1.0 / cfg.policy_hz:.3f}s; chunk_gap={cfg.chunk_gap_s:.3f}s; "
+        f"action_dt={1.0 / cfg.policy_hz:.3f}s; inference_ms={cfg.chunk_gap_s * 1000:g}; "
         f"trajectory_time={estimated_s:.2f}s; execute: {cfg.execute}"
     )
     if not cfg.execute:

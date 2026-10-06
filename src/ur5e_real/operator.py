@@ -68,7 +68,8 @@ def collect() -> int:
     parser.add_argument("--note")
     parser.add_argument("--preview", action=argparse.BooleanOptionalAction, default=None)
     parser.add_argument("--save-video", action=argparse.BooleanOptionalAction, default=None)
-    parser.add_argument("--depth", action="store_true", help="also record aligned head/wrist depth and calibration")
+    parser.add_argument("--depth", action=argparse.BooleanOptionalAction, default=True,
+                        help="record aligned head/wrist depth and calibration (default: enabled; --no-depth for RGB only)")
     args = parser.parse_args()
 
     _enter_repository()

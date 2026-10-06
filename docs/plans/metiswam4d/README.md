@@ -9,7 +9,7 @@ Track4D 和未来视频生成暂不启用。手动重播、现有 π0.5 流程�
 | 内容 | 结果 |
 | --- | --- |
 | 源码 | 用户下载的 ZIP 已提取到 `.third_party/MetisWAM4D`，341 个普通文件；原 ZIP 另存 `.third_party/MetisWAM4D.source.zip`。无需维护 Gitee remote。 |
-| 深度采集 | `ur5e-collect block_drawer_close --note "1005" --depth`；默认 RGB 路径不变。 |
+| 深度采集 | 采集默认RGB-D，无需额外参数；`--no-depth`只采RGB，原RGB路径不变。 |
 | 硬件验证 | 双 D435i 60 秒、600 组 RGB-D，1,200 张深度 PNG 无损回读通过；未连接机器人。 |
 | 数据转换 | 两条 success 示教生成 562 个 10 Hz/H50 窗口；最新版本318训练/244验证，补齐可搬迁索引和真机契约。 |
 | 模型切口 | 冻结 Video 作为当前 RGB 条件，训练 Action/proprio；物理 joint7，内部有效槽位 10–16，外部可转 π0.5 joint14。 |

@@ -70,8 +70,9 @@ class CollectionTest(unittest.TestCase):
     def run_capture(self, keys, *, record_depth=False):
         self.keys.poll.side_effect = keys
         self.rtde.receive_state.side_effect = [robot_state(i) for i in range(len(keys) + 1)]
+        options = {} if record_depth is None else {"record_depth": record_depth}
         return run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open",
-                              record_depth=record_depth)
+                              **options)
 
     def depth_camera(self):
         camera = self.stack.enter_context(patch("ur5e_real.collection.session.DualRgbdCamera")).return_value
@@ -88,11 +89,11 @@ class CollectionTest(unittest.TestCase):
         camera.read.return_value = RgbdPair(self.pair.head, self.pair.wrist, depth, depth, meta)
         return camera
 
-    def test_depth_capture_preserves_uint16_and_links_to_unchanged_sync(self):
+    def test_default_capture_preserves_depth_uint16_and_links_to_unchanged_sync(self):
         import cv2
 
         camera = self.depth_camera()
-        manifest = load_manifest(self.run_capture(["c", "o", "c", "q"], record_depth=True))
+        manifest = load_manifest(self.run_capture(["c", "o", "c", "q"], record_depth=None))
         self.assertEqual(manifest["schema_version"], 3)
         self.assertEqual(manifest["depth_recording"]["complete_pairs"], 3)
         self.assertEqual(manifest["counts"]["frame_pairs"], 3)
@@ -152,6 +153,7 @@ class CollectionTest(unittest.TestCase):
         manifest = load_manifest(self.run_capture(["c", "c", "o", *([None] * 10), "q"]))
         self.assertEqual(manifest["schema_version"], 3)
         self.assertEqual(manifest["recording_status"], "completed")
+        self.assertNotIn("depth_recording", manifest)  # Explicit RGB-only path stays available.
         self.assertEqual(manifest["outcome"], "unreviewed")
         self.assertEqual(manifest["code_commit"], "test-commit")
         self.assertEqual(manifest["state_recording"]["joint_source"], "actual_q")
@@ -217,7 +219,7 @@ class CollectionTest(unittest.TestCase):
     def test_invalid_initial_state_stops_before_freedrive_or_gripper(self):
         self.rtde.receive_state.side_effect = RuntimeError("invalid RTDE joint/TCP state: missing actual_q")
         with self.assertRaisesRegex(RuntimeError, "missing actual_q"):
-            run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open")
+            run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open", record_depth=False)
         manifest = load_manifest(self.manifest_path)
         self.assertEqual(manifest["recording_status"], "failed")
         self.assertEqual(manifest["counts"]["rtde_samples"], 0)
@@ -234,7 +236,7 @@ class CollectionTest(unittest.TestCase):
         ]
         self.keys.poll.return_value = "c"
         with self.assertRaisesRegex(RuntimeError, "invalid RTDE"):
-            run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open")
+            run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open", record_depth=False)
         manifest = load_manifest(self.manifest_path)
         self.assertEqual(manifest["recording_status"], "failed")
         self.assertEqual(manifest["counts"]["rtde_samples"], 1)
@@ -246,13 +248,13 @@ class CollectionTest(unittest.TestCase):
     def test_nonmonotonic_controller_time_is_rejected(self):
         self.rtde.receive_state.side_effect = [robot_state(0), robot_state(0)]
         with self.assertRaisesRegex(RuntimeError, "controller time did not advance"):
-            run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open")
+            run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open", record_depth=False)
         self.assertEqual(load_manifest(self.manifest_path)["recording_status"], "failed")
         self.assert_resources_closed()
 
     def test_keyboard_interrupt_finalizes_without_release_claim(self):
         self.rtde.receive_state.side_effect = [robot_state(0), KeyboardInterrupt()]
-        path = run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open")
+        path = run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open", record_depth=False)
         manifest = load_manifest(path)
         self.assertEqual(manifest["recording_status"], "interrupted")
         self.assertIsNone(manifest["quality"]["release_tail_complete"])
@@ -264,10 +266,25 @@ class CollectionTest(unittest.TestCase):
         path.parent.mkdir(parents=True)
         path.write_text("original recording\n", encoding="utf-8")
         with self.assertRaisesRegex(FileExistsError, "refusing to overwrite"):
-            run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open")
+            run_collection(self.cfg, task="pick_place_cube", initial_gripper_state="open", record_depth=False)
         self.assertEqual(path.read_text(encoding="utf-8"), "original recording\n")
         self.camera.start.assert_not_called()
         self.rtde.connect.assert_not_called()
+
+    def test_both_collection_commands_default_to_depth_and_allow_rgb_only(self):
+        from ur5e_real import cli, operator
+
+        for flags, expected in (([], True), (["--depth"], True), (["--no-depth"], False)):
+            with self.subTest(flags=flags), patch("ur5e_real.collection.session.run_collection") as capture, \
+                    patch("ur5e_real.cli.load_config", return_value=self.cfg), \
+                    patch("ur5e_real.operator.load_config", return_value=self.cfg), \
+                    patch("ur5e_real.operator._enter_repository"), patch("builtins.input", return_value=""):
+                cli.main(["collect", "--config", "unused", "--task", "block_drawer",
+                          "--initial-gripper", "open", *flags])
+                self.assertIs(capture.call_args.kwargs["record_depth"], expected)
+                with patch("sys.argv", ["ur5e-collect", "block_drawer", *flags]):
+                    operator.collect()
+                self.assertIs(capture.call_args.kwargs["record_depth"], expected)
 
 
 if __name__ == "__main__":

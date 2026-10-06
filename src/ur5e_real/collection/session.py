@@ -43,7 +43,7 @@ def run_collection(
     note: str | None = None,
     preview: bool | None = None,
     save_video: bool | None = None,
-    record_depth: bool = False,
+    record_depth: bool = True,
 ) -> Path:
     import cv2
 

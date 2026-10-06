@@ -40,15 +40,16 @@ press Enter to review later. Add a setup note when needed:
 ur5e-collect pick_block_bowl --note "red block, trial 1"
 ```
 
-## Optional depth
+## Depth recording (default)
 
-Add `--depth` to record aligned depth from both D435i cameras:
+Both D435i cameras record aligned depth by default. No extra flag is needed:
 
 ```bash
-ur5e-collect block_drawer_close --note "1005" --depth
+ur5e-collect block_drawer --note "1006 1 layer"
 ```
 
-The default remains RGB only. Depth mode adds `head_depth/` and `wrist_depth/`
+Use `--no-depth` for RGB-only collection; explicit `--depth` remains supported.
+This also applies to `ur5e-real collect`. Depth recording adds `head_depth/` and `wrist_depth/`
 16-bit PNGs, `camera_calibration.json`, and `rgbd_frames.csv` under the same camera
 session. Multiply each depth value by its camera's recorded scale to obtain meters;
 zero means invalid depth. Existing RGB paths and sync CSV columns remain unchanged,

@@ -18,6 +18,8 @@ ur5e-collect-init
 ur5e-collect pick_place_cube --note "可选的场景备注"
 ```
 
+采集默认同时记录双相机RGB和对齐深度；只采RGB时加 `--no-depth`。
+
 采集中按 `c` 闭合夹爪、`o` 打开夹爪、`q` 结束；随后输入 `s`、`f` 或 `a`，标记
 成功、失败或中止。记下终端显示的 `[RUN]` 编号；时间戳由程序自动生成，无需填写。
 

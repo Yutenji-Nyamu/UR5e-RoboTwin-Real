@@ -20,6 +20,8 @@ ur5e-collect-init
 ur5e-collect TASK --note "optional setup note"
 ```
 
+Collection includes aligned depth from both cameras by default; add `--no-depth` for RGB only.
+
 Use `c` to close the gripper, `o` to open it, and `q` to finish; then enter
 `s`, `f`, or `a` for success, failure, or aborted. Save the `[RUN]` ID printed by
 the command—the timestamp is generated automatically.

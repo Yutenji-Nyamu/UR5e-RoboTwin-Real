@@ -1,18 +1,18 @@
-# D435i 可选深度采集
+# D435i 默认深度采集
 
-更新：2026-10-06。`--depth` 已实现，两台 D435i 连续相机落盘实测通过。
+更新：2026-10-06。采集已改为默认RGB-D，`--no-depth`可只采RGB；两台D435i连续相机落盘实测通过。
 
 ## 使用
 
 按原流程完成 `ur5e-collect-init` 后：
 
 ```bash
-ur5e-collect block_drawer_close --note "1005" --depth
+ur5e-collect block_drawer --note "1006 1 layer"
 ```
 
-也支持 `ur5e-real collect ... --depth`。不传参数走原来的 `DualColorCamera`；
-不修改全局 YAML 开关。键盘、结果复核和原 RGB 文件/CSV 约定不变，深度不进入 MP4。
-`--depth` 成功启动会打印 `[DEPTH]`。相机失败会报错，不能静默降级为 RGB。
+同样适用于 `ur5e-real collect`。不传参数使用 `DualRgbdCamera`；显式 `--no-depth` 才使用 `DualColorCamera`。
+原 `--depth` 仍兼容，不修改全局YAML开关。键盘、结果复核和原 RGB 文件/CSV 约定不变，深度不进入 MP4。
+深度成功启动会打印 `[DEPTH]`。相机失败会报错，不能静默降级为 RGB。
 
 实现入口：[相机](../../../src/ur5e_real/hardware/rgbd.py)、
 [写入器](../../../src/ur5e_real/collection/depth.py)、

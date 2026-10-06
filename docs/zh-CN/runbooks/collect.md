@@ -39,13 +39,14 @@ ur5e-collect pick_block_bowl --note "red block, trial 1"
 
 ## 输出
 
-可选地增加两台 D435i 的深度记录：
+默认记录两台 D435i 的深度，无需额外传参：
 
 ```bash
-ur5e-collect block_drawer_close --note "1005" --depth
+ur5e-collect block_drawer --note "1006 1 layer"
 ```
 
-不传 `--depth` 仍只采 RGB。开启后，同一相机 session 下增加 `head_depth/`、
+需要只采RGB时加 `--no-depth`；原 `--depth` 仍兼容，`ur5e-real collect` 同样默认开启。
+同一相机 session 下增加 `head_depth/`、
 `wrist_depth/` 的 16 位 PNG，以及 `camera_calibration.json`、`rgbd_frames.csv`。
 深度对齐到各自 RGB；数值乘该相机保存的 depth scale 得到米，0 表示无效深度。
 原 RGB 路径、sync CSV 字段保持兼容，raw schema v3 增加独立版本的 `depth_recording` 扩展。

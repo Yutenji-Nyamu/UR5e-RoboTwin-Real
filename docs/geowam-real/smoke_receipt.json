@@ -13,5 +13,12 @@
   "grad_accumulation": 1,
   "fsdp_reshard_after_forward": false,
   "steady_step_seconds": 2.742,
-  "peak_allocated_gb": 64.223
+  "peak_allocated_gb": 64.223,
+  "cpu_prediction_decode": {
+    "state": "passed",
+    "tasks": 5,
+    "step": 3,
+    "source": "/data/chenyiteng/projects/geowam-real/runs/smoke_alpha_b2/vis/step_0000003/decode_status.json",
+    "image": "/data/chenyiteng/projects/geowam-real/runs/smoke_alpha_b2/initial_decoded_all_tasks.jpg"
+  }
 }

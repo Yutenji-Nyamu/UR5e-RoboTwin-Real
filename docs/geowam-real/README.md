@@ -2,6 +2,7 @@
 
 本分支 `codex/geowam-real-training` 记录深圳 2 机 GPU 6、7 的实现。主目录 `/data/chenyiteng/projects/geowam-real`。
 
+- [本轮完成情况](11_本轮完成情况.md)
 - [当前状态](00_STATUS.md)
 - [数据处理](01_数据处理规划.md)
 - [初始化与训练](02_初始化与训练规划.md)
@@ -20,3 +21,5 @@
 - [训练与拟合](08_TRAINING.md)
 
 - [模块初始化](09_INITIALIZATION.md)
+
+- [运行、预测图与交接](10_运行与交接.md)

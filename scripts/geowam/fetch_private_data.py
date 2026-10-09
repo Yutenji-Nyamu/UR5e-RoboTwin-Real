@@ -20,7 +20,7 @@ for item in repo.iterdir():
  target=dest/item.name
  if item.is_dir():shutil.copytree(item,target,dirs_exist_ok=True)
  elif item.is_file():shutil.copy2(item,target)
-state={};lock=threading.Lock();status=root/'runs/data-download-status.json'
+status=root/'runs/data-download-status.json';state=json.loads(status.read_text()) if status.exists() else {};lock=threading.Lock()
 def update(name,**fields):
  with lock:
   state.setdefault(name,{}).update(fields)
@@ -34,6 +34,7 @@ def get_signed(asset,offset=0):
   return urllib.request.urlopen(urllib.request.Request(location,headers={'Range':f'bytes={offset}-'}),timeout=60)
 def restore(item):
  name=item['name'];asset=remote[name];assert asset['size']==item['bytes']
+ if state.get(name,{}).get('state')=='complete' and (cache/name).exists():return
  archive=cache/name;partial=cache/(name+'.part');update(name,state='downloading',expected_bytes=item['bytes'],started=time.time())
  try:
   if not archive.exists() or archive.stat().st_size!=item['bytes']:
@@ -67,8 +68,10 @@ def restore(item):
     assert member.isfile() or member.isdir()
     if member.isfile():
      target.parent.mkdir(parents=True,exist_ok=True)
-     with tf.extractfile(member) as src,target.open('wb') as out:shutil.copyfileobj(src,out,1024*1024)
+     temp=target.with_name(target.name+'.extracting')
+     with tf.extractfile(member) as src,temp.open('wb') as out:shutil.copyfileobj(src,out,1024*1024)
+     temp.replace(target)
     else:target.mkdir(parents=True,exist_ok=True)
   update(name,state='complete',finished=time.time());print(name,'complete',flush=True)
  except Exception as e:update(name,state='error',error=type(e).__name__+': '+str(e).split('?')[0]);print(name,'error',type(e).__name__,flush=True)
-with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(restore,manifest['assets']))
+with concurrent.futures.ThreadPoolExecutor(max_workers=12) as pool:list(pool.map(restore,manifest['assets']))

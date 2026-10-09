@@ -1,0 +1,23 @@
+{
+  "state": "passed",
+  "time": 1791575865.4068499,
+  "episodes": 72,
+  "windows": 2405,
+  "manifest_sha256": "85abeafdcb1868d8deb0a5ef1f864439e46e0b34438258354de50c5d7e4865ed",
+  "visual_checks": [
+    "72 episodes raw RGB first/middle/end, both views",
+    "72 episode foreground/body/object first/middle/end",
+    "72 episode mid flow, measured depth and UVD",
+    "44 targeted correction frames across 12 episodes",
+    "box cube/box tracking role union reviewed for 14 episodes",
+    "worst six sampled video VAE reconstructions reviewed"
+  ],
+  "numerical_checks": [
+    "all 2405 tensor contracts and finite values",
+    "all action normalization round trips",
+    "known optical translation and metric-depth codec",
+    "five current-observation encodings: exact equality; future replacement difference zero"
+  ],
+  "aggregate_valid_foreground": 0.7993735058038787,
+  "aggregate_valid_objects": 0.8676473733046511
+}

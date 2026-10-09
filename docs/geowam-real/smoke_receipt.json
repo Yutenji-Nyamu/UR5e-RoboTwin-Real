@@ -1,0 +1,17 @@
+{
+  "state": "complete",
+  "resume_check": true,
+  "checkpoints": [
+    "step_0000002",
+    "step_0000003"
+  ],
+  "output_dir": "/data/chenyiteng/projects/geowam-real/runs/smoke_alpha_b2",
+  "resume_start_step": 2,
+  "completed_step": 3,
+  "batch_size_per_gpu": 2,
+  "world_size": 2,
+  "grad_accumulation": 1,
+  "fsdp_reshard_after_forward": false,
+  "steady_step_seconds": 2.742,
+  "peak_allocated_gb": 64.223
+}

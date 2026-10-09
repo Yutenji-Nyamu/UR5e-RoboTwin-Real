@@ -1,0 +1,206 @@
+name: structure_smoke_random_init
+output_dir: /data/chenyiteng/projects/geowam-real/runs/smoke_structure_b1_v1
+model:
+  experts:
+  - video
+  - track
+  - action
+  action_read: compact
+  video:
+    dim: 3072
+    ffn_dim: 14336
+    layers: 30
+    heads: 24
+    head_dim: 128
+    freq_dim: 256
+  track:
+    dim: 1024
+    ffn_dim: 4096
+    layers: 20
+    heads: 24
+    head_dim: 128
+    freq_dim: 256
+  action:
+    dim: 1024
+    ffn_dim: 4096
+    layers: 30
+    heads: 24
+    head_dim: 128
+    freq_dim: 256
+  latent_channels: 48
+  patch:
+  - 1
+  - 2
+  - 2
+  action_dim: 80
+  proprio_dim: 80
+  text_dim: 4096
+  focus:
+    d_read: 512
+    num_queries: 4
+    kappa: 4
+    read_layers: track_upper_half
+    feedback_to_track: false
+    spatial_kernel: adaptive
+    temporal_window: adaptive
+    gamma_init: 0.3
+    detach_world_hidden: false
+    video_window:
+    - 0
+    - 6
+    - 0
+    - 10
+  gradient_checkpointing: true
+  num_embodiments: 10
+init:
+  alpha_checkpoint: null
+  load_action_from_alpha: true
+  load_video_from_alpha: true
+  track:
+    mode: interpolate_from_video
+  initialize_from: null
+  resume_from: auto
+schedule:
+  completion:
+    video: 1.0
+    track: 0.75
+    action: 0.25
+  shift:
+    video: 5.0
+    track: 5.0
+    action: 5.0
+  mixture:
+    trajectory: 0.4
+    ordered_independent: 0.4
+    independent: 0.0
+    clean_fastest: 0.15
+    clean_all_but_slowest: 0.05
+  inference_rounds: 16
+data:
+  spec:
+    video_channels: 48
+    video_frames: 3
+    video_height: 24
+    video_width: 20
+    track_channels: 48
+    track_frames: 3
+    track_height: 16
+    track_width: 20
+    kappa: 4
+    token_patch:
+    - 2
+    - 2
+    action_horizon: 32
+    action_dim: 80
+    proprio_dim: 80
+    text_dim: 4096
+    max_text_len: 512
+  components:
+  - name: block_drawer
+    weight: 1.0
+    manifest: /data/chenyiteng/projects/geowam-real/runs/smoke_manifests/block_drawer.jsonl
+    modalities:
+    - video
+    - track
+    - action
+    embodiment: ur5e_single_joint
+  - name: blocks_box
+    weight: 1.0
+    manifest: /data/chenyiteng/projects/geowam-real/runs/smoke_manifests/blocks_box.jsonl
+    modalities:
+    - video
+    - track
+    - action
+    embodiment: ur5e_single_joint
+  - name: sort_block
+    weight: 1.0
+    manifest: /data/chenyiteng/projects/geowam-real/runs/smoke_manifests/sort_block.jsonl
+    modalities:
+    - video
+    - track
+    - action
+    embodiment: ur5e_single_joint
+  - name: stack_blocks_two
+    weight: 1.0
+    manifest: /data/chenyiteng/projects/geowam-real/runs/smoke_manifests/stack_blocks_two.jsonl
+    modalities:
+    - video
+    - track
+    - action
+    embodiment: ur5e_single_joint
+  - name: plug_charger
+    weight: 1.0
+    manifest: /data/chenyiteng/projects/geowam-real/runs/smoke_manifests/plug_charger.jsonl
+    modalities:
+    - video
+    - track
+    - action
+    embodiment: ur5e_single_joint
+  batch_size: 1
+  num_workers: 2
+training:
+  max_steps: 3
+  groups:
+    video:
+      lr: 1.0e-06
+      freeze_steps: 0
+      ramp_steps: 0
+    track:
+      lr: 1.0e-05
+      ramp_steps: 0
+      freeze_steps: 0
+    action:
+      lr: 2.0e-05
+      freeze_steps: 0
+      ramp_steps: 0
+    focus:
+      lr: 0.0001
+      freeze_steps: 0
+      ramp_steps: 0
+    proprio:
+      lr: 3.0e-06
+      freeze_steps: 0
+      ramp_steps: 0
+  weight_decay: 0.01
+  betas:
+  - 0.9
+  - 0.95
+  grad_clip: 1.0
+  lr_schedule: cosine
+  dtype: bf16
+  fsdp: true
+  fsdp_granularity: block
+  fsdp_hybrid: false
+  fsdp_reshard_after_forward: true
+  reduce_dtype: bf16
+  grad_accumulation: 1
+  dense_to_compact_steps: 0
+  log_every: 1
+  checkpoint_every: 0
+  keep_last: 3
+  seed: 42
+  loss:
+    video: 1.0
+    track: 1.0
+    camera: 0.1
+    action: 1.0
+    unfold: 0.1
+    role: 0.1
+    condition: 0.01
+    progress: 0.05
+  dropout:
+    video_only: 0.0
+    track_only: 0.0
+    both: 0.0
+    action_text: 0.0
+    action_proprio: 0.0
+  checkpoint_every_minutes: 0
+  visualize: false
+  visualize_samples: 1
+  visualize_rounds: 16
+  lr_schedule_start: 3000
+  min_lr_ratio: 0.1
+  dense_to_compact_max_bias: 6.0
+  gpu_filler: false
+notes: 72 measured RGB-D recordings, fixed source snapshot. Joint7 delta + gripper,
+  10Hz H32. Alpha initialization; no author S2 checkpoint. Equal task sampling.

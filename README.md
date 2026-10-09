@@ -131,3 +131,7 @@ dataset. Data changes are briefly logged in
 
 Commands that move hardware require PolyScope **Remote Control**, a clear
 workspace, and an operator at the emergency stop.
+
+## GeoWAM real-data training
+
+The `codex/geowam-real-training` branch tracks data processing, model initialization, training and offline inference on the Shenzhen 2 server. See the [workflow index](docs/geowam-real/README.md).

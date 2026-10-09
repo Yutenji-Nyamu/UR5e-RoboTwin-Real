@@ -1,0 +1,28 @@
+{
+  "workspace": "/data/chenyiteng/projects/geowam-real",
+  "repos": {
+    "UR5e-RoboTwin-Real": {
+      "head": "e85d7315721c59c9a9a144cb2e9b017be56ebe13"
+    },
+    "MetisWAM4D": {
+      "head": "1392ab585874701485c32372828a873bd0ac7644"
+    },
+    "data_ur5e_gwam": {
+      "head": "e12a2b48cbcb3913fe562212a5e9d45306337a51"
+    },
+    "GeoWAM4D_RealWorld_Exps_Manuscript": {
+      "head": "b904958b42d64bf52ad796d9612686eeddd1e01e"
+    },
+    "sam3": {
+      "head": "0570b3a5be9c4e694f23d85232fb55f4a6f1f7fc"
+    },
+    "RAFT": {
+      "head": "2888e15a51fa41140771d3f498ed8023cff098d1"
+    }
+  },
+  "models": {
+    "alpha_franka": "e75522eb38f9b4148d5ecb985ab80c490ddb3854",
+    "wan_hf": "b8fff7315c768468a5333511427288870b2e9635",
+    "sam31_ms": "616acbee0b9ed4177f1f389e3c13594a0a1f6398"
+  }
+}

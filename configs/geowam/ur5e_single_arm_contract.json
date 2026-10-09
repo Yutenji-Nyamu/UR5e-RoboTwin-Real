@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "source": "recorded session schema v3",
+  "robot": "UR5e",
+  "arms": 1,
+  "joint_position_dim": 6,
+  "gripper_dof": 1,
+  "action_dim_physical": 7,
+  "action_dim_model": 80,
+  "valid_action_slots": [
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "action": "future joint position minus current joint position; absolute gripper command",
+  "proprio": "six measured joint positions and commanded gripper state",
+  "joint_unit": "rad",
+  "gripper_open": 0,
+  "gripper_closed": 1,
+  "save_and_action_hz": 10,
+  "action_horizon": 32,
+  "source_frame_window": 33,
+  "video_stride": 4,
+  "rgb_views": [
+    "head",
+    "wrist"
+  ],
+  "track_view": "head",
+  "depth": "SDK aligned uint16 times per-camera scale",
+  "train_manifest": "/data/chenyiteng/projects/geowam-real/data/manifests/train_rgbd.jsonl",
+  "train_episodes": 72,
+  "sam_prompts_first_drawer_clip": [
+    "robot",
+    "red block",
+    "drawer"
+  ],
+  "status": "data contract and initialization plan; full-model cache/training adapter next",
+  "task_instructions": {
+    "block_drawer": "Put the block into the drawer and close the drawer.",
+    "blocks_box": "Put the block into the box and close the lid.",
+    "sort_block": "Sort the red, yellow, and blue blocks into the boxes of matching colors.",
+    "stack_blocks_two": "Stack the red block on the yellow block.",
+    "plug_charger": "Insert the charger fully into the power strip."
+  },
+  "stacking_source": "Recorded red-on-yellow; metadata visual review for all current stacking episodes."
+}

@@ -1,0 +1,8 @@
+{
+  "sha256": "0567debeec80ba4ac6369540c6c248025283cb3ff2b92827509e57e2b3541cb6",
+  "bytes": 3502755717,
+  "modelscope_revision": "616acbee0b9ed4177f1f389e3c13594a0a1f6398",
+  "hf_git_blob_oid": "88589b6b0bee708b57010d3ed6f413476e4be255",
+  "derived_git_blob_oid": "88589b6b0bee708b57010d3ed6f413476e4be255",
+  "identical_to_official_lfs_pointer": true
+}

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "decision": "User 2026-10-09: train only actual RGB-D; exclude tablecloth and colored-light variations.",
+  "episodes": {
+    "20261006_164416": {
+      "split": "ood_lighting",
+      "train": false
+    },
+    "20261006_170923": {
+      "split": "ood_lighting",
+      "train": false
+    },
+    "20261006_172124": {
+      "split": "ood_lighting",
+      "train": false
+    },
+    "20261006_173937": {
+      "split": "ood_lighting",
+      "train": false
+    },
+    "20261006_175607": {
+      "split": "ood_lighting",
+      "train": false
+    },
+    "20261006_164649": {
+      "split": "ood_tablecloth",
+      "train": false
+    },
+    "20261006_171249": {
+      "split": "ood_tablecloth",
+      "train": false
+    },
+    "20261006_172324": {
+      "split": "ood_tablecloth",
+      "train": false
+    },
+    "20261006_174430": {
+      "split": "ood_tablecloth",
+      "train": false
+    },
+    "20261006_175914": {
+      "split": "ood_tablecloth",
+      "train": false
+    }
+  },
+  "require_depth": true
+}

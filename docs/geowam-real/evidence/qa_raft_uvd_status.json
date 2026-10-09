@@ -1,0 +1,19 @@
+{
+  "state": "complete",
+  "started": 1791561109.0759823,
+  "pid": 4187328,
+  "seconds": 7.663674831390381,
+  "pair": [
+    "frame_00050.png",
+    "frame_00054.png"
+  ],
+  "depth_scale": 0.0010000000474974513,
+  "codec": "metiswam4d.uvd_rgb.mu31.s6w_6w_0p10.v2",
+  "tau_d_display": 0.002,
+  "foreground_pixels": 76613,
+  "valid_pixels": 64568,
+  "foreground_valid_fraction": 0.8427812512236826,
+  "foreground_fb_median_px": 0.07815520465373993,
+  "valid_depth_change_median_m": -0.0008803606033325195,
+  "peak_allocated_gb": 0.583049728
+}

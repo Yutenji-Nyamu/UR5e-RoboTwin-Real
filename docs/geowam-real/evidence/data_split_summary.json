@@ -1,0 +1,28 @@
+{
+  "counts": {
+    "train_rgb_only": 0,
+    "all": 87,
+    "excluded_no_depth": 5,
+    "ood_lighting": 5,
+    "ood_tablecloth": 5,
+    "train": 72,
+    "train_rgbd": 72,
+    "ood_lighting_rgbd": 4,
+    "ood_tablecloth_rgbd": 4
+  },
+  "train_task_counts": {
+    "block_drawer": 16,
+    "sort_block": 14,
+    "stack_blocks_two": 13,
+    "blocks_box": 14,
+    "plug_charger": 15
+  },
+  "train_rgbd_task_counts": {
+    "block_drawer": 16,
+    "sort_block": 14,
+    "stack_blocks_two": 13,
+    "blocks_box": 14,
+    "plug_charger": 15
+  },
+  "policy_sha256": "b728c2f1e92ca57788a9a963af53b948776eff8015be7662ecd106d4f8dd1365"
+}

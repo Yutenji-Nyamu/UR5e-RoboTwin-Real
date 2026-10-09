@@ -2,6 +2,7 @@
 import argparse,fcntl,json,math,os,shutil,signal,subprocess,time,hashlib
 from pathlib import Path
 from pipeline_common import ROOT,REPO,CACHE,atomic_json
+from supervision import refresh_progress,process_identity
 import yaml
 p=argparse.ArgumentParser();p.add_argument('phase',choices=['smoke','train']);p.add_argument('--resume-check',action='store_true');args=p.parse_args()
 GPUS=['GPU-dc5d6921-fa81-b666-bac7-566c126f1dd4','GPU-3c6321c1-3e58-c071-3867-533391152fe7']
@@ -26,7 +27,13 @@ run=Path(cfg['output_dir']);run.mkdir(exist_ok=True)
 atomic_json(run/'data_audit.json',audit)
 config=run/'launch.yaml';config.write_text(yaml.safe_dump(cfg,sort_keys=False))
 state={'supervisor_pid':os.getpid(),'phase':'starting','mode':args.phase,'gpus':GPUS,'output_dir':str(run),'started':time.time(),'resume_check':args.resume_check,'attempts':[]}
-status=ROOT/'runs'/('training_status.json' if args.phase=='train' else 'smoke_status.json');atomic_json(status,state)
+status=ROOT/'runs'/('training_status.json' if args.phase=='train' else 'smoke_status.json')
+if args.phase=='train' and status.exists():
+ previous=json.loads(status.read_text());state['attempts']=previous.get('attempts',[]);state['supervisor_history']=previous.get('supervisor_history',[])
+ state['supervisor_history'].append({'pid':previous.get('supervisor_pid'),'last_heartbeat':previous.get('heartbeat'),'reason':'new recovery cycle'})
+ state['started']=previous.get('started',state['started']);state['recovery_cycle_started']=time.time()
+state['supervisor_starttime']=process_identity(os.getpid())['starttime'];atomic_json(status,state)
+attempt_offset=len(state['attempts'])
 for attempt in range(1,4 if args.phase=='train' else 2):
  free=shutil.disk_usage(ROOT).free;assert free>200*1024**3,free
  active=subprocess.check_output(['nvidia-smi','--query-compute-apps=gpu_uuid,pid','--format=csv,noheader'],text=True)
@@ -37,17 +44,9 @@ for attempt in range(1,4 if args.phase=='train' else 2):
  logfile=run/f'attempt_{int(time.time())}.log'
  with logfile.open('w') as log:
   child=subprocess.Popen(cmd,cwd=REPO,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
-  receipt={'attempt':attempt,'pid':child.pid,'starttime':Path(f'/proc/{child.pid}/stat').read_text().split()[21],'log':str(logfile),'started':time.time(),'cmd':cmd};state['attempts'].append(receipt);state['phase']='running'
+  receipt={'attempt':attempt_offset+attempt,'pid':child.pid,'starttime':Path(f'/proc/{child.pid}/stat').read_text().split()[21],'log':str(logfile),'started':time.time(),'cmd':cmd};state['attempts'].append(receipt);state['phase']='running'
   while child.poll() is None:
-   state['heartbeat']=time.time();state['disk_free_gb']=shutil.disk_usage(ROOT).free/1e9
-   logs=run/'train_log.jsonl'
-   if logs.exists():
-    lines=logs.read_text().splitlines()
-    if lines:
-     try:
-      latest=json.loads(lines[-1]);state['last_log']=latest
-     except json.JSONDecodeError:pass
-   state['checkpoints']=[p.name for p in sorted((run/'checkpoints').glob('step_*')) if (p/'complete.json').exists()]
+   refresh_progress(state,run,ROOT)
    atomic_json(status,state);time.sleep(10)
   receipt.update(exit_code=child.returncode,finished=time.time());state['heartbeat']=time.time()
   if child.returncode==0:state['phase']='complete';atomic_json(status,state);break

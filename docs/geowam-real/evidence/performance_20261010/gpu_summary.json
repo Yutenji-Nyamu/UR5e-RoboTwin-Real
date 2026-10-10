@@ -1,0 +1,26 @@
+{
+  "6": {
+    "n": 180,
+    "uuid": "GPU-dc5d6921-fa81-b666-bac7-566c126f1dd4",
+    "gpu_util_mean": 36.9,
+    "gpu_util_min": 0.0,
+    "gpu_util_max": 100.0,
+    "used_GiB": 69.6083984375,
+    "free_GiB": 9.572265625,
+    "total_GiB": 79.6474609375,
+    "power_mean_W": 191.66916666666665
+  },
+  "7": {
+    "n": 180,
+    "uuid": "GPU-3c6321c1-3e58-c071-3867-533391152fe7",
+    "gpu_util_mean": 65.29444444444445,
+    "gpu_util_min": 0.0,
+    "gpu_util_max": 100.0,
+    "used_GiB": 69.6025390625,
+    "free_GiB": 9.5791015625,
+    "total_GiB": 79.6474609375,
+    "power_mean_W": 200.31
+  },
+  "started_CST": "2026-10-10T12:49:26.202927+08:00",
+  "finished_CST": "2026-10-10T12:52:26.203792+08:00"
+}
